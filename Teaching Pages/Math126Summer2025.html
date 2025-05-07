@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8"> 
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  p {
+        margin-left: 20px;
+        margin-right: 20px;
+        }
+
+body {font-family: Arial;}
+
+/* Style the tab */
+.tab {
+  overflow: hidden;
+}
+
+/* Style the buttons inside the tab */
+.tab button {
+  background-color: inherit;
+  float: left;
+  outline: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  transition: 0.3s;
+  font-size: 17px;
+}
+
+
+/* Change background color of buttons on hover */
+.tab button:hover {
+  background-color: #ddd;
+}
+
+/* Create an active/current tablink class */
+.tab button.active {
+  background-color: #ccc;
+}
+
+/* Style the tab content */
+.tabcontent {
+  display: none;
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-top: none;
+}
+
+/* Style the close button */
+.topright {
+  float: right;
+  cursor: pointer;
+  font-size: 28px;
+}
+
+.topright:hover {color: red;}
+</style>
+</head>
+<body>
+
+    <h1 style="background-color:LightGray">UCB Math 126 Summer 2025</h1>
+
+<div class="tab">
+  <button class="tablinks" onclick="TabDivs(event, 'Main')" id="defaultOpen"> Main </button>
+  <button class="tablinks" onclick="TabDivs(event, 'LecNotes')">Lecture Notes </button>
+  <button class="tablinks" onclick="TabDivs(event, 'DiscSheets')">Discussion Sheets</button>
+</div>
+
+
+
+
+
+
+<!-- Tab content -->
+  <div id="Main" class="tabcontent">
+    <h3> 	MoTuWeTh 12:00-12:59, Wheeler 202
+      MoWe 13:00-13:59, Wheeler 202</h3>
+    <p>Throughout the semester, I'll add materials here for our class. For the syllabus and most other administrative information, 
+    check out the bCourses page. </p>
+
+    <br>
+
+    <p> Office hours are yet to be announced, but there will be about 4-6 hours a week. They will be in-person in Evans 840 (on the corner of the hallway cutting through the middle of the floor), or on zoom by appointment.</p>
+
+    <br>
+    <p> <a href="Math1ASp25Worksheets/Mid1Study.pdf">Midterm 1 Rough Study Guide</a></p>
+
+    <br> 
+
+    <p> Important Reminders:  </p>
+
+    <p>The class will follow David Borthwick's Introduction to Partial Differential Equations (DOI: https://doi.org/10.1007/978-3-319-48936-0) available from the UCB Library Proxy or directly from Springer with access granted by the UC system. 
+      <ul>
+        <li> Introduction; review of calculus and ordinary differential equations</li>
+        <li>Method of Characteristics and Conservation Equations</li>
+        <li>The Wave Equation</li>
+        <li>Separation of Variables for the Wave and Laplace Equations</li>
+        <li>The Heat Equation</li>
+        <li>An introduction to function spaces</li>
+        <li>Fourier Series applications to PDEs</li>
+        <li>The maximum principle for the Laplace Equation</li>
+        <li>Calculus of Variations</li>
+      </ul>
+    </p> 
+      
+  </div>
+  
+
+
+
+
+
+  <div id="LecNotes" class="tabcontent">
+    <h3>Lecture Notes </h3>
+
+    <p> <ul> 
+
+
+  </ul> </p>
+  </div>
+
+  <div id=""DiscSheets" class="tabcontent">
+  <h3> Discussion Worksheets</h3>
+  <p>
+    <ul>
+
+    </ul>
+  </p>
+  </div>
+  
+
+
+
+
+
+
+
+
+<script>
+function TabDivs(evt, cityName) {
+  var i, tabcontent, tablinks;
+  tabcontent = document.getElementsByClassName("tabcontent");
+  for (i = 0; i < tabcontent.length; i++) {
+    tabcontent[i].style.display = "none";
+  }
+  tablinks = document.getElementsByClassName("tablinks");
+  for (i = 0; i < tablinks.length; i++) {
+    tablinks[i].className = tablinks[i].className.replace(" active", "");
+  }
+  document.getElementById(cityName).style.display = "block";
+  evt.currentTarget.className += " active";
+}
+
+// Get the element with id="defaultOpen" and click on it
+document.getElementById("defaultOpen").click();
+</script>
+
+
+</body>
+</html> 
