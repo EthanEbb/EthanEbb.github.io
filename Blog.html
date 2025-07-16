@@ -1,0 +1,93 @@
+<!DOCTYPE html> 
+<html lang="en"> 
+
+<style>
+    p {
+        margin-left: 20px;
+        margin-right: 20px;
+        }
+
+    body {
+margin: 0;
+font-family: Arial, Helvetica, sans-serif;
+}
+
+.topnav {
+overflow: hidden;
+background-color: #333;
+}
+
+.topnav a {
+float: left;
+color: #f2f2f2;
+text-align: center;
+padding: 14px 16px;
+text-decoration: none;
+font-size: 17px;
+}
+
+.topnav a:hover {
+background-color: #ddd;
+color: black;
+}
+
+.topnav a.active {
+background-color: #04AA6D;
+color: white;
+}
+</style>
+<head> 
+    <meta charset="UTF-8"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <title>Research Page</title> 
+
+     <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      jax: ["input/TeX", "output/HTML-CSS"],
+      extensions: ["tex2jax.js"],
+      "HTML-CSS": { preferredFont: "TeX", availableFonts: ["STIX","TeX"] },
+      tex2jax: { inlineMath: [ ["$", "$"], ["\\(","\\)"] ], displayMath: [ ["$$","$$"], ["\\[", "\\]"] ], processEscapes: true, ignoreClass: "tex2jax_ignore|dno" },
+      TeX: { noUndefined: { attributes: { mathcolor: "red", mathbackground: "#FFEEEE", mathsize: "90%" } } },
+      messageStyle: "none"
+    });
+    </script>    
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js"></script>
+</head> 
+<body> 
+    <div class="topnav">
+        <a class="active" href="index.html">Home</a>
+        <a href="Teaching.html">Teaching</a>
+        <a href="Research.html">Research</a>
+        <a href="Contact.html">About & Contact</a>
+      </div>
+      
+      <div style="padding-left:16px">
+        <h1>Some small questions I've worked on.</h1> 
+        
+      </div>
+      <br>
+
+      <h3> Lower Bounds of Hausdorff Density</h3>
+      <p> 
+        It is known from an argument of Besicovitch that for a set $A \subset \mathbb{R}^{n}$ such that $H^{s}(A) < \infty$, $$ 2^{-s} \leq \Theta^{*s}(A,x) \leq 1$$ for almost every point in $A$. For example, see Mattila's Geometry of Sets and Measures in Euclidean Space, Chapter 6. 
+        <br>
+        What we seek to show here is an example that the lower bound cannot be increased. To do so, we will construct a generalized Cantor set appropraitely as follows: Begin with $B(0,1) \subseteq \mathbb{R}^{n}$ and pick some $s>0$. We define some ratio $ \lambda \in (0,1)$ and some number $m_{\lambda}$ such that $m(\lambda^{k+1})^s = \lambda^{s}$. The ambient space $\R^{n}$ is chosen based on $\lambda$ to allow $m$ balls of radius $\lambda$ to exist in $B(0,1)$ (is this possible?). 
+
+        <br>
+
+        We form levels $E_{k}$ as follows: $E_{1} = B(0,1)$, and $E_{k+1}$ is chosen by picking $m$ balls of radius $\lambda^{k+1}$ balls inside of each ball present in $E_{k}$. We shall pick these balls in the same equally distributed configuration in each ball of $E_{k}$. It is known (see Mattila's book again, Chapter 4) that such a construction allows a set $A_{\lambda} = \bigcap_{k=1}^{\infty} E_{k}$ such that $0< H^{s}(A_{\lambda}) < \infty$. By our choice, the set is also self-similar to its pieces. By appriapriate rescaling, assume $H^{s}(A_{\lambda}) = 1$. 
+        
+        <br>
+
+        Next, we compute a bound on the Hausdorff Density. For a point $x \in A_{\lambda}$, and a given $r > 0$ small, we may find $k$ such that $\lambda^{k+1} \leq r \leq \lambda^{k}$. Notice that $x$ is contained within a ball of radius $\lambda^{k}$ in level $E_{k}$, and in particular, $B(x,r)$ contains at-most $m$ balls of radius $\lambda^{k+1}$. Hence, 
+        <br>
+        $\frac{H^{s}(A_{\lambda} \cap B(x,r))}{(2r)^{s}} \leq \frac{m (\lambda^{k+1})^{s} H^{s}(A)}{2^{s}r^{s}} \leq \left( \frac{\lambda^{k}}{r} \right)^{s} 2^{-s} \leq \lambda^{-s}2^{-s}$
+        <br>
+
+        As this holds everywhere in the set, we have $\Theta^{*s}(A_{\lambda},x) \leq \lambda^{-s}2^{-s}$. Since $\lambda$ was picked arbitrarily, we may see a variety of sets so that $\lambda \to 1$. 
+      </p>
+     
+      <br>
+
+    
+</body>
