@@ -2,6 +2,9 @@
 <html lang="en"> 
 
 <style>
+    header {
+    padding: 10px;
+}
     p {
         margin-left: 20px;
         margin-right: 20px;
@@ -39,7 +42,7 @@ color: white;
 <head> 
     <meta charset="UTF-8"> 
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
-    <title>Research Page</title> 
+    <title>Blog/Little Research Questions</title> 
 
      <script type="text/x-mathjax-config">
     MathJax.Hub.Config({
@@ -67,27 +70,44 @@ color: white;
       </div>
       <br>
 
-      <h3> Lower Bounds of Hausdorff Density</h3>
+
+      <h3> Next Post</h3>
+      <p>
+
+        <h3> Generalizations of Well-Distributed Sets </h3>
+      <p>
+
+      </p>
+
+      <h3> Lower Bounds of Hausdorff Density: July 16th, 2025</h3>
       <p> 
-        It is known from an argument of Besicovitch that for a set $A \subset \mathbb{R}^{n}$ such that $H^{s}(A) < \infty$, $$ 2^{-s} \leq \Theta^{*s}(A,x) \leq 1$$ for almost every point in $A$. For example, see Mattila's Geometry of Sets and Measures in Euclidean Space, Chapter 6. 
+        It is known from an argument of Besicovitch that for a set $A \subset \mathbb{R}^{n}$ such that $0< H^{s}(A) < \infty$, $$ 2^{-s} \leq \Theta^{*s}(A,x) \leq 1$$ for almost every point in $A$. For example, see Mattila's Geometry of Sets and Measures in Euclidean Space, Chapter 6. 
         <br>
-        What we seek to show here is an example that the lower bound cannot be increased. To do so, we will construct a generalized Cantor set appropraitely as follows: Begin with $B(0,1) \subseteq \mathbb{R}^{n}$ and pick some $s>0$. We define some ratio $ \lambda \in (0,1)$ and some number $m_{\lambda}$ such that $m(\lambda^{k+1})^s = \lambda^{s}$. The ambient space $\R^{n}$ is chosen based on $\lambda$ to allow $m$ balls of radius $\lambda$ to exist in $B(0,1)$ (is this possible?). 
+        What we seek to show here is an example that the lower bound cannot be increased beyond $2^{-s}$. 
 
-        <br>
-
-        We form levels $E_{k}$ as follows: $E_{1} = B(0,1)$, and $E_{k+1}$ is chosen by picking $m$ balls of radius $\lambda^{k+1}$ balls inside of each ball present in $E_{k}$. We shall pick these balls in the same equally distributed configuration in each ball of $E_{k}$. It is known (see Mattila's book again, Chapter 4) that such a construction allows a set $A_{\lambda} = \bigcap_{k=1}^{\infty} E_{k}$ such that $0< H^{s}(A_{\lambda}) < \infty$. By our choice, the set is also self-similar to its pieces. By appriapriate rescaling, assume $H^{s}(A_{\lambda}) = 1$. 
+        First, we note a simple fact: in $B(0,1) \subset \mathbb{R}^{n}$, we can place $2n$ balls of radius $0 < \lambda < \frac{\sqrt{2}-1}{2+\sqrt{2}}$. Indeed, placing their centers on the points $\pm (1-\lambda)e_{i}$ keeps them within the circle, and this specific value of $r$ is chosen so that for any pair of these balls $B_1$ and $B_2$ have $d(B_1,B_2) > 1$.
         
         <br>
 
-        Next, we compute a bound on the Hausdorff Density. For a point $x \in A_{\lambda}$, and a given $r > 0$ small, we may find $k$ such that $\lambda^{k+1} \leq r \leq \lambda^{k}$. Notice that $x$ is contained within a ball of radius $\lambda^{k}$ in level $E_{k}$, and in particular, $B(x,r)$ contains at-most $m$ balls of radius $\lambda^{k+1}$. Hence, 
-        <br>
-        $\frac{H^{s}(A_{\lambda} \cap B(x,r))}{(2r)^{s}} \leq \frac{m (\lambda^{k+1})^{s} H^{s}(A)}{2^{s}r^{s}} \leq \left( \frac{\lambda^{k}}{r} \right)^{s} 2^{-s} \leq \lambda^{-s}2^{-s}$
+        Next, we notice that for this $\lambda$, we may generate a generalized Cantor set as follows. 
+        
         <br>
 
-        As this holds everywhere in the set, we have $\Theta^{*s}(A_{\lambda},x) \leq \lambda^{-s}2^{-s}$. Since $\lambda$ was picked arbitrarily, we may see a variety of sets so that $\lambda \to 1$. 
+        Fix $s$ and pick some $n$ such that $2n > m$ where $m$ is the constant picked so $m \lambda^{2s} = \lambda^{s}$. Then, set $E_1 = B(0,1)$. Set $E_{2}$ to be some choice of $m$ balls among the choices $\pm (1-\lambda)e_i$. To generate $E_{k}$, on each ball $B_j$ present in $E_{k}$, we pick a sclaed-down arrangement as in the case of the choice for $E_2$, so that the resulting $A_{\lambda} = \bigcap_{i=1}^{\infty} E_{i}$ is self-similar. 
+
+        <br>
+        
+        It is known that $A_{\lambda}$ has Hausdorff dimension $s$ (see Mattila's Geometry of Sets and Measures in Euclidean Space, Chapter 4) and that $0 < H^{s}(A_{\lambda}) < \infty$. Without loss of generality, we may assume by rescaling that $H^{s}(A_{\lambda}) = 1$. 
+
+        <br>
+
+        Furthermore, let us pick some small value $r$ and $x \in A_{\lambda}$. We may take $\lambda^{k+1} \leq r < \lambda^{k}$. Notice that the balls in $E_{k+1}$ have radii $\lambda^{k+1}$, and the distance between the balls is at least $\lambda^{k}$ by the choice of $\lambda$ and the location of the balls. Hence, $B(x,r)$ contains at-most $1$ ball of level $E_{k+1}$ and  
+
+        <br>
+        $ \frac{H^{s}(A_{\lambda} \cap B(x,r) ) }{(2r)^{s}} \leq \frac{\lambda^{(k+1)s}H^{s}(A)}{(2\lambda^{k+1})^{s}} \leq 2^{-s}$
+        <br>
+        Finally, $\theta^{*s}(A_{\lambda},x) \leq 2^{-s}$. By Besicovitch's theorem, we have that $\theta^{*s}(A_{\lambda},x) = 2^{-s}$ for almost every $x \in A_{\lambda}$. 
       </p>
      
-      <br>
-
     
 </body>
