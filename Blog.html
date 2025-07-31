@@ -71,8 +71,76 @@ color: white;
       <br>
 
 
-      <h3> Next Post</h3>
+      <h3> A Minor Note on the Work of Preiss: July 30th</h3>
       <p>
+        D.Preiss [1] constructed in 1981 a measure $\mu$ on an infinite-dimensional Hilbert Space $H$ and a set $C$ so $\mu(C) > 0$ but the density of $\mu$ at any point of $C$ is 0. We can alter this to get a measure $\nu$ of density any fixed value $\beta \in (0,1)$ across $C$. 
+
+    Indeed, Preiss sets up a pair of sequences $a_{k} \in \R_{>0}$ and $N_{k} \in \N$ such that 
+    $
+        \sum_{k=1}^{\infty} a_{k}N_{1}...N_{k} < \infty \\
+        \lim_{k \to \infty} a_{k}N_{1}...N_{k+1} = \infty
+    $
+
+    He then establishes a set $S$ of all finite sequences $(z_{1},...,z_{k})$ with $z_{i} \leq N_{i}$, and the set $Z$ of all infinite sequences with the same bound. First, define a function $h$ mapping each $(z_{1},...,z_{k})$ to $2^{-k}$ times $e_{z_1,...,z_k}$ (a member of an orthonormal basis indexed by the points of $S$), then a pair of functions
+    $
+        g(z) = \sum_{j=1}^{k} h(z_1,...,z_j)  \hspace{0.5 cm} z = (z_1,...,z_k) \in S \\
+        f(z) =  \sum_{j=1}^{\infty} h(z_1,...,z_j)  \hspace{0.5 cm} z \in Z
+    $
+
+    Lastly, consider a measure $\nu$ on $Z$ which is the product of $\nu_{j}$ on $\{1,2,...,N_{j}\}$ where $\nu_j(n) = N_{j}^{-1}$. We may then define
+    $
+        u = f\nu + \sum_{S} a_{k}\delta_{g(z_1,...,z_k)}
+    $
+
+    where $f\nu$ is the pullback measure and $\delta_{x}$ is the dirac measure at $x$. Setting $C = f(Z)$, Preiss shows that for $2^{-k} \leq r^2 < 2^{-k+1}$, 
+    $
+        u(B(x,r) \cap C) = (N_{1}...N_{k+1})^{-1} \\
+        a_{k} \leq u(B(x,r))
+    $
+    which together imply the density result. 
+
+    <br>
+    <br>
+
+    We now break from Preiss' work and modify the process slightly. Let $N_{1}...N_{n} = b_{n}$.
+   
+    If $k$ is the least number $i$ so $y_i \neq z_i$, then 
+    $
+        ||g(y_{1},...,y_{m}) - f(z)|| \geq ||f(y)-f(z)|| - ||g(y_1,...,y_m) - f(y)|| \geq 2^{\frac{-k+2}{2}}-2^{\frac{-k}{2}} = 2^{-k/2}
+    $
+
+    Then, if $g(y_1,...,y_n) \in B(x,r)$ as above, we must have that $y_i=z_i$ for all $i \leq k$. There is one such $y$ of length $k$, and $N_{k+1}$ of length $k+1$, etc.  
+    
+    
+    Hence, we have that 
+    $
+        u(B(x,r)) \leq (N_{1}...N_{k+1})^{-1} + a_{k} + \sum_{i=k+1}^{\infty} a_{i}b_{i}b_{n}^{-1} 
+    $
+
+    We alter the assumptions on our requisite sequences. Pick $a_{n}$ and $N_{n}$ inductively so that for $\alpha \in (0,\infty)$,
+
+    $
+        \lim_{n \to \infty} a_{n}b_{n+1} = \alpha \\
+        \sum_{k=1}^{\infty} a_{k}b_{k} < \infty \\
+        \sum_{k=n+1}^{\infty} a_{k}b_{k} < \frac{1}{n}
+    $
+
+    Using this sequence, for the choice $2^{-k} \leq r^{2} < 2^{-k+1}$
+    $
+        \frac{b_{k+1}^{-1}}{b_{k+1}^{-1} + a_{k} + b_{k}^{-1}\sum_{k+1}^{\infty} a_{i}b_{i} } \leq \frac{u(B(x,r) \cap C)}{u(B(x,r))} \leq \frac{b_{k+1}^{-1}}{b_{k+1}^{-1}+a_{k}}
+    $
+
+    so that as $k \to \infty$, 
+    $
+        \lim_{r \to 0} \frac{u(B(x,r) \cap C)}{u(B(x,r))} = \frac{1}{1+\alpha}
+    $
+
+    For the choice $\alpha = \frac{1}{\beta} -1$, we then have that the density of any point of $C$ is $\beta$ and $u(C) \geq 1$. 
+
+    <br>
+    <br>
+    [1] Preiss, D.. "Invalid Vitali theorems." Abstracta. 7th Winter School on Abstract Analysis. Praha: Czechoslovak Academy of Sciences, 1979. 58-60. <http://eudml.org/doc/221317>.
+      </p>
 <!--
         <h3> Generalizations of Well-Distributed Sets </h3>
       <p>
