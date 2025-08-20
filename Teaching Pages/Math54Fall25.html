@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8"> 
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  header {
+    padding: 10px;
+}
+  p {
+        margin-left: 20px;
+        margin-right: 20px;
+        }
+
+body {font-family: Arial;}
+
+/* Style the tab */
+.tab {
+  overflow: hidden;
+}
+
+/* Style the buttons inside the tab */
+.tab button {
+  background-color: inherit;
+  float: left;
+  outline: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  transition: 0.3s;
+  font-size: 17px;
+}
+
+
+/* Change background color of buttons on hover */
+.tab button:hover {
+  background-color: #ddd;
+}
+
+/* Create an active/current tablink class */
+.tab button.active {
+  background-color: #ccc;
+}
+
+/* Style the tab content */
+.tabcontent {
+  display: none;
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-top: none;
+}
+
+/* Style the close button */
+.topright {
+  float: right;
+  cursor: pointer;
+  font-size: 28px;
+}
+
+.topright:hover {color: red;}
+
+    .topnav {
+    overflow: hidden;
+    background-color: #333;
+    }
+
+    .topnav a {
+    float: left;
+    color: #f2f2f2;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    font-size: 17px;
+    }
+
+    .topnav a:hover {
+    background-color: #ddd;
+    color: black;
+    }
+
+    .topnav a.active {
+    background-color: #04AA6D;
+    color: white;
+    }
+</style>
+</head>
+<body>
+
+      <div class="topnav">
+        <a class="active" href="../index.html">Home</a>
+        <a href="../Teaching.html">Teaching</a>
+        <a href="../Research.html">Research</a>
+        <a href="../Contact.html">About & Contact</a>
+      </div>
+
+    <h1 style="background-color:LightGray">UCB Math 54 Fall 2025 </h1>
+
+<div class="tab">
+  <button class="tablinks" onclick="TabDivs(event, 'Main')" id="defaultOpen"> Main </button>
+  <button class="tablinks" onclick="TabDivs(event, 'Syllabus')">Syllabus</button>
+  <button class="tablinks" onclick="TabDivs(event, 'DiscNotes')">Lecture Notes </button>
+</div>
+
+
+
+
+
+
+<!-- Tab content -->
+  <div id="Main" class="tabcontent">
+    <h3> 	Monday/Wednesday/Friday 9-10 AM (107 Genetics & Plant Biology Building), 10-11 AM (109 Morgan)</h3>
+    <p>Throughout the semester, I'll add materials here for our discussion sections.</p>
+
+    <br>
+
+    <p> Office hours are currently scheduled for Tuesday mornings, tentatively 10-11:30 AM in-person in Evans 787. </p>
+
+
+    <br> 
+
+    <p> Important Reminders:  </p>
+
+    <p>The class will follow ______ textbook. Please read through sections correspondng to class lectures and do some practice problems outside of the HW/Discussion worksheets. 
+      <ul>
+      
+      </ul>
+    </p> 
+      
+  </div>
+  
+  
+<div id="Syllabus" class="tabcontent">
+
+    
+</div>
+
+
+
+  <div id="DiscNotes" class="tabcontent">
+    <h3>Discussion Notes Notes </h3>
+
+    <p> Below I have attached the notes I use during discussion.</p>
+
+    <p> <ul> 
+     
+
+
+
+      
+  </ul> </p>
+  </div>
+
+ 
+
+
+
+
+
+
+
+<script>
+function TabDivs(evt, cityName) {
+  var i, tabcontent, tablinks;
+  tabcontent = document.getElementsByClassName("tabcontent");
+  for (i = 0; i < tabcontent.length; i++) {
+    tabcontent[i].style.display = "none";
+  }
+  tablinks = document.getElementsByClassName("tablinks");
+  for (i = 0; i < tablinks.length; i++) {
+    tablinks[i].className = tablinks[i].className.replace(" active", "");
+  }
+  document.getElementById(cityName).style.display = "block";
+  evt.currentTarget.className += " active";
+}
+
+// Get the element with id="defaultOpen" and click on it
+document.getElementById("defaultOpen").click();
+</script>
+
+
+</body>
+</html> 
