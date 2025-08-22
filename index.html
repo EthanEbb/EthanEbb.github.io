@@ -7,6 +7,28 @@
     </head> 
 
     <style>
+
+        .top-banner {
+            background-color: #178236; /* Dark background color */
+            color: black; /* White text color */
+            padding: 15px 0; /* Vertical padding */
+            text-align: center; /* Center align text */
+            font-family: Arial, sans-serif; /* Font style */
+            font-size: 18px; /* Font size */
+            position: fixed; /* Fix banner to the top */
+            width: 100%; /* Full width */
+            top: 0; /* Align to the very top */
+            left: 0; /* Align to the very left */
+            z-index: 1000; /* Ensure it's above other content */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* Subtle shadow */
+        }
+
+        /* Adjust body padding to prevent content from being hidden behind fixed banner */
+        body {
+            padding-top: 60px; /* Adjust this value based on banner height */
+        }
+
+
     button {
         outline: none;
         cursor: pointer;
@@ -21,8 +43,6 @@
         background-color: #ddd;
         color: black;
     }
-
-
 
     body {
     margin: 0;
@@ -49,13 +69,18 @@
     }
 
     .topnav a.active {
-    background-color: #04AA6D;
+    background-color: #178236;
     color: white;
     }
     p {
         margin-left: 20px;
         margin-right: 20px;
         }
+
+
+
+
+    
     </style>
 
 
