@@ -14,9 +14,9 @@
             overflow: hidden;
             background-color: #404040;
             position: fixed;
-            top: 45px; /* Nav at the very top */
+            top: 45px; /* Nav below 45 px banner (25 px font, 20 px padding) */
             width: 100%;
-            z-index: 2; /* Above banner */
+            z-index: 2; /* Below banner */
         }
 
         .topnav a {
@@ -40,12 +40,12 @@
 
         .banner {
             position: fixed;
-            top: 0px; /* Nav height (46px) + 20px gap */
+            top: 0px;
             width: 100%; 
             background-color: #333; /* Light background */
             text-align: left;
             padding: 10px 10px; /* Increased vertical padding for taller banner */
-            z-index: 1; /* Below nav */
+            z-index: 1; /* Above nav */
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); /* Shadow on all sides */
         }
 
