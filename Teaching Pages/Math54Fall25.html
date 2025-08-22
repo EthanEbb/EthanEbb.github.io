@@ -119,9 +119,13 @@ body {font-family: Arial;}
 
     <p> Important Reminders:  </p>
 
-    <p>The class will follow ______ textbook. Please read through sections correspondng to class lectures and do some practice problems outside of the HW/Discussion worksheets. 
       <ul>
-      
+      <li> General questions: please check and ask on Ed Discussion so that many people aren't emailing the same question! Please only use email for confidential questions (e.g. DSP accomodations, religious exceptions) or for emergencies (e.g. I fell off my bike and have to miss a quiz). </li>
+      <li> Quizzes will occur weekly on Wednesdays, except for the first week and midterm weeks. Each quiz will be roughly 3 questions, with 30 minutes given at the beginning of class (so don't be late!).</li>
+      <li> Otherwise, Mondays and Fridays will both focus on examples and example problems, as well as HW help. We will usually start with a brief review of recent topics then jump in to problems.</li>
+      <li> Homeworks are due each Monday at 11:59 PM on gradescope. Quiz grades will also be uploaded to gradescope. </li>
+      <li> The course will follow Lay/Lay/Mcdonald, Linear Algebra and Differential Equations, Math 54, Second Custom Edition for UC Berkeley. I strongly recommend reading the sections we cover and doing practice problems other than the HW and Worksheets. This will help you prepare for quizzes.</li>
+      <li> The full course syllabus may be found <a href = "https://www.ocf.berkeley.edu/~asharma/Math54/"> here</a>. For any questions not immediately answered here, please check the syllabus (ctrl+F makes things fast) before emailing. Remember that HW assignments will be posted there as well. </li>
       </ul>
     </p> 
       
@@ -158,7 +162,7 @@ body {font-family: Arial;}
 
 
 <script>
-function TabDivs(evt, cityName) {
+function TabDivs(evt, tabName) {
   var i, tabcontent, tablinks;
   tabcontent = document.getElementsByClassName("tabcontent");
   for (i = 0; i < tabcontent.length; i++) {
@@ -168,7 +172,7 @@ function TabDivs(evt, cityName) {
   for (i = 0; i < tablinks.length; i++) {
     tablinks[i].className = tablinks[i].className.replace(" active", "");
   }
-  document.getElementById(cityName).style.display = "block";
+  document.getElementById(tabName).style.display = "block";
   evt.currentTarget.className += " active";
 }
 
