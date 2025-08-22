@@ -12,9 +12,9 @@
 
         .topnav {
             overflow: hidden;
-            background-color: #333;
+            background-color: #3E3B37;
             position: fixed;
-            top: 0; /* Nav at the very top */
+            top: 45px; /* Nav at the very top */
             width: 100%;
             z-index: 2; /* Above banner */
         }
@@ -40,22 +40,21 @@
 
         .banner {
             position: fixed;
-            top: 66px; /* Nav height (46px) + 20px gap */
+            top: 0px; /* Nav height (46px) + 20px gap */
             left: 50%;
             transform: translateX(-50%); /* Center horizontally */
-            width: 90%; /* Almost full width */
+            width: 100%; /* Almost full width */
             max-width: 1200px; /* Cap for larger screens */
             background-color: #333; /* Light background */
             text-align: center;
-            padding: 10px 20px; /* Vertical and horizontal padding */
+            padding: 10px 10px; /* Increased vertical padding for taller banner */
             z-index: 1; /* Below nav */
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); /* Shadow on all sides */
-            border-radius: 5px; /* Rounded corners */
         }
 
         .banner h1 {
             margin: 0;
-            font-size: 20px; /* Smaller font to fit */
+            font-size: 25px; /* Consistent font size */
             color: #f2f2f2;
         }
 
@@ -80,9 +79,9 @@
             margin-right: 20px;
         }
 
-        /* Adjust content to avoid overlap with fixed nav and banner */
+        /* Adjust content to avoid overlap with fixed nav and taller banner */
         .content {
-            margin-top: 120px; /* Nav (46px) + banner (44px) + gap (20px) + extra for shadow/offset */
+            margin-top: 140px; /* Nav (46px) + banner (64px: 20px padding top + 20px padding bottom + 20px font-size + 4px buffer) + gap (20px) + extra for shadow */
             padding-left: 16px;
         }
 
@@ -115,13 +114,13 @@
                 top: 66px; /* Keep below nav with gap */
                 width: 90%; /* Maintain near-full width */
                 max-width: 500px; /* Smaller cap for mobile */
-                padding: 8px 10px; /* Slightly less padding */
+                padding: 16px 10px; /* Slightly less padding for mobile, still taller */
             }
             .banner h1 {
                 font-size: 18px; /* Slightly smaller for mobile */
             }
             .content {
-                margin-top: 120px; /* Same as desktop */
+                margin-top: 132px; /* Nav (46px) + banner (56px: 16px padding top + 16px padding bottom + 18px font-size + 4px buffer) + gap (20px) + extra */
             }
         }
     </style>
@@ -140,8 +139,8 @@
     </div>
 
     <div class="content">
-       <br>
-       <p> Hello! Use the navigation bar on the top of the page to explore.</p>
+        <br>
+        <p> Hello, welcome to my website! I have logs of my teaching courses, research, and some contact information. Use the navigation bar above to explore.</p>
     </div>
 
     <script>
