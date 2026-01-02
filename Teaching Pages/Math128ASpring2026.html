@@ -96,7 +96,7 @@ body {font-family: Arial;}
 
 <div class="tab">
   <button class="tablinks" onclick="TabDivs(event, 'Main')" id="defaultOpen"> Main </button>
-  <button class="tablinks" onclick="TabDivs(event, 'Syllabus')">Syllabus</button>
+  <button class="tablinks" onclick="TabDivs(event, 'MatLab')">MatLab</button>
   <button class="tablinks" onclick="TabDivs(event, 'LecNotes')">Lecture Notes </button>
 </div>
 
@@ -122,8 +122,10 @@ body {font-family: Arial;}
     <p> 
       <ul>
         <li> Info Later</li>
-        <li> We are using the text <em> Numerical Analysis</em> by Burden and Faire, the 10th edition (ISBN 	9781305253667). It is available from the Student Stores, and also from Cengage. The helpful part of this text is that it will match our coverage with MatLab (see the preface to find the coded algorithms).</li>
+        <li> We are using the text <a href="https://ebookcentral-proquest-com.libproxy.berkeley.edu/lib/berkeley-ebooks/detail.action?docID=4717637"> <em> Numerical Analysis : Mathematics of Scientific Computing </em> </a>, Third Edition
+David Kincaid and Ward Cheney (<a href = "https://web.ma.utexas.edu/CNA/NA3/errata.html"> errata </a>). It is available from the Student Stores, and also online for free through your student account. The helpful part of this text is that it will match our coverage with MatLab (see the preface to find the coded algorithms). Professor Hass also has his previous lecture notes available on his personal website.</li>
         <li> There are plenty of other resources for conceptual understanding and review. For example, there is a <a href = "https://ocw.mit.edu/courses/18-330-introduction-to-numerical-analysis-spring-2012/" >MIT Opencourseware</a> for a similar course.</li>
+        <li> We will be using MatLab to code various solvers for the class. You can find some instructions on how to download it <a href="https://software.berkeley.edu/matlab%C2%AE"> here </a>. There are certainly other options— popular software includes Julia and Python— but MatLab has some nice solvers built in.</a></li>
     </p> 
       
   </div>
@@ -131,6 +133,36 @@ body {font-family: Arial;}
  
    
 
+  <div id="MatLab" class="tabcontent">
+    <h3>Some Resources for MatLab </h3>
+
+    <p> Everyone is coming to the class with a different level of coding knowledge, so here are some extra links to help you get started with MatLab. You can set up your MatLab account and download software by following the information <a href="https://software.berkeley.edu/matlab%C2%AE"> here </a>, but you can also use MatLab online for coding if you don't want to download it. There are lots of tutorials out there (the official MatLab onramp can be found <a href="https://matlabacademy.mathworks.com/details/matlab-onramp/gettingstarted"> here </a>). We will teach you what you need in time, and I will include files for or from discussion or office hours here. I also ahve a quick-start to make you a little more comfortable with using MatLab below. </p>
+
+    <p> <ul> 
+      <li> Where Notes and files Will Be Later</li>
+  </ul> </p>
+
+
+<p> Quickstart: this is a imple coding example for how to take a derivative of a function and use some basic file formats in MatLab. First, open the MatLab program. If you're signed in, you should see a file directory, perhaps an open file, and the command window. On the file directory, right click and create a new function. Name the file "fdd.m". It will have some example text involved. The file name is important because it is the function name you will call when you want to use this function in other files or the command window. </p>
+
+<p> Next, we will define the function. The top line should start with "function" regardless of what else you want. We then have the function call, something like "output = fdd(input)". We will have one output, and three inputs. You should name these in a useful way when you write functions. For us, the top line will read "function deriv = fdd(fun, x, step)". Next, you should include a description of what the function does and what the inputs are. To write these, we use a percent sign to denote comments. An example line could be "%fdd: a function which returns the finite difference derivative at a point". Next, the body of the function does whatever you want it to. This is the part which we will make very complicated later on. For now, input the definition of the derivative. The whole file should look like this:
+ <br>
+ 
+  <code> function deriv = fdd(fun, x, step)
+%Finite-Difference Derivative
+%fun: the function you want to differentiate
+%x: the value you wish to differentiate at
+%step: the step for the derivative
+
+
+deriv = (fun(x+step) - fun(x))/h</code>
+<br>
+
+Save the file, and move to your command line. We want a function to differentiate, so we need to initialize one in the command line. Write "f = @(x) x^2". This gives the function the name "f", where the @(x) denotes the variable involved and the x^2 means we have x squared. Notice that here I mean a math function, and above I'm talking about a coding function. Hit enter. You can now call the derivative function. Write "fdd(f,2,0.05)" in the command line and hit enter. If everything is correct, you should recieve back the value 4.05. Play around with different functions and values. You can also try writing an integral (note, MatLab has built in functions for these operations!) 
+</p>
+
+
+  </div>
 
 
 
