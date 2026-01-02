@@ -146,17 +146,19 @@ David Kincaid and Ward Cheney (<a href = "https://web.ma.utexas.edu/CNA/NA3/erra
 <p> Quickstart: this is a imple coding example for how to take a derivative of a function and use some basic file formats in MatLab. First, open the MatLab program. If you're signed in, you should see a file directory, perhaps an open file, and the command window. On the file directory, right click and create a new function. Name the file "fdd.m". It will have some example text involved. The file name is important because it is the function name you will call when you want to use this function in other files or the command window. </p>
 
 <p> Next, we will define the function. The top line should start with "function" regardless of what else you want. We then have the function call, something like "output = fdd(input)". We will have one output, and three inputs. You should name these in a useful way when you write functions. For us, the top line will read "function deriv = fdd(fun, x, step)". Next, you should include a description of what the function does and what the inputs are. To write these, we use a percent sign to denote comments. An example line could be "%fdd: a function which returns the finite difference derivative at a point". Next, the body of the function does whatever you want it to. This is the part which we will make very complicated later on. For now, input the definition of the derivative. The whole file should look like this:
- <br>
- 
-  <code> function deriv = fdd(fun, x, step)
-%Finite-Difference Derivative
-%fun: the function you want to differentiate
-%x: the value you wish to differentiate at
-%step: the step for the derivative
+</p>
+ <p>
+  <code> function deriv = fdd(fun, x, step) <br>
+%Finite-Difference Derivative <br>
+%fun: the function you want to differentiate <br>
+%x: the value you wish to differentiate at <br>
+%step: the step for the derivative <br> 
 
 
 deriv = (fun(x+step) - fun(x))/h</code>
 <br>
+</p>
+<p>
 
 Save the file, and move to your command line. We want a function to differentiate, so we need to initialize one in the command line. Write "f = @(x) x^2". This gives the function the name "f", where the @(x) denotes the variable involved and the x^2 means we have x squared. Notice that here I mean a math function, and above I'm talking about a coding function. Hit enter. You can now call the derivative function. Write "fdd(f,2,0.05)" in the command line and hit enter. If everything is correct, you should recieve back the value 4.05. Play around with different functions and values. You can also try writing an integral (note, MatLab has built in functions for these operations!) 
 </p>
