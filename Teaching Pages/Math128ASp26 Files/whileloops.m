@@ -65,4 +65,18 @@ end
 y
 
 
-%
+%Alternately, try coding a bisection method coder
+%File is attached
+
+%Example function: .^ is for termwise application to the array
+f = @(x) 10*x.^3 + 3*x.^2 + 2*x + 4;
+
+x = linspace(-100,100,100);
+y = f(x);
+plot(x,y)
+
+%See a 0 between -20 and 20
+
+zero = bismethod(-20,20,f, 1)
+
+%This takes a while for low tolerances
