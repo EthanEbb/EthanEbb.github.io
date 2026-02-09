@@ -2,6 +2,8 @@ function [root, numIterations] = newtonmethod(f, df, x0, errorTol)
 %Applying Newton's method to the function f with derivative df starting at
 %x0
 
+%Very Basic Interpretation of the Method...
+
 x = x0;
 j = 0;
 
