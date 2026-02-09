@@ -8,14 +8,17 @@ if f(lowerbound) * f(upperbound) >= 0
 else
     a = lowerbound;
     b = upperbound;
-    c = (a+b)/2;
+    %Remember the approx+epsilon mentality, so we take c to be a+epsilon
+    c = a + (b-a)/2;
     while abs(f(c)) > errorTol
-        if f(a)*f(c) < 0
+        %Remember that we use sign to not take an unnecessary
+        %multiplication
+        if sign(f(a)) ~= sign(f(c))
             b = c;
-            c = (a+b)/2;
+            c = a+(b-a)/2;
         else
-            a = c;
-            c = (a+b)/2;
+            a = c;  
+            c = a + (b-a)/2;
         end
     end
 end
