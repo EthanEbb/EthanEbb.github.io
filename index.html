@@ -119,6 +119,20 @@
                 margin-top: 132px; /* Nav (46px) + banner (56px: 16px padding top + 16px padding bottom + 18px font-size + 4px buffer) + gap (20px) + extra */
             }
         }
+
+
+.column {
+  float: left;
+  width: 50%;
+  padding: 5px;
+}
+
+/* Clearfix (clear floats) */
+.row::after {
+  content: "";
+  clear: both;
+  display: table;
+}
     </style>
 </head>
 <body>
@@ -138,6 +152,15 @@
         <br>
         <p> Hello, welcome to my website! I have pages for my teaching courses, research, and some contact information. Use the navigation bar above to explore.</p>
     </div>
+
+<div class="row">
+  <div class="column">
+    <img src="Mandelbrot.gif" alt="TraverseMandelbrot" style="width:100%">
+  </div>
+  <div class="column">
+    <img src="julia.gif" alt="Julia Set" style="width:100%">
+  </div>
+</div>
 
     <script>
         function toggleMenu() {
