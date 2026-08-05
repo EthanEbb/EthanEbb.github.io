@@ -1,0 +1,542 @@
+
+\DocumentMetadata{tagging=on,
+	tagging-setup={math/setup=mathml-SE},
+	pdfstandard=ua-2,
+	lang=en-US
+}
+\documentclass{article}
+
+%Math Libraries
+\usepackage{multirow, longtable, amsmath, amssymb, amsthm}
+\usepackage[mathscr]{euscript}
+
+%Formatting
+\usepackage[margin = 1 in]{geometry}
+\usepackage{indentfirst}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage{tabularx}
+\usepackage{cite}
+
+%Diagram Packages
+\usepackage{tikz}
+\usetikzlibrary{automata,positioning,arrows}
+
+%Standard Commands
+\newcommand{\mm}{\mathscr}
+\newcommand{\B}{{\mathcal{B}}}
+\newcommand{\A}{{\mathcal{A}}}
+\newcommand{\N}{{\mathbb{N}}}
+\newcommand{\R}{{\mathbb{R}}}
+\newcommand{\C}{{\mathbb{C}}}
+\newcommand{\Q}{{\mathbb{Q}}}
+\newcommand{\Z}{{\mathbb{Z}}}
+
+
+\newcommand{\abs}[1]{{|{#1}|}}
+\newcommand{ \norm }[1]{{ || {#1}||}}
+\newcommand{\cl}[1]{{\overline{#1}}}
+\newcommand{\pd}{\partial}
+\newcommand{\ip}[2]{ \langle {#1},{#2}\rangle }
+\newcommand{\ls}{\lesssim}
+\newcommand{\gs}{\gtrsim}
+\newcommand{\supp}{\text{supp}}
+
+%Result Environment
+\newcounter{result}[section]
+\newenvironment{res}[1][]{\refstepcounter{result}\par\medskip
+	\noindent \textbf{[\thesection.\theresult] #1} \rmfamily}{\medskip}
+
+\newenvironment{defn}[1][]{\refstepcounter{result}\par\medskip \noindent \textbf{Definition [\thesection.\theresult] #1} \rmfamily}{\medskip}
+
+%Proof Environment
+\newenvironment{pf}{%
+	\par%
+	\medskip
+	\leftskip=2em\rightskip=2em%
+	\noindent\ignorespaces \textit{Proof:} \newline}{%
+	\,\, \newline \textit{Q.E.D.}\par\medskip}
+
+\title{Lecture 1: Introductory Topics}
+\author{Ethan Ebbighausen}
+\date{May 12, 2025}
+
+\begin{document}
+	\pagestyle{fancy}
+	\fancyfoot{} 
+	\fancyfoot[L]{Topics Document, Ethan Ebbighausen}
+	
+	\maketitle
+	\section{References, Goals}
+	
+	The topics of these notes will be based on the contents of Borthwick's \textit{Introduction to Partial Differential Equations}, Evans' \textit{Partial Differential Equations}, and Sung-Jin Oh's Lecture notes on the subject. My goal is to add information to and contextualize the information presented. 
+	
+	Our learning objectives for this lecture are 
+	
+	\begin{itemize}
+		\item Classify General PDEs in ways that describe their behavior.
+		\item Analyze basic structures in differentiability.
+		\item Recall ODE existence theorems and solution methods.
+		\item Apply the change-of-variables to make sense of surface integrals.
+		\item Simplify vector integrals via the Divergence theorem.
+	\end{itemize}
+	
+	\section{What are Partial Differential Equations?}
+	
+	Welcome to Partial Differential Equations. Throughout the course, we will call such equations PDEs, and call ordinary differential equations ODEs. What are PDEs? You should recall that ODEs take a form such as 
+	\begin{align*}
+		\begin{cases}
+			x'(t) = f(t,x) \\
+			x(t_0) = x_0
+		\end{cases}
+	\end{align*}
+	
+	We call them \textit{ordinary} because they take an ordinary derivative. Example uses cases involve things like modeling population, concentration of a solution, or even temperature as a function of time. We are constrained to one variable, and this limits physical applicability. 
+	
+	Let's focus on the last case. What if we wanted to measure the temperature of a room (in 3D space) as a function of time. We would establish some function $u(t,x,y,z)$ where $t$ is our point in time, starting at some arbitrary time we call $t=0$, and $x,y,z$ give the coordinates of a spot in our room. 
+	
+	If the room is empty and isolated from anything outside (if we had very well-insulated walls), we should expect the temperature to stay the same. However, in the real world, we have some influence via outside phenomena (heat exchange through the walls). Let's say it's some fixed temperature $T_0$ outside. Let us also say the room is $U = [0,1]^{3} \subset \R^{3}$. We'll explain notation a bit more later, but call $\pd U$ the walls of the room. We should have something like $u(t,x,y,z)|_{\pd U} = T_0$, since changes in our room aren't likely to change the temperature of the whole region. This is called \textit{boundary condition}. 
+	
+	We should also have some model of how heat changes or spreads in the room, and we should take account for sources of heat in the room like electronics or even us. We do this via some some function of $u$ and its derivatives, and write the PDE in the form
+	
+	\begin{align*}
+		\begin{cases}
+			F(t,x,y,z,u, \pd_{t} u, \pd_{x}u, ... , \pd_{t}^{a}\pd_{x}^{a}\pd_{y}^{b}\pd_{z}^{c}u) = 0 \\
+			u |_{\pd U} = T_0
+		\end{cases}
+	\end{align*}
+	
+	We'll look into the actual function involved later. Since this is a bit cumbersome, we usually denote all spatial variables by a vector $x$ and use partials $\pd_{i} = \pd_{x^i} = \frac{\pd}{\pd x^i}$. The \textit{order} of a PDE is the order of the highest derivative appearing in the equation, so if we have 
+	
+	\begin{align*}
+		F(x,u,\pd_{j}u,...,\pd_{j_1}...\pd_{j_m} u) = 0
+	\end{align*}
+	
+	we have order $m$. 
+	
+	
+	In general, PDEs are very hard and have no unified method for solution. Hence, mathematicians like to classify PDEs to look at when we might apply methods. First, we have classifications based on the operator involved. For simplicity of notation, we will often use multi-index notation. For $\alpha = (\alpha_1,....,\alpha_n)$, and $x = (x^1,...,x^n) \in \R^{n}$, we set $x^{\alpha} = \prod_{i=1}^{n} (x^i)^{\alpha_i}$ and $\pd^{\alpha} = \pd_{1}^{\alpha_1}...\pd_{n}^{\alpha_n}$. We call $|\alpha| = \alpha_1 + ... + \alpha_n$ the order of $\alpha$. By $D^{k}$, we will denote the vector of all $\pd^{\alpha}$ for $|\alpha| = k$. 
+	
+	\textbf{Behavior as an operator:}
+	
+	\textit{Linear PDEs} are PDEs linear in the input function. In other words, we can write a partial differential operator $L$ and have $L(u+v) = Lu + Lv$, $L(c u) = cLu$ for $c \in \R$. These are important because, if we have a PDE $Lu = 0$, two solutions $u_1$ and $u_2$ give a new solution $c_1u_1 + c_2u_2$ by linearity. This is called the property of superposition. For example, the general second-order linear operator is
+	\begin{align*}
+		L = - \sum_{i,j=1}^{n} a_{ij} \pd_{i}\pd_{j} + \sum_{j=1}^{n} b_{j} \pd_{j} + c
+	\end{align*}
+	where the $a_{ij},b_{j},c$ are all functions. We will study this exact operator later. 
+	
+	We also have weaker versions of linearity. A \textit{semilinear} PDE is a PDE linear in its highest order derivative with coefficients that do not depend on $u$, so 
+	\begin{align*}
+		\sum_{|\alpha| = k} a_{\alpha}(x) \pd^{\alpha}u + b(D^{k-1}u,...,Du,u,x) = 0
+	\end{align*}
+	A \textit{quasilinear} PDE is linear in the highest-order derivative with coefficients depending on at most the lower-order derivatives of $u$, so 
+	\begin{align*}
+		\sum_{|\alpha| = k} a_{\alpha}(D^{k-1}u,..., du,u,x) \pd^{\alpha}u + b(D^{k-1}u,...,Du,u,x) = 0
+	\end{align*}
+	
+	
+	\textbf{Behavior as a PDE:}
+	
+	We also like to classify PDEs by the way the operator looks. Roughly speaking, we form a symbolic polynomial from the PDE operator by replacing the derivatives with variables. For example, given $\pd_{1}\pd_{2} + \pd_{2}$, we would have a polynomial $\xi^{1}\xi^2 + \xi^2$. The level sets of the polynomial gives some geometric shape, which actually tells us a lot about PDE solutions. 
+	
+	For example, \textit{elliptic} equations act a lot like a specific equation called the Laplace equation $-\Delta u = 0$ where $\Delta = \sum \pd_{i}^{2} $. For the general second-order operator above, these correspond to the cales where the matrix $[a_{ij}]$ is symmetric with strictly positive eigenvalues. 
+	
+	We will also look at \textit{hyperbolic} equations, which look like the wave equation $(\pd_{t}^{2} - \Delta) u = 0$, and \textit{parabolic} equations that look like the heat equation $(\pd_{t} - \Delta )u = 0$
+	
+	
+	\subsection{Posing Problems, Well-Posedness}
+	
+	As in our example at the beginning, we usually pose the PDE on some sort of domain $U\subset \R^{n}$, with a function $u:U \to \R$. We will often have some sort of information about how $u$ behaves on the boundary of $U$, which we call boundary data or boundary conditions. We focus on two common types. \textit{Dirichlet} boundary conditions specify the value of $u$ on the boundary, usually like $u|\pd U = g$. \textit{Neumann} boundary conditions specify the normal derivatives of $u$ at the boundary, in the form $\pd_{\eta} u = g$. 
+	
+	
+	Given some sort of data and a PDE, we care about whether the equation os solvable, whether this is stable in our data, and whether the solution is "nice". We define a concept to encapsulate this idea of a "good problem". A PDE is called \textit{well-posed} if 1.) a solution exists, 2.) the solution is uniquely determined by the data and 3.) the solution depends continuously on the data. The third condition is necessary because our input data is usually flawed in practice, so we want to guarantee that small errors in the data mean only small errors in the solution. 
+	
+	
+	\subsection{Questions:}
+	
+	1.) What type of PDE is $2x^{1}\pd_{1}^{2}u = 3\pd_{2}^{2}u + 5u$?
+	
+	2.) What about $\pd_{1}^{5}u + \pd_{1}^{3}\pd_{2}^{2}u + 3u \pd_{2}^{4}u + 16u^{2} = 0$? 
+	
+	
+	\section{A Crash-Course in Analysis}
+	
+
+	
+	
+	\subsection{Real Numbers, Euclidean Space}
+	
+	Any reader has likely used the real numbers $\R$ extensively and will have an intuitive idea of their structure. Strictly speaking, one constructs them from the rational numbers using a process like Dedekind cuts to take a sort of completion. We only need this in as much it means the real numbers and $\R^{n}$ are complete, or that limits behave nicely. This manifests itself in $\R$ by the completeness axiom. Given a set $A \subset \R$, an upper bound for $A$ is a number $M$ such that for all $x \in A$, $x \leq M$. The completeness axiom says that any nonempty subset bounded above has a \textit{supremum}, denoted $\sup(A)$, which is the least upper bound in the sense that given any other upper bound $M$ for $A$, $\sup(A) \leq M$. A related concept is the \textit{infimum}, or greatest lower bound. If $A$ is not bounded above, we may say that $A$ has an infinite supremum.
+	
+	\vspace{0.25 cm}
+	
+	We will often use sequences to capture ideas of limits like this. A \textit{sequence} $\{x_{k}\}_{k=1}^{\infty}$ is just a collection of numbers $x_{i} \in \R^{n}$ indexed by the natural numbers $\N = \{1,2,...\}$. A sequence is said to converge to a limit $x$ if, for all $\epsilon > 0$, there is some $N$ such that if $k > N$, $|x-x_{k}| < \epsilon$. In simple terms, the numbers get closer and closer to $x$ as $k$ gets large. A function that respects limits is called \textit{continuous}. More rigorously, a function $f$ is continuous at $x$ if whenever $\{x_{k}\} \to x$ (converges to $x$), $\{f(x_k)\} \to f(x)$. Equivalently, for all $\epsilon > 0$ there exists some $\delta > 0$ so that if $|x-y| < \delta$, $|f(x)-f(y)| < \epsilon$. In simple terms, $f$ takes nearby points to nearby points. 
+	
+	\vspace{0.25 cm}
+	
+	Now, given $A$ bounded above, we can extract an interesting property. Consider any number $\epsilon > 0$. We may find $x \in A$ so $x > \sup(A) - \epsilon$. This is simple to prove by contradiction: if this were not true, then $\sup(A) - \epsilon \geq x$ for all $x \in A$, and so this is an upper bound, which contradicts that the supremum is the least upper bound. If we do this for all the numbers $\frac{1}{n}$ for $n \in \N$, we prove the following
+	
+	\begin{res}
+		For a nonempty set $A \subset \R$, there exists a sequence of points $x_k \in A$ such that 
+		\begin{align*}
+			\lim_{k \to \infty} x_{k} = \sup(A)
+		\end{align*}
+		and a similar statement is true for the infimum. 
+	\end{res} 
+	
+	
+	In $\R^{n}$, a supremum doesn't make sense, but we can get a similarly useful concept by actually defining completeness. Recall that a sequence is \textit{Cauchy} if, for any $\epsilon > 0$ there exists some $N$ so $|x_{n} - x_{m}| < \epsilon$ when $n,m > N$. A space is called \textit{complete} if every Cauchy sequence has a limit in the space. We will not need the details of proving the following:
+	
+	\begin{res}
+		$\R^{n}$ is a complete metric space. 
+	\end{res}
+	
+	If you haven't seen metrics before, don't worry. They are a way of measuring distance. In $\R^{n}$, we so this by defining the norm or Euclidean length $|x| = \sqrt{x \cdot x}$ from the dot product. Then, we define the distance $d(x,y) = |x-y|$. In particular, $|x - y| \leq |x-z| + |z-y|$ is the useful property called the \textit{triangle inequality} which we will use from this distance (the length of the side of a triangle is less than the sum of the lengths of the other sides). We also have that 
+	\begin{align*}
+		\lim_{k \to \infty} x_{k} = w \,\, \Leftrightarrow \lim_{k \to \infty} |x_{k} - w| = 0
+	\end{align*}
+	
+	On many occasions, we will use balls in $\R^{n}$, denoted $B(x,r) = \{y \in \R^{n} : |y-x| < r\}$, because they capture the concept of "nearby". If $x \in A$ has $B(x,\epsilon) \subset A$ for a small $\epsilon$, then $x$ is called an \textit{interior point} of $A$ and $A$ is called a \textit{neighborhood} for $x$. A set $A$ is \textit{open} if it is a neighborhood of all of its points. By contrast, a set $B$ is called closed if its complement $B^{C} = \R^{n} \backslash B$ (everything outside of $B$) is open. An easier way to look at this in the real numbers is to define the \textit{boundary} $\pd A$, which is the set of points $x$ so every neighborhood intersects both $A$ and its complement. This is exactly "the edge" in simple cases. For example, $\pd B(x,r) = \{ y : |x-y| = r\}$ is the sphere. A set $B$ is closed if and only if $\pd B \subset B$. For this reason, we also often define the closure of a set $A$ to be $\cl{A} = A \cup \pd A$. 
+	
+	\vspace{0.25 cm}
+	
+	A set $A$ is \textit{bounded} if $A \subset B(0,R)$ for some $R>0$. A set which is closed and bounded (in $\R^{n}$) is called \textit{compact}.
+	
+	A set $A \subset \R^{n}$ is called path connected if any two points in the set may be joined by a a continuous path in the set. In other words, for $a,b \in A$, there is some $\sigma: [0,1] \to A$ so $\sigma(0) = a$, $\sigma(1) = b$, and $\sigma$ is continuous. Lastly, we call an open, path connected set $\Omega \subset \R^{n}$ a \textit{domain}. (Note, we really only care about this set being \textit{connected}, not path connected, but for an oepn set in $\R^{n}$, the concepts are equivalent)
+	
+	\vspace{0.25 cm}
+	
+	
+	\textbf{Examples:}
+	
+	1.) the set $(0,1)$ is open, and has boundary $\{0,1\}$. Then, $[0,1]$ is closed (and compact). 
+	
+	2.) $B(x,r)$ is open
+	
+	3.) Any interval $[a,b]$ is connected, as is any ball. 
+	
+	
+	\subsection{Questions:}
+	
+	1.) What is $\lim_{n \to \infty} \frac{n!}{n^{n}}$? 
+	
+	2.) Is $(0,2) \cup (3,4)$ connected? Is it complete? Is it bounded?
+	
+	3.) Let $A = \{ (x,\sin(x)) \mid x \in (0,1]\} \cup \{ (0,0)\}$. Is this set path connected? Can you find open $C$, $D$ disjoint so for $C_{A} = C \cap A$, $D_{A} = D \cap A$, $C_{A} \cup D_{A} = A$?
+	
+	
+	\subsection{Differentiability, ODEs and Solutions}
+	
+	To understand PDEs, we must first understand derivatives and ODEs. Recall that a function $f: \R \to \R$ is called differentiable at $x \in \Omega$ if 
+	\begin{align*}
+		\lim_{h \to 0} \frac{f(x+h)-f(x)}{h}
+	\end{align*}
+	exists, in which case we denote it $f'(x)$. Given a domain $\Omega \subset \R^{n}$, $f:\Omega \to \R$ is differentiable if the limits 
+	\begin{align*}
+		\lim_{h \to 0} \frac{f(x+he)-f(x)}{h}
+	\end{align*}
+	exist for all unit vectors $e$, in which case we denote this $\pd_{e} f$. Recall that the partial derivatives are simply setting these to be the standard basis vectors. We denote the space of functions which admit continuous partial derivatives up to order $m$ by $C^{m}(\Omega)$. A \textit{smooth} function has continuous partial derivatives of all orders, and we denote it $C^{\infty}(\Omega)$. We need an open set for this definition because these limits don't make sense ar boundary points. Therefore, we define by $C^{m}(\cl{\Omega})$ the set of functions which admit $C^{m}$ extensions on some open set containing $\cl{\Omega}$. We sometimes denote continuous functions by $C(\Omega)$ or $C^{0}(\Omega)$. 
+	
+	\vspace{0.25 cm}
+	
+	\textbf{Examples:}
+	
+	1.) Any polynomial $p(x) = a_{m}x^{m} + ... + a_1 x + a_0$ is smooth on $\R$. 
+	
+	2.) $f(x) = |x|$ is not differentiable on $\R$, but it is on $(1,2)$. $f(x) = \frac{1}{1+x^2}$ is smooth on $\R$.
+	
+	3.) $f(x) = \frac{1}{x}$ is smooth on $(0,1)$, but is not in in $C^{m}([0,1])$ for any $m$
+	
+	\vspace{0.25 cm}
+	
+	One other tool we will need in the future is the Leibniz Integral Rule, which is a way of differentiating under an integral. The standard, general statement is the following
+	
+	\begin{res}
+		Let $f(x,t)$ be a function such that both $f$ and $f_{x}$ are continuous in $t$ and $x$ in some region of the $x,t$ plane including $a(x) \leq t \leq b(x)$, $x_0 \leq x \leq x_1$. Suppose both $a(x)$ and $b(x)$ are $C^{1}([x_0,x_1])$. Then,
+		\begin{align*}
+			\pd_{x} \int_{a(x)}^{b(x)} f(x,t) dt = f(x,b(x))b'(x) - f(x,a(x))a'(a) + \int_{a(x)}^{b(x)} \pd_{x} f(x,t) dt
+		\end{align*} 
+	\end{res}
+	
+	
+	\subsubsection{Supports and Smooth Bumps}
+	
+	The \textit{support} of a function is the closure of place where it is nonzero, $\supp(f) = \cl{\{x \in \Omega : f(x) \neq 0\}}$. We use this to locate where the function behaves meaningfully. We denote by $C_{c}^{m}(\Omega)$ the set of $C^{m}$ functions with compact support in $\Omega$. We will often use a special type of function with compact support called a smooth bump $\psi(x)$. The goal of this function is that, when we have a compact set $C$ and open subset $U$ so $C \subset U \subset \Omega$, we may find $\psi \in C_{c}^{\infty}$ so $\psi = 1$ on $C$ and $\supp(\psi) \subset U$.  
+		
+	\vspace{0.25 cm}
+		
+	\textbf{Constructing $\psi$:}
+	
+	Set $d(x,C) = \inf\{ d(x,y) : y \in A \}$. Since $C$ is compact and $U$ is open, we may use that $B(C,\epsilon) \subset U$ for some $\epsilon >0$ (if you haven't seen compactness before, just take this as given). 
+	
+	We may start with a function $h: \R \to \R$ given by 
+	\begin{align*}
+		h(x) = \begin{cases}
+			e^{-\frac{1}{1-x^{2}}} & |x| < 1 \\
+			0 & |x| \geq 1
+		\end{cases}
+	\end{align*}
+	
+	This gives one example of a nonzero smooth compactly supported function. 
+	
+	You may check that $h$ is smooth using L'Hopital's rule. Then, $\phi(x) = \frac{\int_{-\infty}^{x} h(t)dt}{\int_{-\infty}^{\infty} h(t)dt}$ is smooth and has $\phi(x) = 0$ for $x \leq -1$, $\phi(x) = 1$ for $x \geq 1$. We sometimes call this a \textit{smooth transition function}. 
+	
+	Lastly, 
+	\begin{align*}
+		\psi(x) = \phi(1- (\frac{2d(C,x)}{\epsilon})^{2})
+	\end{align*}
+	has the desired properties
+	
+%	To reach the final function $\psi$, we use a scaling of the smooth bump. First, notice that $H(x) = h(|x|): \R^{n} \to \R$ is still smooth. Second, 
+%	\begin{align*}
+%		\gamma_{C}(x) = \begin{cases}
+%			1 & x \in C \\
+%			1-\frac{d(C,x)}{\epsilon_{4}} & x \in \cl{B}(C,\epsilon_{4}) \\
+%			0 & x \notin B(C,\epsilon_{4}) 
+%		\end{cases}
+%	\end{align*} 
+%	so $\gamma_{C}$ is continuous and supported in $\cl{B}(C,\epsilon_{4})$ for $\epsilon_{4} = \epsilon /4$. Let $M = \int H(x) dx$. Lastly, we say
+%	
+%	\begin{align*}
+%		\psi(x) = \int_{\R^{n}} H(\frac{x-y}{\epsilon_{4}}) \frac{\epsilon_{4}^{-n}}{M} 1_{C}(y) dy
+%	\end{align*}
+%	
+%	Using the Leibniz rule, $\psi$ is smooth, and we will leave it as an exercise to check that $\psi$ has support contained in $U$. 
+	
+	
+	\vspace{0.25 cm}
+	
+	\subsubsection{Picard-Lindel{\"o}f}
+	
+	Along with defining derivatives, we will also commonly use a result from ODEs called the Picard-Lindel{\"o}f theorem. We won't prove it fully here (see the ODEs Existence Document on my website for an in-depth treatment and proof). We call a function $F: \Omega \to \R$ Lipschitz continuous if there exists some $M$ so $|F(x)-F(y)| \leq M|x-y|$. We also consider the standard form for an ODE:
+\begin{align*}
+	\begin{cases}
+		x'(t) = f(t,x) \\
+		x(t_0) = x_0
+	\end{cases}
+\end{align*}
+	
+	\begin{res}
+		Picard-Lindel{\"o}f: Consider the ODE above, where $f: \R \times \R^{n} \to \R^{n}$ is continuous in $t$ and Lipschitz continuous in $x$. Then, there exists some $\epsilon > 0$ admitting a $C^{1}$ solution to the ODE $X: (t_0 - \epsilon, t_0 + \epsilon) \to \R^{n}$, and this is the unique solution to the ODE in this time interval. 
+	\end{res}
+	
+	\subsubsection{Solving ODEs}
+	
+	Recall that we only need to consider a first-order ODE since a higher order ODE may be reduced to a first-order system of ODEs. We will use Picard-Lindel{\"o}f several times throughout the course to claim that ODE solutions exist. Occasionally, we will also need to solve ODEs. There are a few easy cases to remember. The first is that of separable equations 
+	\begin{align*}
+		x' = \frac{f(t)}{g(x)}
+	\end{align*}
+	
+	in this case, we may integrate to find $\int g(x)dx = \int f(t)dt$. Presuming we may invert $\int g(x)dx$ (solve for $x$, perhaps nonconstructively using something like the inverse function theorem), then we obtain a solution $x = G^{-1}(F(t))$. For example,
+	\begin{align*}
+		x' = ax
+	\end{align*}
+	has the general family of solutions $x(t) = x_0e^{at}$. 
+	
+	Another common case is to use an integrating factor. An ODE of the form
+	\begin{align*}
+		y' + p(t) y = q(t)
+	\end{align*}
+	looks a bit like a chain rule. To realize this, consider that 
+	\begin{align*}
+		(ye^{a(t)})' = y'e^{a(t)} + a'(t)ye^{a(t)}
+	\end{align*}
+	so setting $a(t) = \int p(t)dt$ gives 
+	\begin{align*}
+		(y e^{\int p})' = qe^{\int p}
+	\end{align*}
+	a separable equation we may solve as 
+	\begin{align*}
+		y(t) = e^{-\int p} ( \int qe^{\int p} dt)
+	\end{align*}
+	
+	Our last ODE case to consider is a specific family of ODEs,
+	\begin{align*}
+		x'' = -k^{2}x
+	\end{align*}
+	for $k>0$. To solve this, we convert to the system $y = (x,x')$ and 
+	\begin{align*}
+		y' = \begin{bmatrix}0 & 1 \\ -k^{2} & 0\end{bmatrix} y
+	\end{align*}
+	
+	we solve such an equation by diagonalizing the matrix. Its eigenvalues are $\pm i k$ with eigenvectors $\begin{bmatrix} 1 \\ \pm ik\end{bmatrix}$. Hence, we see solutions $x = c_{1}e^{ik t} + c_{2}e^{-ik t}$. Reducing this to real numbers makes life a bit easier, and becomes $x = a_1 \sin(kt) + a_{2} \cos(ky)$.
+	
+	\subsection{Vector Calculus, Divergence Theorem, Greens' Identities}
+	
+	We next treat vector calculus as a way to approach manipulating PDEs. One of the most useful tools will be the Divergence theorem, which gives a way to ``integrate by parts". For this, we recall a couple concepts. 
+	
+	First, recall that the \textit{gradient} of $f \in C^{1}(\Omega)$ is the vector-valued function $\nabla f = (\pd_{1}f,...,\pd_{n}f)$ (the symbol is called nabla). We define the \textit{divergence} of a vector-valued $F \in C^{1}(\Omega;\R^{n})$ with components $v_i$ to be 
+	\begin{align*}
+		\nabla \cdot v = \sum \pd_{i}v_i
+	\end{align*}
+	In this language, the Laplacian is $\Delta u = \nabla \cdot (\nabla u)$, and is sometimes written as $\nabla^{2}$ in differential geometry (where directional derivatives are hard to define).
+	
+	
+	We also note that there are multi-dimensional versions of the Leibniz rule, often under other names like the Reynolds' Transport Theorem. We shall tend to use the multi-dimensional version 
+	\begin{align*}
+		\pd_{t} \int_{\Omega} u(t,x) dx = \int_{\Omega} \pd_{t}u(t,x) dx
+	\end{align*}
+	where $u$ and $u_t$ are assumed continuous on $(a,b) \times \cl{\Omega}$ and $\Omega$ is a bounded domain. 
+	
+	
+	\subsubsection{Boundary Regularity}
+	
+	We need the notion of a "nice" boundary for our domain, in essence so we can differentiate with respect to the normal vector to the boundary. This is a bit more complicated. We say that a domain $\Omega$ has $C^{k}$ boundary if, for every $x \in \pd \Omega$, there exists some $\epsilon > 0$ and some $C^{k}$ function $\sigma: B(0,\delta) \subset \R^{n-1} \to B(x,\epsilon)$ such that $\pd \Omega \cap B(x,\epsilon) = \sigma( B(0,\delta))$. In simpler terms, the boundary is locally the graph of a $C^{k}$ function on $\R^{n-1}$. The map $\sigma$ is called a \textit{coordinate parameterization}. 
+	
+	Using some higher theory (the implicit function theorem), it turns out that we can write this same definition in a "backward" way. We may say that that the boundary is $C^{k}$ at $x$ if there exists a function $\gamma: \R^{n-1} \to \R$ such that, up to relabeling coordinate axes, $\Omega \cap B(x,\epsilon) = \{y \in B(x,\epsilon) : y^{d} > \gamma(y^{1},...,y^{n-1})\}$. This is a bit weird, but it's a way to ``flatten" the boundary by writing it in coordinates $\Phi(x) = (x^{1},..,x^{n-1},x^{n}-\gamma(x^{1},...,x^{n-1}))$ (notice that $\Phi^{-1}|_{x_{n} = 0}$ gives a coordinate parameterization). It also gives us a way to compute a normal vector, since the boundary is now a level surface to $x^{d} - \gamma(x)$, so a \textit{normal vector} is 
+	
+	\begin{align*}
+		(-\pd_{1} \gamma,...,-\pd_{n-1}\gamma,1)
+	\end{align*}
+	
+	and we may get an outward unit normal vector by dividing by the magnitude and checking whether this points inward or outward.
+	
+	\vspace{0.25cm}
+	
+	\textbf{Example:} 
+	Consider the simple domain $\omega = B(0,1) \subset \R^{n}$. Let us consider $x_0 = (0,...,0,-1)$. In the neighborhood $\{x : x^{n} > 0 \}$, we get a coordinate parameterization  
+	\begin{align*}
+		\phi(y^1,...,y^{n-1}) = (y^{1},...,y^{n-1},-\sqrt{1-\sum_{i=1}^{n-1} (y^i)^{2}}) 
+	\end{align*}
+	
+	and we also have $\gamma(x^1,...,x^{n-1}) = -\sqrt{1 - \sum_{i=1}^{n-1}(x^i)^{2} }$. Hence, we may find a normal via the gradient
+	\begin{align*}
+		(\frac{x^1}{\sqrt{1 - \sum_{i=1}^{n-1}(x^i)^{2} }},...,\frac{x^{n-1}}{\sqrt{1 - \sum_{i=1}^{n-1}(x^i)^{2} }},1)
+	\end{align*}
+	
+	Dividing by the magnitude shows that the normal to the unit sphere at point $x$ is just the vector $x$ itself (you should also be able to justify this geometrically)!
+	
+	
+	\vspace{0.25cm}
+	
+	\subsubsection{Surface Integration, Polar Integration}
+	
+	The last piece of theory we need to set up the divergence theorem is the idea of integrating over a surface. The main concept is to write coordinates or a parameterization for the surface like we did for the boundary case above. Since we are interested in these boundaries, we will only consider surfaces of dimension $n-1$ in $\R^{n}$, but this theory may be easily generalized. 
+	
+	Given some $C^1$ parameters $\sigma: V \subset \R^{n-1} \to U$ where $U$ is the surface to integrate over, we may consider $U$ and $V$ as ``the same" for our integration. Integrating over $V$ using the change of variables tells us how to integrate over $U$. Let $\nu$ be the outward unit normal to $\sigma(V)$. If you haven't seen the change-of-variables theorem before, just take the following formula as given
+	
+	\begin{align*}
+		\int_{\sigma(V)} f dS = \int_{V} f(\sigma(w))| \det(\pd_{w^1}\sigma,...,\pd_{w^{n-1}}\sigma, \nu ) |dx
+	\end{align*}
+	
+	Recall that the determinant tells us how a linear map affects the volume of a unit cube. Thus, the Jacobian determinant above tells us the instantaneous change in volume caused by applying the transformation $\sigma$. 
+	
+	\vspace{0.25 cm}
+	\textbf{Example:} Polar Integration
+	
+	Let us consider the unit sphere $S^{n-1} = \{x \in \R^{n}: |x|=1\}$. Consider $\omega(y)$ a parameterization of the sphere by coordinates in $\R^{n-1}$.
+	
+	Consider the change-of-variables $(r,y) \mapsto x= r \omega(y)$, and the integration formula gives
+	\begin{align*}
+		dx = r^{n-1} | \det(\pd_{y^1}\omega,...,\pd_{y^{n-1}}\omega, \omega )|drdy^{1}...dy^{n-1} \\
+		= r^{n-1} dr dS(y)
+	\end{align*} 
+	
+	since the outward unit normal is exactly $\omega(y)$.
+	
+	for the polar formula
+	
+	\begin{align*}
+		\int_{B(0,R)} f dx = \int_{S^{n-1}} \int_{0}^{R} f(r\omega(y))r^{n-1}drdS(y)
+	\end{align*}
+	
+	\vspace{0.25cm} 
+	
+	
+	
+	
+	
+	
+	\subsubsection{Divergence Theorem}
+	
+	We now have enough to state (without proof) the divergence theorem of Gauss. 
+	
+	\begin{res}
+		Suppose $\Omega \subset \R^{n}$ is a bounded domain with a piecewise $C^{1}$ boundary. For a vector field $F \in C^{1}(\cl{\Omega};\R^{n})$, 
+		\begin{align*}
+			\int_{\Omega} \nabla \cdot F dx = \int_{\pd \Omega} F \cdot \nu dS
+		\end{align*}
+		where $\nu$ is the outward unit normal to $d\Omega$ and $dS$ is the surface measure. 
+	\end{res}
+	
+	
+	\vspace{0.25cm}
+	
+	\textbf{Example:} We consider the unit ball again, specifically $B(0,1) \subset \R^{3}$. We will show the divergence theorem via direct integration here. Since the integral is linear and we may decompose vector fields by coordinates, consider $F = (0,0,f)$, whose divergence is simply $\pd_{3}f$. 
+	
+	Then, using cylindrical coordinates
+	\begin{align*}
+		\int_{B(0,1)} \nabla \cdot F dx = \int_{0}^{2\pi} \int_{0}^{1} \int_{-\sqrt{1-\rho^{2}}}^{\sqrt{1-\rho^{2}}} \pd_{3} f \rho dz d\rho d\theta \\
+				= \int_{0}^{2\pi} \int_{0}^{1} [f(\rho \cos(\theta), \rho \sin(\theta), \sqrt{1-\rho^{2}}) - f(\rho \cos(\theta), \rho \sin(\theta), -\sqrt{1-\rho^{2}}) ]\rho d\rho d\theta
+	\end{align*}
+	
+	Notice that the coordinates of the entries of $f$ are now on the sphere. As with the above examples, we consider the upper and lower hemisphere separately, and obtain volume element $dS = \frac{\rho}{\sqrt{1-\rho^{2}}} d\rho d\theta$. Then,
+	\begin{align*}
+		\int_{0}^{2\pi} \int_{0}^{1} [f(\rho \cos(\theta), \rho \sin(\theta), \sqrt{1-\rho^{2}}) - f(\rho \cos(\theta), \rho \sin(\theta), -\sqrt{1-\rho^{2}}) ]\rho d\rho d\theta \\
+		= \int_{S^{2}_{+}} f\sqrt{1-\rho^{2}} dS + \int_{S^{2}_{-}} f(-\sqrt{1-\rho^{2}})dS \\
+		= \int_{S^{2}} F \cdot \nu dS
+	\end{align*}
+	
+	as desired. 
+	
+	
+	\subsubsection{Greens' Identities}
+	
+	Greens' Identities are special cases of the divergence theorem when we consider the Laplacian. If $F = \nabla u$, then $\nabla \cdot F  = \Delta u$. Further, $\nabla u \cdot \nu = \pd_{\nu} u$ on the boundary. This means that the divergence theorem may be written in this special case as 
+	\begin{align*}
+		\int_{\Omega} \Delta u dx = \int_{\pd \Omega} \pd_{\nu} u dS
+	\end{align*}
+	
+	Green extended this in the process of solving some PDEs to consider $F = v \nabla u$ and applying the product rule:
+	\begin{align*}
+		\nabla \cdot (v \nabla u) = \nabla v \cdot \nabla u + v \Delta u 
+	\end{align*}
+	which gives the following
+	
+	\begin{res} Let $\Omega \subset \R^{n}$ be a bounded domain with piecewise $C^{1}$ boundary. 
+		
+	1.) For $u \in C^{2}(\cl{\Omega})$ and $v \in C^{1}(\cl{\Omega})$, 
+	\begin{align*}
+		\int_{\Omega} \nabla v \cdot \nabla u + v \Delta u dx = \int_{\pd \Omega} v \pd_{\nu} u dS
+	\end{align*}
+	
+	2.) If $u,v \in C^{2}(\cl{\Omega})$, 
+	\begin{align*}
+		\int_{\Omega} v \Delta u - u \Delta v dx = \int_{\pd \Omega} ( v \pd_{\nu}u - u \pd_{\nu}) v dS
+	\end{align*}
+	
+	\end{res}
+	
+	\vspace{0.25 cm}
+	
+	\textbf{Example:}
+	We compute the radial Laplacian, which we shall use to simplify some PDEs later. We consider $\Omega = B(0,R)$ and a radial function $h(x) = g(|x|)$. Then, by integrating in polar coordinates,
+	\begin{align*}
+		\int_{B(0,a)} \Delta h dx = |S^{n-1}| \int_{0}^{a} \Delta g(r)r^{n-1} dr
+	\end{align*}
+	Using the divergence theorem, the left is 
+	\begin{align*}
+		\int_{\pd B(0,a)} \pd_{\nu} g dS = \int_{\pd B(0,a)} \pd_{r} g (a) dS = |S^{n-1}|a^{n-1}\pd_{r}g(a)
+	\end{align*}
+	
+	such that 
+	\begin{align*}
+		\int_{0}^{a} \Delta g(r) r^{n-1} dr = a^{n-1} \pd_{r}g(a)
+	\end{align*}
+	
+	To recover the Laplacian, differentiate this formula and obtain 
+	\begin{align*}
+		a^{n-1} \Delta g(a) = \pd_{a} \left[a^{n-1} \pd_{r}g(a) \right]
+	\end{align*}
+	
+	or that 
+	\begin{align*}
+		\Delta g = r^{1-n} \pd_{r} \left[r^{n-1} \pd_{r} \right]g
+	\end{align*}
+	
+	
+	
+	
+	
+	
+\end{document}

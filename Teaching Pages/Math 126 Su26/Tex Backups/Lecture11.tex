@@ -1,0 +1,910 @@
+
+\DocumentMetadata{tagging=on,
+	tagging-setup={math/setup=mathml-SE},
+	pdfstandard=ua-2,
+	lang=en-US
+}
+\documentclass{article}
+
+%Math Libraries
+\usepackage{multirow, longtable, amsmath, amssymb, amsthm}
+\usepackage[mathscr]{euscript}
+
+%Formatting
+\usepackage[margin = 1 in]{geometry}
+\usepackage{indentfirst}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage{tabularx}
+\usepackage{cite}
+
+%Diagram Packages
+\usepackage{tikz}
+\usetikzlibrary{automata,positioning,arrows}
+
+%Standard Commands
+\newcommand{\mm}{\mathscr}
+\newcommand{\B}{{\mathcal{B}}}
+\newcommand{\A}{{\mathcal{A}}}
+\newcommand{\N}{{\mathbb{N}}}
+\newcommand{\R}{{\mathbb{R}}}
+\newcommand{\C}{{\mathbb{C}}}
+\newcommand{\Q}{{\mathbb{Q}}}
+\newcommand{\Z}{{\mathbb{Z}}}
+
+
+\newcommand{\abs}[1]{{|{#1}|}}
+\newcommand{ \norm }[1]{{ || {#1}||}}
+\newcommand{\cl}[1]{{\overline{#1}}}
+\newcommand{\pd}{\partial}
+\newcommand{\ip}[2]{ \langle {#1},{#2}\rangle }
+\newcommand{\ls}{\lesssim}
+\newcommand{\gs}{\gtrsim}
+\newcommand{\supp}{\text{supp}}
+
+%Result Environment
+\newcounter{result}[section]
+\newenvironment{res}[1][]{\refstepcounter{result}\par\medskip
+	\noindent \textbf{[\thesection.\theresult] #1} \rmfamily}{\medskip}
+
+\newenvironment{defn}[1][]{\refstepcounter{result}\par\medskip \noindent \textbf{Definition [\thesection.\theresult] #1} \rmfamily}{\medskip}
+
+%Proof Environment
+\newenvironment{pf}{%
+	\par%
+	\medskip
+	\leftskip=2em\rightskip=2em%
+	\noindent\ignorespaces \textit{Proof:} \newline}{%
+	\,\, \newline \textit{Q.E.D.}\par\medskip}
+
+\title{Lecture 11: Calculus of Variations}
+\author{Ethan Ebbighausen}
+\date{July 20, 2026}
+
+\begin{document}
+	\pagestyle{fancy}
+	\fancyfoot{} 
+	\fancyfoot[L]{Topics Document, Ethan Ebbighausen}
+	
+	\maketitle
+	
+	\section{Introduction}
+	
+	Leonhard Euler and Joseph-Louis Lagrange worked in collaboration in the 1750s on the tautochrone problem. They sought to determine a curve along which a weighted particle (a ball, but with no rotational analysis), would fall from any given height to a fixed point in a fixed amount of time (so two balls at different starting points arrive at the bottom at the same moment). Lagrange solved the problem in 1755 and sent his solution to Euler. The method he used was the precursor to Lagrangian mechanics, and their collaboration led to the Calculus of variations (a term coined by Euler) where problems in classical mechanics are expressed as minimization of an action functional. 
+	
+	The action functional, in the original setting, was the integral of a \textit{Lagrangian function}, or kinetic energy minus potential energy. 
+	
+%	In the tautochrone problem, let $s(t)$ be the position of the particle paramterized by arc length from the bottom. Let $h(s)$ denote the height of the curve at this arg-length $s$. Then, kinetic energy is proportional to $s'(t)^{2}$ (the velocity) and potential energy to $h(s(t))$ (the height). We would then find a curve $s$ to minimize 
+%	\begin{align*}
+%		\int_{0}^{t_0} \frac{1}{2}s'(t)^{2} - gh(s(t))dt
+%	\end{align*}
+%	
+%	For example, if the curve is parameterized as $(x(t),y(t))$, the force acting on the particle at $t_0$ is the component of gravity parallel to the tangent to the curve, or 
+%	\begin{align*}
+%		\frac{g y'(t_0)}{\sqrt{x'(t_0)^{2} + y'(t_0)^{2}}}
+%	\end{align*}
+%	
+%	Therefore, the acceleration imbued is this divided by mass. In other words, the velocity 
+%	
+%	\begin{align*}
+%		\int_{0}^{t_0} \frac{1}{2}s'(t)^{2} - gy(s(t))dt
+%	\end{align*}
+	
+	
+	
+	
+	
+	
+	
+	
+	While the tautochrone problem is interesting, it is a little opaque to why we make make some choices on first viewing. Let us look instead at a related but slightly simpler problem called the Brastichrone problem, where we are trying to find a curve $(x, y(x))$ in $\R^{2}$ along which a point mass sliding frictionlessly moves from point A to point B the fastest. 
+	
+	The time it takes to move along the curve is the distance divided by the velocity, so 
+	\begin{align*}
+		T = \int_{x_{A}}^{x_{B}} dt = \int_{x_A}^{x_B} \frac{1}{v(x,y)}\sqrt{1 + y'(x)^{2}} dx
+	\end{align*}
+	
+	From energy conservation, we may determine the speed as 
+	\begin{align*}
+		v = \sqrt{2gy}
+	\end{align*}
+	and so 
+	\begin{align*}
+		T = \int_{x_{A}}^{x_{B}} \sqrt{\frac{1 + y'(x)^{2}}{2gy}} dx 
+	\end{align*}
+	
+	We may view $T$ as the output of a map $y \mapsto T(y)$ and finding the curve amounts to minimizing this function. To do so, we try to look for critical points:
+	
+	\begin{align*}
+		T(y) =  \int_{x_{A}}^{x_{B}} F(y,y') dx  \\
+		\frac{d}{ds}T(y+sv) = \int_{x_A}^{x_B} \frac{d}{ds} \left( F(y+sv,y'+sv')\right)dx
+	\end{align*}
+	
+	so that this is a critical point when it is 0 for all $v$. Computing this carefully gives a solution that $y$ is a cycloid. 
+	
+	
+	
+	
+	
+	
+	\vspace{1cm}
+	\textbf{Learning Objectives:}
+	\begin{itemize}
+		\item 
+	\end{itemize}
+	
+	
+	
+	
+	
+	\section{The Poisson Equation and Dirichlet's Principle}
+	
+	We can twist this physical situation for our benefit in the case of viewing the Laplace equation as an energy minimizer (time invariant/equilibrium solution) for the wave equation energy. 
+	
+	We start with the \textit{Dirichlet energy} for $w \in C^{2}(\cl{\Omega})$, defined by 
+	\begin{align*}
+		\mathcal{E}[w] = \frac{1}{2} \int_{\Omega} |\nabla w|^{2} dx
+	\end{align*} 
+	
+	We view $\mathcal{E}$ as a function $\mathcal{E}:C^{2}(\Omega) \to \R$, and so we emphasize that its domain is a function space by calling it a \textit{functional}. Let us suppose $u$ is a minimizer of this energy, so for all $\phi \in C_{c}^{\infty}(\cl{\Omega},\R)$, 
+	\begin{align*}
+		\mathcal{E}[u] \leq \mathcal{E}[u + \phi]
+	\end{align*} 
+	
+	Therefore, for each such $\phi$,
+	\begin{align*}
+		\frac{d}{dt} \mathcal{E}[u+t \phi]|_{t=0} = 0
+	\end{align*}
+	
+	If we differentiate under the integral,
+	
+	\begin{align*}
+		\frac{d}{dt} \mathcal{E}[u+t \phi]|_{t=0} = \frac{1}{2} \frac{d}{dt} \int_{\Omega} (|\nabla u |^{2} + 2t\nabla u \cdot \nabla \phi + t^{2} |\nabla \phi|^{2})dx|_{t=0}\\
+		= \int_{\Omega} \nabla u \cdot \nabla \phi dx = -\int_{\Omega} \phi \Delta u dx
+	\end{align*}
+	
+	Since this holds for all test functions $\phi$, 
+	\begin{align*}
+		\int_{\Omega} \phi \Delta u dx =0
+	\end{align*}
+	implies $\Delta u=0$. Minimizers are then Laplace solutions, and Laplace solutions are critical points. 
+	
+	Let us add some generality. Consider the PDE
+	\begin{align*}
+		-\Delta u = f \\
+		u|_{\pd \Omega} = 0
+	\end{align*}
+	
+	to solve this via minimization, it is helpful to use the weak formulation instead, where we take $f \in L^{2}(\Omega)$ and try to find $u \in H^{1}_{0}(\Omega)$ such that 
+	\begin{align*}
+		\int_{\Omega} \left[ \nabla u \cdot \nabla \psi - f \psi \right] dx = 0
+	\end{align*}
+	for every $\psi \in C_{c}^{\infty}(\Omega)$. 
+	
+	To match this formulation, we define the functional 
+	\begin{align*}
+		\mathcal{D}_{f}[w] = \int_{\Omega} \left[\frac{1}{2} \nabla w \cdot \nabla w - f w \right] dx
+	\end{align*}
+	
+	
+	\begin{res}
+		[Dirichlet's Principle] Suppose $\Omega \subset \R^{n}$ is a bounded domain and $f \in L^{2}(\Omega, \R)$. If $u \in H^{1}_{0}(\Omega, \R)$ satisfies 
+		\begin{align*}
+			\mathcal{D}_{f}[u] \leq \mathcal{D}_{f}[w]
+		\end{align*}
+		for all $w \in H^{1}_{0}(\Omega, \R)$, then $u$ is a weak solution of the Poisson equation. 
+	\end{res}
+	
+	\begin{pf}
+		Since $C_{c}^{\infty} \subset H^{1}_{0}$, 
+		\begin{align*}
+			\mathcal{D}_{f}[u] \leq \mathcal{D}_{f}[u+t \psi]
+		\end{align*}
+		for test functions $\psi$ and $t \in \R$. Therefore, 
+		\begin{align*}
+			0 = \frac{d}{dt} \mathcal{D}_{f}[u,t\psi]|_{t=0} = \int_{\Omega} \nabla u \cdot \nabla \psi - f \psi dx
+		\end{align*}
+	\end{pf}
+	
+	The term ``calculus of variations'' refers to the fact that we are differentiating across the family of variations $u+t \psi$. We have now reduced solving the PDE to finding a minimum, and next show that a minimum exists. 
+	
+	\subsection{Assumptions for the Existence of a Minimum}
+	
+	Minimizing the functonal $\mathcal{D}_{f}[u+t\psi]$ reduces to minimizing 
+	\begin{align*}
+		\int_{\Omega} \frac{1}{2}|\nabla u |^{2} - fu + t (\nabla u \cdot \nabla \psi - f\psi) + t^{2} |\nabla \psi |^{2} dx
+	\end{align*}
+	
+	or that we have a quadratic term, a linear term, and a constant term. The quadratic $ax^{2}+bx+c$ has a minimum if and only if $a>0$, which is of course true for the above form given non-constant $\psi$. However, to have this across all $\psi$, we need a better formulation of the lower bound for the quadratic term. The original form of this is a result of Henri Poincar{\'e}
+	
+	\begin{res}
+		[Poincar{\'e} Inequality] For a bounded domain $\Omega \subset \R^{n}$, there is a constant $\kappa > 0$ depending only on $\Omega$ such that 
+		\begin{align*}
+			\norm{u}_{2}^{2} \leq \kappa^{2} \mathcal{E}[u]
+		\end{align*}
+		for all $u \in H^{1}_{0}(\Omega)$. 
+	\end{res}
+	\textbf{Remark:} We call the optimal $\kappa$ above the \textit{Poincar{\'e} cosntant} $\kappa(\Omega)$ 
+	\begin{pf}
+		We first focus on the test functions (which are dense in $H^{1}_{0}$) and deal with the general case after. The basic idea is that we want to compare the size of a function to the size of its derivative. In 1D, for a test function $\psi$ supported in $(a,b)$, this is obvious due to the Cauchy-Schwarz inequality
+		\begin{align*}
+			|\psi(x)|^{2} = (\int_{a}^{x} \psi'(t)dt)^{2} \leq \norm{\psi'}_{2}^{2} (b-a)
+		\end{align*}
+		
+		so that 
+		\begin{align*}
+			\norm{\psi}_{2}^{2} \leq (b-a)^{2} \norm{\psi'}_{2}^{2} = (b-a)^{2} \mathcal{E}[\psi]
+		\end{align*}
+		
+		In higher dimensions, the harder part is defining the right derivative to apply this idea to. If we have a bounded domain $\Omega \subset \R^{n}$, we pick a symmetrical box bound 
+		\begin{align*}
+			\Omega \subset [-M,M]^{n}
+		\end{align*}
+		for some large $M$. By our previous theorem, smooth and $H^{1}_{0}$ functions may be extended by $0$ to this space. Then, 
+		\begin{align*}
+			|\psi(x)|^{2} = \left(\int_{-M}^{x_1} \pd_{1}\psi(y,x_{2},...,x_{n})dy\right)^{2} \\
+			\leq 2M \norm{\pd_{1}\psi(y,x_{2},...,x_{m})}_{L^{2}([-M,M])}^{2}
+		\end{align*}
+		so integrating across all $x$ gives
+		\begin{align*}
+			\norm{\psi}_{2}^{2} \leq 4M^{2} \norm{\pd_{1}\psi}_{2}^{2}
+		\end{align*}
+		
+		Taking the average across all $x_i$, 
+		\begin{align*}
+			\norm{\psi}_{2}^{2} \leq \frac{4M^{2}}{n} \sum  \norm{\pd_{i}\psi(y,x_{2},...,x_{m})}_{2}^{2}
+		\end{align*}
+		
+		
+		Notice that 
+		\begin{align*}
+			\mathcal{E}[\psi] = \frac{1}{2} \int_{\Omega} \nabla \psi \cdot \nabla \psi dx = \frac{1}{2} \sum \norm{\pd_{i} \psi}_{2}^{2}
+		\end{align*}
+		
+		Combining this with the above inequality gives 
+		\begin{align*}
+			\norm{\psi}_{2}^{2} \leq \frac{8M^{2}}{n} \mathcal{E}[\psi]
+		\end{align*}
+		
+		To extend to $u \in H^{1}_{0}(\Omega)$, we take some sequence $\{\psi_{k}\}$ of test functions which converges to $u$ in $H^{1}$. This immediately implies $\norm{\psi_{k}}_{2} \to \norm{u}_{2}$, so we need only treat the energy on the right hand side of the inequality above to show it converges to the energy of $u$. Taking the difference,
+		
+		\begin{align*}
+			\mathcal{E}[u] -\mathcal{E}[\psi_{k}] = \int \nabla u \cdot \nabla u - \nabla \psi_{k} \cdot \nabla \psi_{k}dx \\
+			= \int \nabla u \cdot \nabla( u - \psi_{k}) + \nabla \psi_{k} \cdot \nabla (u-\psi_{k}) dx\\
+			\leq \norm{\nabla (u-\psi_{k})}_{2} ( \norm{\nabla u}_{2} + \norm{\nabla \psi}_{2})
+		\end{align*}
+		
+		so that 
+		\begin{align*}
+			|\mathcal{E}[u] - \mathcal{E}[\psi_{k}] | \leq \norm{u - \psi_{k}}_{H^{1}}(\norm{u}_{H^{1}} + \norm{\psi}_{H^{1}})
+		\end{align*}
+		
+		Since the $\psi_{k}$ are bounded in norm, 
+		\begin{align*}
+			\lim_{k \to \infty} \mathcal{E}[\psi_{k}] = \mathcal{E}[u]
+		\end{align*}
+		
+		so taking the limit of 
+		\begin{align*}
+			\norm{\psi_{k}}_{2}^{2} \leq \frac{8M^{2}}{n} \mathcal{E}[\psi_{k}]
+		\end{align*}
+		as $k \to \infty$ shows 
+		\begin{align*}
+			\norm{u}_{2}^{2} \leq \frac{8M^{2}}{n} \mathcal{E}[u]
+		\end{align*}
+	\end{pf}
+	
+	
+	We may re-express this theorem in terms of the $H^{1}$-norm using
+	\begin{align*}
+		\norm{u}_{H^{1}}^{2} = \norm{u}_{2}^{2} + \mathcal{E}[u]
+	\end{align*}
+	so that the theorem states 
+	\begin{align*}
+		\norm{u}_{H^{1}}^{2} \leq (\kappa^{2}+1) \mathcal{E}[u]
+	\end{align*}
+	
+	
+	In general, a quadratic operator $L:H \to \R$ is called \textit{coercive} if $|Lu| \geq C \norm{u}^{2}$ for some $C>0$. This states that the energy is a coercive operator. We also know 
+	\begin{align*}
+		\mathcal{E}[u] \leq \norm{u}_{H^{1}}^{2}
+	\end{align*}
+	so that it is also a \textit{bounded} operator. Using these two properties, we may solve the minimization problem 
+	
+	\begin{res}
+		For a bounded domain $\Omega \subset \R^{n}$ and $f \in L^{2}(\Omega)$, there is a unique function $u \in H^{1}_{0}(\Omega)$ such that 
+		\begin{align*}
+			\mathcal{D}_{f}[u] \leq \mathcal{D}_{f}[w]
+		\end{align*}
+		for all $w \in H^{1}_{0}(\Omega)$. 
+	\end{res}
+	
+	\begin{pf}
+		This proof will be non-constructive. We will show that the Dirichlet operator is bounded below, so an infimum value exists. Then, we will use the existence of a sequence converging to that infimum to find a function that minimizes the value of the Dirichlet operator, which will be our minimizer. Finally, we will show that this minimizer is unique and so this process gave the only possible minimizer. 
+		
+		
+		To show that a finite infimum exists, notice that 
+		\begin{align*}
+			\mathcal{D}_{f}[w] \geq \mathcal{E}[w] - |\langle f,w\rangle |
+		\end{align*}
+		so that adding in Poincare's inequality (Coercivity estimate) and the Cauchy-Schwarz inequality,
+		\begin{align*}
+			\mathcal{D}_{f}[w] \geq \frac{1}{\kappa^{2}+1}\norm{w}_{H^{1}}^{2} - \norm{f}_{2}\norm{w}_{2}\\
+			\geq \frac{1}{\kappa^{2}+1}\norm{w}_{H^{1}}^{2} - \norm{f}_{2}\norm{w}_{H^{1}}
+		\end{align*}
+		
+		Notice that for $x = \norm{w}_{H^{1}}$, this right side is a quadratic in $x$ with a positive coefficient on $x^{2}$. Therefore, using the vertex of the parabola, we have that
+		\begin{align*}
+			\mathcal{D}_{f}[w] \geq -\frac{\kappa^{2}+1}{4} \norm{f}_{2}^{2}
+		\end{align*}
+		
+		We have a lower bound and may now take $d_{0} = \inf_{w \in H^{1}_{0}(\Omega)} \mathcal{D}_{f}[w]$. We take a sequence $\{w_{k}\} \subset H^{1}_{0}$ so $\mathcal{D}_{f}[w_k] \to d_{0}$. We want to show that this sequence is Cauchy, and so a limit exists because $H^{1}_{0}$ is complete. 
+		
+		We first use a convexity-type inequality. 
+		\begin{align*}
+			\mathcal{E}[\frac{u+v}{2}] = \frac{1}{2}\mathcal{E}[u] + \frac{1}{2} \mathcal{E}[v] - \frac{1}{4} \mathcal{E}[u-v]
+		\end{align*}
+		implies 
+		\begin{align*}
+			d_0 \leq \mathcal{D}_{f}[\frac{w_k+w_m}{2}] = \frac{1}{2} \mathcal{D}_{f}[w_k] + \frac{1}{2} \mathcal{D}_{f}[w_m] - \frac{1}{4} \mathcal{E}[w_k-w_m]
+		\end{align*}
+		or 
+		\begin{align*}
+			\mathcal{E}[w_k - w_m] \leq 2\mathcal{D}_{f}[w_k] + 2 \mathcal{D}_{f}[w_m] - 4d_0
+		\end{align*}
+		
+		As $k,m \to \infty$, the right hand side of this inequality decreases to $0$ (both functional values go to $d_0$). Using the coercivity estimate $\norm{w}_{H^{1}}^{2} \leq C \mathcal{E}[w]$, we then have that 
+		\begin{align*}
+			\norm{w_k-w_m}_{H^{1}} \to 0
+		\end{align*}
+		as $k,m \to \infty$. The sequence is therefore Cauchy, and there is a limit $u \in H^{1}_{0}(\Omega)$. By construction, $\mathcal{D}_{f}[u] = d_0$, so $u$ is a minimizer. 
+		
+		Lastly, for uniqueness, if $u_1$ and $u_2$ both have $\mathcal{D}_{f}[u_i] = d_0$, 
+		\begin{align*}
+			\norm{u_1-u_2}_{H^{1}}^{2} \leq C\mathcal{E}[u_1-u_2] \leq C[ 2\mathcal{D}_{f}[u_1] + 2 \mathcal{D}_{f}[u_2] - 4d_0] = 0
+		\end{align*}
+		so $u_1 \equiv u_2$. 
+	\end{pf}
+	
+	\begin{res}
+		For $f \in L^{2}(\Omega)$, the weak formulation of the Poisson equation admits a unique solution $u \in H^{1}_{0}(\Omega)$. 
+	\end{res}
+	\begin{pf}
+		By the Dirichlet principle and the theorem above, the existence of a minimizer to $D_{f}$ implies the existence of a Poisson solution $u$. To prove uniqueness, we note that two solutions $u_1$ and $u_2$ have 
+		\begin{align*}
+			\int_{\Omega} \nabla (u_1-u_2)\cdot \nabla \psi dx = 0
+		\end{align*}
+		for all $\psi \in C_{c}^{\infty}(\Omega)$. Since we may take a sequence of test functions $\psi_{k}$ converging to $u_1-u_2$ in $H^{1}$, this implies 
+		\begin{align*}
+			\mathcal{E}[u_1-u_2] = \lim_{k \to \infty} \int_{\Omega} \nabla(u_1-u_2) \cdot \nabla \psi_{k} dx = 0
+		\end{align*} 
+		
+		so that, by the Poincar{\'e} inequality, $\norm{u_1-u_2}_{2} = 0$ and $u_1 \equiv u_2$. 
+	\end{pf}
+	
+	
+	\subsection{Elliptic Regularity}
+	
+	In the classical Poisson equation $-\Delta u=f$ (with true derivatives), where $f \in C^{k}$, we expect $u \in C^{k+2}$. In the case of a harmonic function, we should then expect it to be smooth. The goal of this section is to derive a similar result for the weak formulation. 
+	
+	As smoothness is a local property, we avoid technicalities with the boundary by working with local Sobolev spaces
+	\begin{align*}
+		H^{m}_{loc}(\Omega) = \{u \in L^{1}_{loc}(\Omega) \mod u\psi \in H^{m}(\Omega) \text{ for all } \psi \in C_{c}^{\infty}(\Omega)\}
+	\end{align*}
+	which is slightly less restrictive than $H^{1}_{0}$. 
+	
+	\begin{res}
+		[Interior Regularity] Suppose that $u \in H^{1}_{loc}(\Omega)$ is a weak solution of 
+		\begin{align*}
+			-\Delta u = f
+		\end{align*}
+		If $f \in H^{m}_{loc}(\Omega)$ for $m \geq 0$, then $u \in H^{m+2}_{loc}(\Omega)$. 
+	\end{res}
+	
+	\textbf{Remark:} Our Sobolev embedding theorem (lecture 9) gives $H^{m}_{loc}(\Omega) \subset C^{k}(\Omega)$ when$k < m - \frac{n}{2}$. Therefore, if $f \in H^{m}_{loc}$ for $m > \frac{n}{2}$, this theorem says that $u$ is actually a classical solution. 
+	
+	
+	We begin by proving the toral version using Fourier analysis, then extend to the real numbers using an argument on localities. 
+	\begin{res}
+		[Lemma] Suppose $u \in H^{1}(\mathbb{T}^{n})$ solves $-\Delta u = f$ in the weak sense. If $f \in H^{m}(\mathbb{T}^{n})$ for $m \in \N_{0}$, then $u \in H^{m+2}(\mathbb{T}^{n})$. 
+	\end{res}
+	
+	\begin{pf}
+		Let $u$ be a solution as in the statement of the theorem, so for all $\psi \in C^{\infty}(\mathbb{T}^{n})$, 
+		\begin{align*}
+			\int_{\mathbb{T}^{n}} \nabla u \cdot \nabla \psi - f \psi dx = 0
+		\end{align*}
+		
+		Taking $\psi = e^{-ikx}$ shows 
+		\begin{align*}
+			\int_{\mathbb{T}^{n}} [-ik\cdot \nabla u - f(x)]e^{-ikx}dx = 0
+		\end{align*} 
+		or 
+		\begin{align*}
+			c_{k}[f] = (-ik) \cdot c_{k}[\nabla u] \\
+			= |k|^{2}c_{k}[u]
+		\end{align*}
+		
+		Since $f \in H^{m}$,
+		\begin{align*}
+			\sum |k|^{2m+4}|c_{k}[u]|^{2} = \sum |k|^{2m} |c_{k}[f]|^{2} < \infty 
+		\end{align*}
+		and so $u \in H^{m+2}$ as desired by our Sobolev regularity theorem of lecture 9. 
+	\end{pf}
+	
+	\begin{pf}
+		[Proof of Theorem] Suppose $-\Delta u = f$ weakly, and $u \in H^{1}_{0}(\Omega)$, $f \in L^{2}_{loc}(\Omega)$. Since the Poisson function is invariant under rescaling and translating, we may alter $\Omega$ as necessary to assume $\Omega \subset [0,2\pi]^{n}$. Let $\chi \in C_{c}^{\infty}(\Omega)$, so $u\chi$ is a localization of $u$. We will extend this function by $0$ to $\mathbb{T}^{n}$, show that it satisfies the Poisson equation here, then use the above lemma to complete the argument. 
+	\end{pf}
+	
+	\section{Spectral Analysis}
+	
+	As we've been diving into elliptic equations in general settings both in the last lecture with Green's functions and here with variations, we have neglected one piece of information that we used readily in our simpler studies of the Laplacian: eigenvalues. We used the eigenvalues and eigenfunctions to develop the heat series equation and Fourier series, and now we shall apply variational calculus to the eigenvalue problem to try to estimate more general eigenvalues. 
+	
+	\subsection{Eigenvalues by Minimization}
+	
+	The goal of this section is to prove the following result. 
+	
+	\begin{res}
+		[Spectral Theorem for the Dirichlet Laplacian] Let $\Omega \subset \R^{n}$ be a bounded domain. There exists an orthonormal basis $\{\phi_{k}\}_{k \in \N}$ for $L^{2}(\Omega)$ such that 
+		\begin{align*}
+			-\Delta \phi_k = \lambda_{k} \phi_{k}
+		\end{align*}
+		with $\phi_{k} \in H^{1}_{0}(\Omega; \R) \cap C^{\infty}(\Omega)$. Furthermore, $\lambda_{k} > 0 $ for all $k$ and 
+		\begin{align*}
+			\lim_{k \to \infty} \lambda_{k} = \infty
+		\end{align*}
+	\end{res}
+	
+	In the 1D case, we have already directly computed these eigenvalues. Now, we will exploit the weak formulation of the eigenvalue equation $-\Delta \phi = \lambda \phi$, given by 
+	\begin{align*}
+		\int_{\Omega} [ \nabla \phi \cdot \nabla \psi - \lambda \phi \psi]dx = 0
+	\end{align*}
+	(for all test functions $\psi$). This looks like a difference of an energy-type inner product and the $L^{2}$ inner product, so we will use the notation 
+	\begin{align*}
+		\mathcal{E}[u,v] = \int_{\Omega} \nabla u \cdot \overline{\nabla v}dx
+	\end{align*}
+	whereby the weak formulation is 
+	\begin{align*}
+		\mathcal{E}[\phi,\psi] = \lambda \langle \phi,\psi \rangle 
+	\end{align*}
+	for all $\psi \in C_{c}^{\infty}(\Omega)$. Therefore, we will aim to compute $\lambda$ by minimizing
+	\begin{align*}
+		\mathcal{R}[v] = \frac{\mathcal{E}[v,v]}{\norm{v}_{L^{2}}^{2}}
+	\end{align*}
+	a function called the \textit{Rayleigh quotient}.
+	
+	To compute this, it is easier to work over $H^{1}_{0}$, and it suffices to note that the density of $C_{c}^{\infty}$ in $H^{1}_{0}$ allows us to take that the weak formulation holds for all such functions. In this case, any eigenfunction has $\mathcal{R}[\phi] = \lambda$. We also know by Poincare's inequality that 
+	\begin{align*}
+		\mathcal{R}[v] \geq \frac{1}{\kappa^{2}} >0
+	\end{align*}
+	for nonzero $v \in H^{1}_{0}$, so that the Rayleigh quotient is bounded below. This suggest a relationship between the constant here and the first eigenvalue. 
+	
+	However, the Rayleigh quotient is not linear, and so we need an extra tool to work with minimization. 
+	
+	\begin{res}
+		[Rellich's Theorem] Suppose $\Omega \subset \R^{n}$ is a bounded domain and $\{v_{k}\}$ is a bounded sequence in $H^{1}_{0}(\Omega)$. Then, $\{v_{k}\}$ has a subsequence $\{v_{k_n}\}$ which is convergent in $L^{2}(\Omega)$. 
+	\end{res}
+	
+	We will not prove this result (it is proved in Borthwick, section 11.6 if you would like to see it) for the sake of technicality. Results of this form are very important in PDE, but much more of the flavor of higher analysis than we are using for this course. 
+	
+	\begin{res}
+		[First Eigenvalue] There exists $\phi_{1} \in H^{1}_{0}(\Omega; \R) \cap C^{\infty}(\Omega)$ satisfying 
+		\begin{align*}
+			-\Delta \phi_{1} = \lambda_{1} \phi_{1}
+		\end{align*}
+		for $\lambda_{1} > 0$ such tat 
+		\begin{align*}
+			\lambda_{1} \leq \mathcal{R}[v]
+		\end{align*}
+		for all $v \in H^{1}_{0}(\Omega)$, $v \neq 0$. 
+	\end{res}
+	\begin{pf}
+		Set 
+		\begin{align*}
+			\lambda_{1} = \inf_{v \in H^{1}_{0}(\Omega)\backslash \{0\}} \mathcal{R}[v]
+		\end{align*}
+		which is finite and positive by Poincare's inequality. Pick a sequence of $\{v_{k}\}$ such that $\mathcal{R}[v_k] \to \lambda_{1}$, and rescale the $v_{k}$ so they have $L^{2}$-norm $1$ (i.e. $\mathcal{R}[v_k] = \mathcal{E}[v_k]$).
+
+		Since these quotients converge, the energies also converge and are therefore bounded. This implies the sequence is bounded in the $H^{1}$ norm, so by passing to a subsequence we may assume that the $v_{k}$ converge to some function $\phi$ in $L^{2}$. We want to show that this convergence is actually true in $H^{1}$, and we manipulate the energy functional to do so. We have $L^{2}$ convergence already, so we just need to show that $\mathcal{E}[v_k - \phi] \to 0$ as $k \to \infty$.
+		
+		
+		First, from the known inequality
+		\begin{align*}
+			\mathcal{R}[\frac{v_k+v_m}{2}] \geq \lambda_1
+		\end{align*}
+		we have
+		\begin{align*}
+			\mathcal{E}[\frac{v_k + v_m}{2}] \geq \frac{\lambda_1}{4} \norm{v_k + v_m}_{2}^{2}
+		\end{align*}
+		
+		Combining this with 
+		\begin{align*}
+			\mathcal{E}[\frac{v_k + v_m}{2}]= \frac{1}{2} \mathcal{E}[v_k] + \frac{1}{2} \mathcal{E}[v_m] - \frac{1}{4} \mathcal{E}[v_k - v_m]
+		\end{align*}
+		
+		shows that 
+		\begin{align*}
+			\mathcal{E}[v_k - v_m] \leq 2\mathcal{E}[v_k] + 2\mathcal{E}[v_m] - \lambda_1 \norm{v_k + v_m}_{2}^{2}
+		\end{align*}
+		
+		The third term of the right-hand side, as we know, converges to $\lambda_{1} \norm{2 \phi}_{2}^{2} = 4 \lambda_{1}$. The two energy terms also converge to this by the infimum sequence assumption, so the RHS converges to $0$ and we know 
+		\begin{align*}
+			\lim_{k,m \to \infty} \mathcal{E}[v_k - v_m] = 0
+		\end{align*}
+		
+		Since we know the $\{v_{k}\}$ are Cauchy in $L^{2}$, this gives that th4 $\{v_{k}\}$ are Cauchy in $H^{1}$ and converge to some $u \in H^{1}_{0}$. However, since $L^{2}$ convergence is accounted for here, we must have that $u = \phi$. This shows $\phi \in H^{1}_{0}$ and also that 
+		\begin{align*}
+			\mathcal{R}[\phi] = \lambda_1
+		\end{align*}
+		
+		\vspace{1cm}
+		
+		
+		To conclude this proof, we now show that $\phi_1$ satisfies the weak solution condition. Suppose $w \in H^{1}_{0}(\Omega)$. We may expand the inner product of $\mathcal{E}$ to see 
+		\begin{align*}
+			\mathcal{E}[\phi + t w] = \lambda_1 + 2t \Re \mathcal{E}[\phi,w] + t^{2} \mathcal{E}[w]
+		\end{align*}
+		for $t \in \R$. Doing the same to the norm,
+		\begin{align*}
+			\norm{\phi + tw}_{2}^{2} = 1 + 2t \Re \langle \phi,w\rangle +t^{2}\norm{w}_{2}^{2}
+		\end{align*}
+		
+		This gives that 
+		\begin{align*}
+			\frac{d}{dt}\mathcal{R}[\phi + tw]|_{t=0} = 2 \Re \mathcal{E}[\phi,w] - 2\lambda_{1} \Re \langle \phi,w\rangle 
+		\end{align*}
+		
+		Since $\mathcal{R}[\phi]$ is a minimum, 
+		\begin{align*}
+			\frac{d}{dt} \mathcal{R}[\phi + tw]|_{t=0} = 0
+		\end{align*}
+		
+		which is to say
+		\begin{align*}
+			\Re \mathcal{E}[\phi,w] = \lambda_{1} \Re \langle \phi,w\rangle 
+		\end{align*}
+		for all $w \in H^{1}_{0}$. The same is true for the imaginary part by replacing $w$ with $iw$, so 
+		\begin{align*}
+			\mathcal{E}[\phi,w] = \lambda_{1}\langle \phi,w\rangle 
+		\end{align*}
+		for all $w \in H^{1}_{0}$, which is exactly the weak formulation. 
+		
+		\vspace{1cm}
+		
+		Lastly, notice $\phi$ is smooth by applying elliptic regularity to the eigenvalue equation. 
+	\end{pf}
+	
+	To move from the first eigenvalue to the general case, we will simply remove the subspace generated by the first eigenfunction from $L^{2}$. In particular, we will take the orthocomplement
+	\begin{align*}
+		A^{\perp} = \{w \in L^{2}(\Omega) \mid \langle w,v\rangle  = 0 \text{ for all }v \in A\}
+	\end{align*}
+	
+	We notice that $A^{\perp} \cap H^{1}_{0}$ is immediately closed with respect to the $H^{1}$-norm, since the $L^{2}$ norm is dominated by it (the $L^{2}$-inner product is continuous with respect to the $H^{1}$-norm). 
+	
+	\begin{pf}
+		[Proof of Spectral Theorem] Let $\phi_{1} \in H^{1}_{0}(\Omega, \R)$ be the eigenvector obtained from the previous theorem, normalized so $\norm{\phi_{1}}_{2} = 1$. Set
+		\begin{align*}
+			W_{1} = \{\phi_1\}^{\perp} \cap H^{1}_{0}(\Omega)
+		\end{align*}
+		which is closed and hence complete as we noticed above. Applying the minimzation argument, or \textit{Rayleigh Principle} to $W$ instead of to $H^{1}_{0}$ gives a new minimum $\lambda_2$ and new eigenvector $\phi_{2}$ that is also a solution to the weak Helmholtz equation when looking at other functions in $W$. By the orthogonal construction, $\langle \phi_1,\phi_2\rangle =0$ and, by the weak solution property,
+		\begin{align*}
+			\mathcal{E}[\phi_1,\phi_2] = \lambda_1 \langle \phi_1,\phi_2\rangle =0
+		\end{align*}
+		
+		We claim $\phi_2$ is a full weak solution to the Helmholtz equation. Indeed, take $v \in H^{1}_{0}$, and $v = c \phi_1 + w$ for $w \in W$. Therefore, 
+		\begin{align*}
+			\mathcal{E}[\phi_2,c] - \lambda_2 \langle \phi_2,v\rangle  = \mathcal{E}[\phi_2,w] - \lambda_2 \langle \phi_2,w\rangle  = 0
+		\end{align*}
+		as desired. 
+		
+		\vspace{1cm}
+		
+		We may find further values by setting 
+		\begin{align*}
+			W_{k} = \{\phi_1,...,\phi_{k}\}^{\perp} \cap H^{1}_{0}(\Omega)
+		\end{align*}
+		and applying the same argument to find $\lambda_{k+1}$ and $\phi_{k+1}$. Our next claim to prove is that $\lambda_{k}\to \infty$. Assume for contradiction that this sequence is bounded. Then,
+		\begin{align*}
+			\norm{\phi_{k}}_{H^{1}}^{2} = 1+\lambda_k
+		\end{align*}
+		
+		so that the $\phi_{k}$ are bounded. By Rellich's theorem, a subsequence converges in $L^{2}$ to some $\Phi$. However, the $\phi_{k}$ are orthonormal in $L^{2}$, so this is impossible. 
+		
+		\vspace{1cm}
+		
+		Finally, we show that the $\{\phi_k\}$ are a basis for $L^{2}(\Omega)$. Set 
+		\begin{align*}
+			W_{\infty} = \{\phi_1,\phi_{2},...\}^{\perp} \cap H^{1}_{0}(\Omega)
+		\end{align*}
+		and suppose a nonzero vector $\psi$ is in this space. Then, applying Rayleigh's principle, we have a new eigenvalue $\lambda$. Since $W_{k} \supset W_{\infty}$, $\lambda > \lambda_{k}$ for all $k$. However, this is impossible since the eigenvalues grow to infinity. Hence, $W_{\infty} = \{0\}$. 
+		
+		Therefore, for any $\psi \in H^{1}_{0}$, 
+		\begin{align*}
+			\sum \langle \psi,\phi_{k}\rangle \phi_{k} \to \psi
+		\end{align*} 
+		in the $L^{2}$-norm. Therefore, the $\phi_{k}$ are a basis for $H^{1}_{0}$ under the $L^{2}$ norm. A vector $v$ orthogonal to the $\phi_k$ is then orthogonal to $H^{1}_{0}$, but $H^{!}_{0}$ is dense in $L^{2}$, so the only such vector can be $0$. 
+	\end{pf}
+	
+	
+	\subsection{Estimation of Eigenvalues}
+	
+	
+	The Rayleigh Principle allows us to gain the existence of eigenvalues theoretically, but it also allows us to estimate eigenvalues numerically since we may compute eigenvalues on some domains. Assume the Dirichlet eigenvalues $\{\lambda_k\}$ for a domain $\Omega$ are written in increasing order such that 
+	\begin{align*}
+		\lambda_{k} = \min_{w \in W_{k-1}\backslash \{0\}} \mathcal{R}[w]
+	\end{align*}
+	as in the previous section, with corresponding eigenfunction $\phi_{k}$. 
+	
+	
+	\begin{res}
+		[Minimax Principle] For a bounded domain $\Omega \subset \R^{n}$, let $\Lambda_k$ denote the set of all $k$-dimensonal subspaces of $H^{1}_{0}(\Omega)$. Then,
+		\begin{align*}
+			\lambda_{k} = \min_{V \in \Lambda_{k}} \{ \max_{u \in V \backslash \{0\}} \mathcal{R}[u]\}
+		\end{align*}
+		for each $k \in \N$. 
+	\end{res}
+	
+	
+	
+	\begin{pf}
+		Let $\{\phi_k\}$ be the eigenfunction basis as above. We then have 
+		\begin{align*}
+			\mathcal{E}[\phi_i,\phi_j] = \begin{cases}
+				\lambda_i & i=j \\ 0 & i \neq j
+			\end{cases}
+		\end{align*}
+		
+		Set $V_{e} = \text{span}[\phi_1,...,\phi_k] \subset H^{1}_{0}(\Omega)$. For $u \in V_{e}$, 
+		\begin{align*}
+			u = \sum c_j \phi_j \Rightarrow \\
+			\mathcal{E}[u] = \sum_{j=1}^{k} \lambda_j |c_j|^{2} \\
+			\text{and} \\
+			\mathcal{R}[u] = \frac{\sum_{j=1}^{k} \lambda_j |c_{j}|^{2}}{\sum |c_{j}|^{2}}
+		\end{align*}
+		Since the eigenvalues are increasing, $\mathcal{R}[u] \leq \lambda_k$, and of course, $\mathcal{R}[\phi_k] = \lambda_k$ so that the maximum value of the Rayleigh quotient over $V_{e}$ is attained. This justifies that the minimum is at most $\lambda_k$. 
+		
+		Suppose we take a general subspace $V \in \Lambda_k$. Then, by the dimension of the space, there must be some
+		\begin{align*}
+			w \in V \cap \text{span}[\phi_1,...,\phi_{k-1}]^{\perp}
+		\end{align*}
+		from which we have, by the definition of our eigenvaleus by minimization, $\lambda_{k} \leq \mathcal{R}[w]$. Therefore,
+		\begin{align*}
+			\lambda_{k} \leq \max_{u \in V \backslash \{0\}} \mathcal{R}[u]
+		\end{align*}
+		
+		which shows that the minimum in the theorem statement is exactly $\lambda_k$. 
+	\end{pf}
+	
+	\textbf{Remark:} We shall not use or prove it here, but there is also a maxi-min principle that changes these orders:
+	\begin{align*}
+		\lambda_{k} = \max_{S\subset H^{1}_{0}(\Omega), \dim(S) = k-1} \left( \min_{u \in S^{\perp} \backslash \{0\}} \mathcal{R}[u]\right)
+	\end{align*}
+	
+	\begin{res}
+		[Comparison Principle] Consider two bounded domains in $\R^{n}$ satisfying $\Omega \subset \tilde{\Omega}$. Assuming the Dirichlet eigenvalues are arranged in increasing order, 
+		\begin{align*}
+			\lambda_{k}()\tilde{\Omega}) \leq \lambda_{k}(\Omega)
+		\end{align*}
+	\end{res}
+	
+	\begin{pf}
+		Let $\tilde{\Lambda}_{k} $ denote the $k$-dimensional subspaces of $H^{1}_{0}(\tilde{\Omega})$. Since $V_{e}$ from the above proof is such a subspace (extending by 0s),
+		\begin{align*}
+			\lambda_{k}(\tilde{\Omega}) = \min_{W \in \tilde{\Lambda}_{k}} \{ \max_{u \in W \backslash \{0\}} \mathcal{R}[u] \leq \max_{u \in V_{e} \backslash \{0\}} \mathcal{R}[u] = \lambda_{k}(\Omega)
+		\end{align*}
+	\end{pf}
+	
+	Recall that, for example, we know the eigenvalues on a rectangle $\prod [-a_i,a_i]$ since we wind up with sums 
+	\begin{align*}
+		\{\sum_{i=1}^{n} k_{i}^{2} \mid k_i \in \frac{\pi}{a_i}\Z\}
+	\end{align*} 
+	
+	and we can then put lower bounds on the eigenvalues depending on the size of the domain. We can make this even more precise.
+	
+	\vspace{1cm}
+	\textbf{Example:} Consider the unit disk $B(0,1) \subset \R^{2}$. Consider $w_{a}(r) = 1-r^{\alpha}$. Using the radial definition,
+	\begin{align*}
+		\mathcal{E}[w_\alpha] = \int_{0}^{1} \left(\frac{\pd w_\alpha}{\pd r}\right)^{2} 2\pi r dr \\
+		= \pi \alpha
+	\end{align*}
+	
+	and the $L^{2}$ norm is 
+	\begin{align*}
+		\norm{w_\alpha}_{2}^{2} = \int_{0}^{1} (1-r^{\alpha})^{2}2\pi r dr = \frac{\pi \alpha^{2}}{2+3\alpha+\alpha^{2}}
+	\end{align*}
+	
+	so $\lambda_{1} \leq \mathcal{R}[\alpha] = \frac{2}{\alpha} + 3 + \alpha$. Picking $\alpha = \sqrt{2}$ minimizes this expression, showing $\lambda_{1} = 3 + 2\sqrt{2} \approx 5.828$. The exact value of $\lambda_1$ is the first root of the Bessel function squared, or approximately $5.783$. 
+	
+	\vspace{1 cm}
+	
+	We can estimate higher eigenvalues using a strategy introduced by Walter Ritz in 1909, where we look at subspaces of $H^{1}_{0}$. Let $A \subset H^{1}_{0}(\Omega)$ by a finite-dimensional subspace. Then, the approximate eigenvalues associated to $A$ are 
+	\begin{align*}
+		\eta_{k} = \min_{W \in \Lambda_{k}(A)} \max_{u \in W \backslash \{0\}} \mathcal{R}[u]
+	\end{align*}
+	for $k=1,...,\dim(A)$. In this finite dimensional case, we may rearrange the situation to be a matrix eigenvalue problem. The values $\eta_k$ are associated the vectors $v_k \in A$ satisfying the weak eigenvalue equation 
+	\begin{align*}
+		\mathcal{E}[v_k,w] = \eta_{k} \langle v_k,w \rangle 
+	\end{align*}
+	for all $w \in A$. Fix a basis $\{w_{i}\}$ for $A$. Then, define 
+	\begin{align*}
+		E_{ij} = \mathcal{E}[w_i,w_j] \hspace{2cm} F_{ij} = \langle w_i,w_j \rangle 
+	\end{align*} 
+	
+	If $v = \sum c_j w_j$ in coordinates, then the weak equation is 
+	\begin{align*}
+		\sum c_i ( E_{ij} - \eta_k F_{ij}) = 0
+	\end{align*}
+	In other words, the vector $C$ is in the nullspace of $E-\eta_k F$. 
+	
+	So $\{\eta_1,...,\eta_k\} = \{ \eta \mid \text{det}(E - \eta F) = 0\}$, or that these are the eigenvalues of $EF^{-1}$. This is called the \textit{Rayleigh-Ritz Scheme}. 
+	
+	\vspace{1cm}
+	\textbf{Example:}
+	
+	Set $A = \text{span}\{w_1,w_2,w_3\}$ where $w_{j}(r) = 1-r^{2j}$. Then,
+	\begin{align*}
+		E = \begin{bmatrix}2\pi & \frac{8\pi}{3} & 3\pi \\ \frac{8\pi}{3} & 4\pi & \frac{24 \pi}{5} \\ 3\pi & \frac{24 \pi}{5} & 6 \pi \end{bmatrix} \\
+		F = \begin{bmatrix}
+			\frac{\pi}{3} & \frac{5\pi}{12} & \frac{9\pi}{20} \\ \frac{5\pi}{12} & \frac{8\pi}{15}&\frac{7\pi}{12} \\ \frac{9\pi}{20}&\frac{7\pi}{12}&\frac{9\pi}{4}
+		\end{bmatrix}
+	\end{align*}
+	where we see eigenvalues $\eta_1 = 5.783$, $\eta_2 = 30.712$, and $\eta_3 = 113.505$. In fact, $|\lambda_1 - \eta_1|\approx 10^{-6}$. However, $\lambda_2 \approx 14.682$, where we lost accuracy in this case because we focused solely in radial functions (the second eigenfunction is orthogonal to $A$). The third eigenvalue, $\lambda_3 \approx 30.471$, is approximated quite well by $\lambda_2$, however. 
+	
+	\vspace{1cm}
+	To prevent the type of issue above, we use the finite-element method to find $A$ which covers $H^{1}_{0}(\Omega)$ well. This involves subdividing $\Omega$ into small polygons, producing a mesh (or triangulation). Each interior vertex is associated with an element, a piecewise linear function which is positive at this vertex and decays to $0$ on the neighboring faces. The subspace $A$ is the span of the elements. This produces an extremely adaptable and accurate method for computing the eigenvalues numerically. 
+	
+	\section{Euler-Lagrange Problems}
+	
+	As we mentioned in the introduction, the development of the Calculus of Variations came from Lagrange and Euler working on problems in classical mechanics and representing solutions in terms of the minimzation of an action functional. In particular, this is usually the integral of a \textit{Lagrangian} $L(p,z,x)$ for 
+	\begin{align*}
+		L:\R^{n} \times \R \times \cl{\Omega} \to \R
+	\end{align*}
+	
+	Then, the action functional is 
+	\begin{align*}
+		I[w] = \int_{\Omega} L(\nabla w(x),w(x),x)dx
+	\end{align*}
+	
+	A critical point of $I[w]$, i.e. $w$ so 
+	\begin{align*}
+		\frac{d}{dt} I[w + t \psi]|_{t=0} = 0
+	\end{align*}
+	for any test function $\psi$ is a weak solution of an associated PDE called the \textit{Euler-Lagrange Equation} associated to $L$. Indeed, we simply must compute the derivative to show this. Set $i(t) = I[w + t \psi]$. Then, 
+	
+	\begin{align*}
+		i'(t) = \int_{\Omega} \sum_{i} L_{p_i}( \nabla w + t \nabla \psi, w+t\psi, x)\psi_{x_i} + L_{z}( \nabla w + t \nabla \psi, w+t\psi, x) \psi dx\\
+		0=i'(0) =  \int_{\Omega} \sum_{i} L_{p_i}(\nabla w,w,x)\psi_{x_i} + L_{z}(\nabla w, w,x)\psi dx
+	\end{align*}
+	
+	or
+	
+	\begin{align*}
+		0 = \int_{\Omega} \left[-\sum_{i} ((L_{p_i}(\nabla w, w, x))_{x_i}) + L_{z}(\nabla w, w,x) \right] \psi dx
+	\end{align*}
+	
+	for all test functions $\psi$. The associated Euler-Lagrange equation is then 
+	\begin{align*}
+		-\sum_{i} ((L_{p_i}(\nabla w, w, x))_{x_i}) + L_{z}(\nabla w, w,x) = 0
+	\end{align*}
+	
+	
+	\vspace{1cm}
+	\textbf{Example:} Dirichlet's principle relied on the Lagrangian
+	\begin{align*}
+		L(p,z,x) = \frac{1}{2} |p|^{2}
+	\end{align*}
+	
+	which generated equation $-\Delta u = 0$ in $\Omega$. 
+	
+	\vspace{1cm}
+	
+	\textbf{Example:} We may also create Poisson equation $-\Delta u = f(x)$ from 
+	\begin{align*}
+		L(p,z,x) = \frac{1}{2}|p|^{2} - zf(x)
+	\end{align*}
+	and the nonlinear Poisson equation 
+	\begin{align*}
+		-\Delta u = f(u)
+	\end{align*}
+	from 
+	\begin{align*}
+		L(p,z,x) = \frac{1}{2}|p|^{2} - \int_{0}^{z} f(y)dy
+	\end{align*}
+	
+	
+	\vspace{1cm}
+	
+	\textbf{Example:} We may further produce \textit{minimal surfaces} through this approach. Minimal surfaces are defined as being the surface minimizing the surface area while passing through some known regions (bubbles are good examples of creating such surfaces). This problem was first studied by Lagrange, though much work was done by Joseph Plateau who looked precisely at soap films. 
+	
+	The surface area of the graph of a function $w$ is 
+	\begin{align*}
+		\int_{\Omega} \sqrt{1+|\nabla w|^{2}}dx
+	\end{align*}
+	so this looks like the action functional of Lagrangian 
+	\begin{align*}
+		L(p,z,x) = \sqrt{1+|p|^{2}}
+	\end{align*}
+	
+	From our derivation above, this gives the \textit{minimal surface equation}
+	
+	\begin{align*}
+		\nabla \cdot \left(\frac{ \nabla u }{\sqrt{1+ |\nabla u |^{2}}}\right) = 0
+	\end{align*}
+	
+	which says that the surface has \textit{zero mean curvature}. 
+	
+	\vspace{1cm}
+	
+	In the previous section, we looked at a specific Laplacian and used the properties of coercivity to find a minimum. While the proof may be a bit too technical for us, this may be done with general Lagrangians under further assumptions. In particular, we call the action functional $I[w]$ \textit{coercive} if 
+	\begin{align*}
+		I[w] \geq \delta \norm{\nabla w}_{L^{2}(\Omega)}^{q} - \gamma
+	\end{align*}
+	
+	This says roughly that $I[w] \to \infty$ as $\norm{\nabla w}_{L^{2}} \to \infty$, which helps us show that we truly achieve a minimizer. We also used a continuity argument that does not hold in all cases. Therefore, we may define an action functional $I[w]$ to be \textit{weakly lower semicontinuous} on $H^{1}(\Omega)$ provided 
+	\begin{align*}
+		I[u] \leq \liminf_{k \to \infty} I[u_k]
+	\end{align*}
+	whenever $\langle u_{k},w\rangle_{L^{2}} \to \langle u,w\rangle_{L^{2}}$ for all $w \in L^{2}(\Omega)$. These two properties are enough to show existence.
+	
+	\begin{res}
+		Assume that $I[w]$ is an action functional generated from Lagrangian $L$ and is coercive and weakly lower semicontinuous. Suppose also that there are functions $w$ so $I[w] < \infty$. Then, there exists at least one $w$ so 
+		\begin{align*}
+			I[w] = \min_{u} I[u]
+		\end{align*} 
+	\end{res}
+	
+	If we ascribe some further restrictions to $L$ (in particular, it cannot grow too quickly), then this minimizer $w$ is a weak solution to the associated Euler-Lagrange Equation [See Evans Chapter 8 for a full discussion and Proof]. 
+	
+	A helpful tool to arise from all of this theoretical quandry is the \textit{Lagrange Multiplier}. In particular, if we want to restrain $I[w]$ by the condition 
+	\begin{align*}
+		J[w] = \int_{\Omega} G(w) dx = 0
+	\end{align*}
+	
+	we define $A = \{w \in H^{1}_{0}(\Omega) \mid J[w] = 0\}$. When we have some restrictions on $G$ ($|G'(z)| \leq C(|z|+1))$, minimizers still exist and the following is true. 
+	
+	\begin{res}
+		Let $w\in A$ have 
+		\begin{align*}
+			I[w] = \min_{u\in A} I[u]
+		\end{align*}
+		Then, there exists a real number $\lambda$ such that 
+		\begin{align*}
+			\int_{\Omega} Dw \cdot Dv dx = \lambda \int_{\Omega} G'(w)v dx
+		\end{align*}
+		for all $v \in H^{1}_{0}(\Omega)$. 
+	\end{res}
+	
+	For a physicist, the topic of Euler-Lagrange equations is one of the highest-reward topics in PDEs to study due to the sheer breadth of extensions of these results (for example, all of Lagrangian mechanics). For example, optimal control problems may also be reduced to Euler-Lagrange problems (as can several other stochastic minimzation problems).  
+	
+	
+	\subsection{Finishing the Brastichrone Problem}
+	
+	Recall from the introduction that we had reduced the Brastichrone problem to finding the curve $(x,y(x))$ such that $y$ minimizes
+	\begin{align*}
+		T(y) = \frac{1}{\sqrt{2g}} \int_{x_A}^{x_B} \sqrt{\frac{1+(y')^{2}}{y}} dx
+	\end{align*}
+	
+	we can now solve this by using the Euler-Lagrange equations. While taking the derivatives is a bit laborious, the equation is, for $F(y,y')$ the integrand of the integral above,
+	\begin{align*}
+		0 = \frac{\pd F}{\pd y} - \frac{d}{dx} \frac{\pd F}{\pd y'}=-\frac{1}{2y} - \frac{y''}{1+(y')^{2}}
+	\end{align*}
+	
+	We may solve this by multiplying by $2y'$ and integrating,
+	\begin{align*}
+		0 = -\frac{y'}{y} - \frac{2y'y''}{1+(y')^{2}} \\
+		c = -\ln(y) - \ln(1+(y')^{2}) \\
+		y(1+(y')^2) = C \\
+		y' = \sqrt{\frac{C}{y}-1}
+	\end{align*}
+	
+	Solving this ODE is a bit tricky, but gives the parametric solution 
+	\begin{align*}
+		\begin{cases}
+			x = \frac{C}{2}(\theta - \sin(\theta)) \\
+			y = \frac{C}{s}(1-\cos(\theta))
+		\end{cases}
+	\end{align*}
+	which is a cycloid based on a circle of diameter $C$. 
+	
+
+\end{document}

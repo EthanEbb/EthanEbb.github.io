@@ -1,0 +1,114 @@
+
+\DocumentMetadata{tagging=on,
+	tagging-setup={math/setup=mathml-SE},
+	pdfstandard=ua-2,
+	lang=en-US
+}
+\documentclass{article}
+
+%Math Libraries
+\usepackage{multirow, longtable, amsmath, amssymb, amsthm}
+\usepackage[mathscr]{euscript}
+
+%Formatting
+\usepackage[margin = 1 in]{geometry}
+\usepackage{indentfirst}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage{tabularx}
+\usepackage{cite}
+
+%Diagram Packages
+\usepackage{tikz}
+\usetikzlibrary{automata,positioning,arrows}
+
+%Standard Commands
+\newcommand{\mm}{\mathscr}
+\newcommand{\B}{{\mathcal{B}}}
+\newcommand{\A}{{\mathcal{A}}}
+\newcommand{\N}{{\mathbb{N}}}
+\newcommand{\R}{{\mathbb{R}}}
+\newcommand{\C}{{\mathbb{C}}}
+\newcommand{\Q}{{\mathbb{Q}}}
+\newcommand{\Z}{{\mathbb{Z}}}
+
+
+\newcommand{\abs}[1]{{|{#1}|}}
+\newcommand{ \norm }[1]{{ || {#1}||}}
+\newcommand{\cl}[1]{{\overline{#1}}}
+\newcommand{\pd}{\partial}
+\newcommand{\ip}[2]{ \langle {#1},{#2}\rangle }
+\newcommand{\ls}{\lesssim}
+\newcommand{\gs}{\gtrsim}
+\newcommand{\supp}{\text{supp}}
+
+%Result Environment
+\newcounter{result}[section]
+\newenvironment{res}[1][]{\refstepcounter{result}\par\medskip
+	\noindent \textbf{[\thesection.\theresult] #1} \rmfamily}{\medskip}
+
+\newenvironment{defn}[1][]{\refstepcounter{result}\par\medskip \noindent \textbf{Definition [\thesection.\theresult] #1} \rmfamily}{\medskip}
+
+%Proof Environment
+\newenvironment{pf}{%
+	\par%
+	\medskip
+	\leftskip=2em\rightskip=2em%
+	\noindent\ignorespaces \textit{Proof:} \newline}{%
+	\,\, \newline \textit{Q.E.D.}\par\medskip}
+
+\title{Math 126 Summer 2026 HW 1}
+\author{Lec 001, Ebbighausen}
+
+
+\begin{document}
+	\pagestyle{fancy}
+	\fancyfoot{} 
+	\fancyfoot[L]{Math 126}
+	
+	\maketitle
+	
+	\textbf{Problem 1:} (Borthwick 2.2) Polar coordinates in $\R^{2}$ are related to polar coordinates by $(x^1,x^2) = (r\cos(\theta),r\sin(\theta))$. 
+	
+	A.) Use the chain rule to compute $\frac{\pd}{\pd r}$ and $\frac{\pd}{\pd \theta}$ in terms of $\frac{\pd}{\pd x^1}$ and $\frac{\pd}{\pd x^{2}}$. 
+	
+	B.) Find the expression for $\Delta$ in radial coordinates. 
+	
+	
+	\textbf{Problem 2:} Let $E = \{(x,y) \in \R^{2} \mid \frac{x^{2}}{16} + \frac{y^{2}}{9} \leq 1\}$. 
+	A.) Describe the boundary of the set. Is this set open or closed? 
+	
+	B.) What is the outward unit normal to the boundary at the point $(2\sqrt{2}, \frac{3}{\sqrt{2}})$? 
+		
+	
+	\textbf{Problem 3:} (Borthwick 2.4) For $f \in C^{0}(\R^{n})$, set $h(t) = \int_{B(0,t)} f(x) dx$. What is $\frac{dh}{dt}$? (Hint: use the radial decomposition to break the volume integral into an integral over the radius and over the sphere)
+	
+	
+	\textbf{Problem 4:} (Borthwick 3.1) Consider a conservation equation with constant velicoty $c > 0$,
+	\begin{align*}
+		\frac{\pd u}{\pd t} + c \frac{\pd u}{ \pd x} = 0
+	\end{align*}
+	in the quadrant $t,x \geq 0$. Suppose that $u(0,x) = g(x)$ for $x \geq 0$ and $u(t,0) = h(t)$ for $t \geq 0$, where $g,h \in C^{1}([0,\infty))$. 
+	
+	A.) Find a formula for $u(t,x)$ in terms of $g$ and $h$. 
+	
+	B.) What condition on $g$,$h$ do we need for $u$ to be continuous?
+	
+	
+	\textbf{Problem 5:} Let $U \subset \R^{2}$ be the half-space $\{x^{2} > 0\}$. Consider the partial differential equation
+	\begin{align*}
+		\begin{cases}
+			u_{x^{1}} + u_{x^{2}} = u^{2} & U \\
+			u|_{x^{2} = 0} = (x^{1})^{2}
+		\end{cases}
+	\end{align*}
+	
+	
+	A.) Compute the characteristic ODEs.
+	
+	B.) Solve for $x(s)$ and $z(s)$ from the characteristic ODEs.
+	
+	C.) Solve for $u(x^1,x^2)$ as a formula depending on $x^{1}$ and $x^{2}$.
+	
+	D.) Check that $u$ is truly a solution to the ODE. 
+\end{document}

@@ -1,0 +1,140 @@
+
+\DocumentMetadata{tagging=on,
+	tagging-setup={math/setup=mathml-SE},
+	pdfstandard=ua-2,
+	lang=en-US
+}
+\documentclass{article}
+
+%Math Libraries
+\usepackage{multirow, longtable, amsmath, amssymb, amsthm}
+\usepackage[mathscr]{euscript}
+
+%Formatting
+\usepackage[margin = 1 in]{geometry}
+\usepackage{indentfirst}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage{tabularx}
+\usepackage{cite}
+
+%Diagram Packages
+\usepackage{tikz}
+\usetikzlibrary{automata,positioning,arrows}
+
+%Standard Commands
+\newcommand{\mm}{\mathscr}
+\newcommand{\B}{{\mathcal{B}}}
+\newcommand{\A}{{\mathcal{A}}}
+\newcommand{\N}{{\mathbb{N}}}
+\newcommand{\R}{{\mathbb{R}}}
+\newcommand{\C}{{\mathbb{C}}}
+\newcommand{\Q}{{\mathbb{Q}}}
+\newcommand{\Z}{{\mathbb{Z}}}
+
+
+\newcommand{\abs}[1]{{|{#1}|}}
+\newcommand{ \norm }[1]{{ || {#1}||}}
+\newcommand{\cl}[1]{{\overline{#1}}}
+\newcommand{\pd}{\partial}
+\newcommand{\ip}[2]{ \langle {#1},{#2}\rangle }
+\newcommand{\ls}{\lesssim}
+\newcommand{\gs}{\gtrsim}
+\newcommand{\supp}{\text{supp}}
+
+%Result Environment
+\newcounter{result}[section]
+\newenvironment{res}[1][]{\refstepcounter{result}\par\medskip
+	\noindent \textbf{[\thesection.\theresult] #1} \rmfamily}{\medskip}
+
+\newenvironment{defn}[1][]{\refstepcounter{result}\par\medskip \noindent \textbf{Definition [\thesection.\theresult] #1} \rmfamily}{\medskip}
+
+%Proof Environment
+\newenvironment{pf}{%
+	\par%
+	\medskip
+	\leftskip=2em\rightskip=2em%
+	\noindent\ignorespaces \textit{Proof:} \newline}{%
+	\,\, \newline \textit{Q.E.D.}\par\medskip}
+
+\title{Math 126 Summer 2026 HW 3}
+\author{Lec 001, Ebbighausen}
+
+
+\begin{document}
+	\pagestyle{fancy}
+	\fancyfoot{} 
+	\fancyfoot[L]{Math 126}
+	
+	\maketitle
+	
+	\textbf{Problem 1:} (Borthwick 7.6) On HW 3, we investigated a quantity
+	\begin{align*}
+		\eta(t) = \int_{\Omega} u(t,x)^{2} dx
+	\end{align*}
+	for $u$ a smooth solution to the heat equation on $(0,\infty) \times \Omega$ with bounded $C^{1}$ domain $\Omega$. Suppose $u$ is such a solution and $u|_{t=T} = 0$, $u|_{\pd \Omega} = 0$. 
+	
+	Part A.) Use Cauchy-Schwarz to deduce that 
+	\begin{align*}
+		\eta'(t)^{2} \leq 4 \eta(t) \int_{\Omega} \lvert \frac{\pd u}{\pd t} \rvert^{2} dx
+	\end{align*}
+	
+	Part B.) Show 
+	\begin{align*}
+		\eta''(t) = 4 \int_{\Omega} \lvert \frac{\pd u}{\pd t} \rvert^{2} dx
+	\end{align*}
+	
+	so that from A.), $\eta'(t)^{2} \leq \eta(t) \eta''(t)$. 
+	
+	
+	Part C.) Suppose $\eta(0) > 0$ and $\eta$ is defined in some neighborhood of $0$. Using part B.), show 
+	\begin{align*}
+		(\log(\eta(t)) '' \geq 0
+	\end{align*}
+	
+	This implies that $\log(\eta(t))$ is \textit{convex} and, in particular, bounded below by its tangent lines such that 
+	\begin{align*}
+		\log(\eta(t)) \geq \log(\eta(0)) + \frac{\eta'(0)}{\eta(0)}t
+	\end{align*}
+	so that $\eta(t) \geq \eta(0) e^{-ct}$. Thus, if $\eta(0)>0$, $\eta$ is strictly positive for all time. 
+	
+	Part D.) Conclude from Part C.) that if $\eta(T) = 0$, $\eta(t) = 0$ for all $t$ and $u=0$ (it may help to reference HW 3). 
+	
+	\textbf{Problem 2:} In the separation of variables section, we used the Legendre polynomials to help construct solutions. These are an orthonormal basis for $L^{2}$ via polynomials, as opposed to exponentials. 
+	
+	Part A.) Use Gram-Schmidt on $\{1,x,x^{2}\}$ with the $L^{2}((-1,1))$-inner product to obtain the first 3 Legendre polynomials. Verify that these are normalized (norm 1) versions of the first three solutions of 
+	\begin{align*}
+		P_{k}(x) = \frac{1}{2^{k}k!} \frac{d^{k}}{dx^{k}}(x^{2}-1)^{k}
+	\end{align*}
+	
+	
+	Part B.) These polynomials are solutions of the ODE
+	
+	\begin{align*}
+		\frac{d}{dx} \left[ (x^{2}-1) \frac{d}{dx} f \right] -k(k+1)f = 0
+	\end{align*}
+	
+	or eigenvectors $Lf = k(k+1)f$ for $L = \frac{d}{dx} \left[ (x^{2}-1) \frac{d}{dx} \right]$. For $u,v \in C^{2}([-1,1])$, check that 
+	\begin{align*}
+		\langle u,Lv \rangle = \langle Lu,v\rangle   
+	\end{align*}
+	so that the $P_{k}$ with distinct $k$ are orthogonal. 
+	
+	
+	Part C.) Let $f(x) \in L^{2}((-1,1))$ be a function so 
+	\begin{align*}
+		\int_{-1}^{1} f(x)x^{l}dx = 0
+	\end{align*}
+	for $l=0,1,2,...$. Show that 
+	\begin{align*}
+		\int_{-1}^{1} f(x)S_m(x)dx = 0
+	\end{align*}
+	
+	for $S_{m}(x) = \sum_{l=0}^{m} \frac{(-ikx)^{l}}{l!}$. Since $\lim_{m \to \infty} S_{m}(x) = e^{-ikx}$, show $f$ must be $0$. 
+	
+	Part D.) Use Part C.) to show the Legendre polynomial $P_{k}$ are a basis for $L^{2}$. 
+	
+	
+
+	
+\end{document}

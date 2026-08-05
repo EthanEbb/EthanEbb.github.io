@@ -1,0 +1,586 @@
+
+\DocumentMetadata{tagging=on,
+	tagging-setup={math/setup=mathml-SE},
+	pdfstandard=ua-2,
+	lang=en-US
+}
+\documentclass{article}
+
+%Math Libraries
+\usepackage{multirow, longtable, amsmath, amssymb, amsthm}
+\usepackage[mathscr]{euscript}
+
+%Formatting
+\usepackage[margin = 1 in]{geometry}
+\usepackage{indentfirst}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage{tabularx}
+\usepackage{cite}
+
+%Diagram Packages
+\usepackage{tikz}
+\usetikzlibrary{automata,positioning,arrows}
+
+%Standard Commands
+\newcommand{\mm}{\mathscr}
+\newcommand{\B}{{\mathcal{B}}}
+\newcommand{\A}{{\mathcal{A}}}
+\newcommand{\N}{{\mathbb{N}}}
+\newcommand{\R}{{\mathbb{R}}}
+\newcommand{\C}{{\mathbb{C}}}
+\newcommand{\Q}{{\mathbb{Q}}}
+\newcommand{\Z}{{\mathbb{Z}}}
+\newcommand{\bT}{\mathbb{T}}
+
+
+\newcommand{\abs}[1]{{|{#1}|}}
+\newcommand{\norm}[1]{{ \lVert {#1} \rVert}}
+\newcommand{\cl}[1]{{\overline{#1}}}
+\newcommand{\pd}{\partial}
+\newcommand{\ip}[2]{ \langle {#1},{#2}\rangle }
+\newcommand{\ls}{\lesssim}
+\newcommand{\gs}{\gtrsim}
+\newcommand{\supp}{\text{supp}}
+
+%Result Environment
+\newcounter{result}[section]
+\newenvironment{res}[1][]{\refstepcounter{result}\par\medskip
+	\noindent \textbf{[\thesection.\theresult] #1} \rmfamily}{\medskip}
+
+\newenvironment{defn}[1][]{\refstepcounter{result}\par\medskip \noindent \textbf{Definition [\thesection.\theresult] #1} \rmfamily}{\medskip}
+
+%Proof Environment
+\newenvironment{pf}{%
+	\par%
+	\medskip
+	\leftskip=2em\rightskip=2em%
+	\noindent\ignorespaces \textit{Proof:} \newline}{%
+	\,\, \newline \textit{Q.E.D.}\par\medskip}
+
+\title{Lecture 7: Fourier Series}
+\author{Ethan Ebbighausen}
+\date{July 3rd, 2026}
+
+\begin{document}
+	\pagestyle{fancy}
+	\fancyfoot{} 
+	\fancyfoot[L]{Fourier Series, Ebbighausen}
+	
+	\maketitle
+	
+	\section{Introduction}
+	
+	The idea of decomposing movement with respect to simple oscillations dates back to at least the Hipparchian theory of deferents and epicycles (ancient Greek astronomy), though it was not used widely until the 1700s when Euler, d'Alembert, and Bernoulli began to study trigonometric series in pursuit of the wave and heat equations. 
+	
+	In 1807, while studying heat flow, Jean-Baptiste Joseph Fourier made the claim that all solutions of the heat equation on a metal plate should be able to be represented by oscillatory (trigonometric) series. It should be mentioned that Bessel (of the Bessel function) also independently began using Fourier series in 1819 for Kepler's equations. However, the full justification for these series solutions, or general Fourier series, would not come for nearly another hundred years. The functional analysis tools developed in part for this exact problem were then applied by Dirichlet and Riemann to sharpen Fourier's work. The development of rigorous Fourier series would be a turning point for both mathematics and physics, revolutionizing the study of operators, geometric sets, data compression, and even quantum physics.   
+	
+	
+	\textbf{Learning Objectives:}
+	
+	\begin{itemize}
+		\item{Connect the heat equation to Fourier sums}
+		\item{Compute Fourier Series of Polynomials, Exponentials, and Piecewise Polynomial functions}
+		\item{Analyze the Convergence of Fourier Series depending on their coefficients}
+		\item{Determine the Regularity of the function depending on its Fourier series}
+		\item{Connect Wave-Space decay with regularity}
+	\end{itemize}
+	
+	
+	\section{Series Solution of the Heat Equation}
+	
+	Recall the heat equation 
+	\begin{align*}
+		\pd_{t}u - \Delta u = 0
+	\end{align*}
+	on a domain $\Omega \subset \R^{n}$. If we assume there is a product solution $u(t,x) = v(t)\phi(x)$ as in lecture 4, we see time solutions $v(t) = v(0) e^{-\lambda(t)}$ and spatial solutions the eigenvalues of $-\Delta$ satisfying 
+	\begin{align*}
+		-\Delta \phi = \lambda \phi
+	\end{align*}
+	We then have corresponding product solutions $u_{k}(t,x) = e^{-\lambda_{k}t} \phi_{k}(x)$, and linear combinations thereof. It is then reasonable to expect a general solution of the form 
+	\begin{align*}
+		u(t,x) = \sum_{n=1}^{\infty} a_{n} e^{-\lambda_{n} t}\phi_{n}(x)
+	\end{align*}
+	
+	for coefficients $a_{n}$, when this converges. If we have initial condition $u(0,x) = h(x)$, then 
+	\begin{align*}
+		h(x) = \sum a_{n} \phi_{n}(x)
+	\end{align*}
+	which is possible for all $h \in L^{2}(\Omega)$ precisely when $\{\phi_{n}\}$ forms a basis for $L^{2}(\Omega)$. Since the Laplacian is self-adjoint with simple boundary assumptions, we would, in fact, have an orthonormal basis as we studied in lecture 6. While this guarantees that the series converges to $h(x)$, it doesn't guarantee convergence for general $t$, and so this tool still requires some work. Further, the limit as $t \to 0$ isn't necessarily $h$. 
+	
+	
+	\vspace{0.25 cm}
+	
+	\textbf{Example:}
+	
+	Consider the 1D metal rod $[0,\pi]$ with insulated ends. The Neumann boundary conditions $\pd_{t} u(t,0) = \pd_{t}u (t,\pi) = 0$ imply that the eigenfunctions are $\phi(n) = \cos(nx)$ for eigenvalues $\lambda_{n} = n^{2} \geq 0$.
+	
+	Let us consider the initial condition $h(x) = 3\pi x^{2} - 2x^{3}$. Since, as we discussed previously, the $\cos(nx)$ functions are orthogonal, 
+	\begin{align*}
+		h(x) = \sum a_{n} \cos(nx)
+	\end{align*}
+	would imply $a_{n} = \frac{\int_{0}^{\pi} h(x)\cos(nx) dx}{\int_{0}^{\pi} \cos(nx)^{2} dx}$. 
+	
+	For example,
+	\begin{align*}
+		a_{1} = \frac{2}{\pi} \int_{0}^{\pi} 3 \pi x^{2}\cos(x) - 2x^{3} \cos(x) dx \\
+		= 6\int_{0}^{\pi} x^{2}\cos(x) dx - \frac{4}{\pi} \int_{0}^{\pi} x^{3}\cos(x)dx\\
+		= 6\left[ x^{2}\sin(x)+2x\cos(x)|_{0}^{\pi} - \int_{0}^{\pi} \cos(x)dx\right] \\-\frac{4}{\pi}\left[x^{3}\sin(x)+3x^{2}\cos(x) - x\sin(x)|_{0}^{\pi} +\int_{0}^{\pi} \sin(x)dx \right] \\
+		= -\frac{48}{\pi}
+	\end{align*}
+	
+	
+	
+	These are 
+	\begin{align*}
+		a_{n} = \begin{cases}
+			\frac{\pi^{3}}{2} & n=0 \\ -\frac{48}{\pi n^{4}} & n \geq 1  \text{ odd }\\ 0 & n \geq 2 \text{ even } 
+		\end{cases}
+	\end{align*}
+	
+	The proposed solution would then be 
+	\begin{align*}
+		u(t,x) = \frac{\pi^{3}}{2} - \sum_{n \text{ odd}} \frac{48}{\pi n^{4}} e^{-n^{2}t} \cos(nx)
+	\end{align*}
+	
+	which converges for all $t>0$, $x \in [0,\pi]$ due to the exponential decay of the $e^{-n^{2}t}$ terms and the presence of $\frac{1}{n^{4}}$ in the sum. 
+	
+	In this case, we have absolute convergence of 
+	\begin{align*}
+		\frac{\pi^{3}}{2} - \sum_{n \text{ odd}} \frac{48}{\pi n^{4}}  \cos(nx)
+	\end{align*}
+	to $h(x)$ and of the series above to $u(t,x)$ for $t>0$, $x \in [0,l]$. We then have that 
+	\begin{align*}
+		u(t,x) - h(x) = \sum_{n \text{ odd}} \frac{48}{\pi n^{4}}  \cos(nx)(1-e^{-n^{2}t})
+	\end{align*}
+	
+	Pick $\epsilon > 0$. For large $N$, we have that $\sum_{n \geq N} \frac{2(48)}{\pi n^{4}} < \epsilon/2$ and we may then take some $\delta$ such that for $t < \delta$, 
+	\begin{align*}
+		|1 - e^{-n^{2}t}| \leq \frac{\epsilon}{2N \sum \frac{1}{n^{2}}}
+	\end{align*}
+	for $n \leq N$. Therefore, for such $t<\delta$,
+	
+	\begin{align*}
+		|u(t,x) - h(x)| \leq \sum_{n \leq N} \frac{48}{\pi n^{4}}\frac{\epsilon}{2N \sum \frac{1}{n^{2}}} + \sum_{n \geq N}\frac{2(48)}{\pi n^{4}} \\
+		\leq \epsilon
+	\end{align*}
+	
+	so that we obtain exactly $\lim_{t \to 0} u(t,x) = h(x)$. Lastly, it may be checked that $u$ solves the heat equation. 
+	
+	
+	\section{Periodic Fourier Series}
+	
+	Since this study begins with trigonometric functions and series, the functions to approximate are restricted to the $2 \pi$-periodic functions. As we generalize theory, we will break away from this case, but for now we consider 
+	\begin{align*}
+		\mathbb{T} = \R / (2 \pi \Z)
+	\end{align*}
+	a quotient space, so $C^{m}(\mathbb{T})$ is the set of $C^{m}(\R)$ functions which are $2\pi$ periodic. We also then have a bounded domain, so the $L^{2}(\bT)$ inner product
+	\begin{align*}
+		\langle f,g \rangle  = \int_{-\pi}^{\pi} f \cl{g} dx
+	\end{align*}
+	may be taken over any length-$2\pi$ interval, and constant functions are in $L^{2}(\bT)$. 
+	
+	On $\bT$, the Helmholtz equation $- \pd_{x}^{2} \phi = \lambda \phi$ admits eigenfunctions $\phi_{k}(x) = e^{ikx}$ for eigenvalues $\lambda_{K} =k^{2}$, $k \in \Z$. As with our other considerations, these eigenfunctions are orthogonal and $\frac{1}{\sqrt{2\pi}} e^{ikx}$ are orthonormal. Then, 
+	\begin{align*}
+		c_{k}[f] = \frac{1}{2\pi} \int_{-\pi}^{\pi} f e^{-ikx} dx
+	\end{align*}
+	gives the coefficients with respect to this basis. 
+	
+	Bessel's inequality tells us 
+	\begin{align*}
+		\sum_{\Z} |c_{k}[f]|^{2} \leq \frac{1}{2\pi} \norm{f}_{2}^{2}
+	\end{align*}
+	with equality iff. the partial sum converge to $f$ in $L^{2}$. This is not the only way that we care about convergence, though. We also care whether the convergence is \textit{pointwise}, i.e. whether $S_{n}[f](x) \to f(x)$ for each $x \in \bT$, and we also care whether the convergence is \textit{uniform}, i.e. whether $S_{n}[f] \to f$ in the sup norm. Let us compare and contrast these types of convergence 
+	
+	\vspace{1 cm}
+	\textbf{Example:}
+	
+	Uniform convergence implies pointwise convergence. The converse is not true. Consider 
+	\begin{align*}
+		f_{n}(x) = x^{n}
+	\end{align*}
+	on $[0,1)$. It is clear that $f_{n}(x) \to 0$ as $n \to \infty$ for all $x$ in the domain. However, given any $n$, we may find some small $\epsilon > 0$ so that $(1-\epsilon)^{n} > 1/2$. Therefore, 
+	\begin{align*}
+		\norm{f_{n} - 0}_{\infty} \geq 1/2
+	\end{align*}
+	for all $n$ and the convergence fails to be uniform. 
+	
+	
+	Uniform convergence also implies $L^{2}(\bT)$ convergence (though not general $L^{2}$ convergence). However $L^{2}$ convergence fails to imply uniform convergence. Consider 
+	\begin{align*}
+		f_{n}(x) = \sqrt[4]{n} 1_{[0,1/n]}
+	\end{align*}
+	on $[0,1]$, which converge in $L^{2}([0,1])$ to $0$ but fail to converge uniformly. 
+	
+	\vspace{1 cm}
+	
+	\textbf{Example:} 
+	Pointwise convergence fails to imply $L^{2}$ convergence. Consider 
+	\begin{align*}
+		f_{n}(x) = \frac{1}{x + \frac{1}{n}}
+	\end{align*} 
+	
+	which convergence pointwise on $(0,1)$ to $\frac{1}{x}$. However, 
+	\begin{align*}
+		\int_{0}^{1} \left[ \frac{1}{x} - \frac{1}{x + 1/n} \right]^{2} dx = \int_{0}^{1} \frac{1}{x^{2}(nx+1)^{2}}dx = \infty
+	\end{align*}
+	
+	so $L^{2}$ convergence fails. 
+	
+	
+	$L^{2}$ convergence fails to imply pointwise convergence, even pointwise almost-everywhere convergence. Consider 
+	\begin{align*}
+		f_{n}(x) = 1_{[a_{n},b_{n}]}
+	\end{align*}
+	
+	where the intervals $[a_n,b_n]$ have $|b_{n} - a_{n}| \to 0$ and $\bigcup_{n=10^{k}}^{10^{k+1}-1} [a_{n},b_{n}] = [0,1]$ for each $k$. 
+	
+	\vspace{1 cm}
+	
+	Uniform convergence is the often-desired type of convergence because it is simple to work with. However, even if we prove that the eigenfunctions are a basis, we only reach $L^{2}$ convergence and not uniform convergence. A good example of this failure is the series for $h(x) = 1_{[\pi/2,3\pi/2]}$. Since the partial sums of the Fourier series, 
+	\begin{align*}
+		S_{n}[h](x) = \sum_{-k}^{k} c_{k}e^{ikx}
+	\end{align*}
+	are continuous, they are likely to have issues around the discontinuity of $h$. Indeed, we may compute 
+	\begin{align*}
+		c_{k}[h] = \frac{1}{2\pi} \int_{\pi/2}^{3\pi/2} e^{-ikx}dx = \begin{cases} 1/2 & k=0 \\ \frac{(-1)^{k}}{\pi k} \sin(\frac{k \pi}{2}) & k \neq 0 \end{cases}
+	\end{align*}
+	
+	and notice that the partial sums fail to convergence uniformly by considering points near $\pi /2$. This behavior is called the \textit{Gibbs Phenomenon}, first discovered by Henry Wilbraham then later independently discovered by J.Willard Gibbs. 
+	
+	\subsection{Pointwise Convergence}
+	
+	The first major critereon for pointwise convergence of a Fourier series was due to Dirichlet. It relies on swapping the order of integration and summation in the $S_{n}$ terms to write the partial sum as a convolution with a function $D_{n}(x)$ which is now called the Dirichlet kernel:
+	\begin{align*}
+		S_{n}[f](x) = \sum_{-n}^{n} e^{ikx} \frac{1}{2\pi} \int_{0}^{2\pi} f(y) e^{-iky} dy\\
+		= \int_{0}^{2\pi} f(y) \sum_{-n}^{n}  \frac{e^{ik(x-y)}}{2\pi} dy = f(x) * D_{n}(x)
+	\end{align*}
+	
+	In particular, $\int_{0}^{2\pi} D_{n}(t) dt = 1$ and, using geometric series sums,
+	\begin{align*}
+		D_{n}(t) = \frac{e^{-int}}{2\pi} \sum_{k=0}^{2n} e^{ikt} = \frac{e^{-int}}{2\pi} \frac{e^{i(2n)t}-1}{e^{it}-1} \\
+		=\frac{1}{2\pi} \frac{e^{i(n+1)t}-e^{-int}}{e^{it}-1} \\
+		= \frac{1}{2\pi} \frac{\sin((n+1/2)t)}{\sin(t/2)}
+	\end{align*}
+	(factoring $e^{it/2}$ out of the denominator). This kernel acts similarly to the heat kernel: it centralizes mass near $t=0$. This property is useful in several places (see, for example, my topics document on the Stone-Weierstrass theorem for an example beyond this course), and we shall use it to show $D_{n} * f \to f$ in special cases. 
+	
+	
+	\begin{res}
+		Suppose $f \in L^{2}(\bT)$ and that for a fixed $x \in \bT$, the estimate 
+		\begin{align*}
+			\text{ess-sup}_{y \in [-\epsilon, \epsilon]} \left| \frac{f(x) - f(x-y)}{y}\right| < \infty
+		\end{align*}
+		holds for some $\epsilon > 0$. Then,
+		\begin{align*}
+			\lim_{n \to \infty} S_{n}[f](x) = f(x)
+		\end{align*}
+	\end{res} 
+	
+	\textbf{Remark:} This is a weak derivative-type assumption. $C^{1}$ functions automatically satisfy such a critereon. 
+	
+	\begin{pf}
+		We begin by taking the difference
+		\begin{align*}
+			f(x) - S_{n}[f](x) = \int_{-\pi}^{\pi} D_{n}(y) [f(x)-f(x-y)] dy \\
+			= \frac{1}{2\pi} \int_{-\pi}^{\pi} \frac{f(x)-f(x-y)}{e^{iy}-1} \left[ e^{i(n+1)y} - e^{-iny}\right] dy
+		\end{align*}
+		
+		The main insight to solving this integral is that it looks like a difference of Fourier coefficients of a function. Let 
+		\begin{align*}
+			h(y) = \frac{f(x)-f(x-y)}{e^{iy}-1} 
+		\end{align*}
+		so for $y \neq 0$, we may split this as 
+		\begin{align*}
+			\frac{f(x)-f(x-y)}{e^{iy}-1} =\frac{f(x)-f(x-y)}{y} \frac{y}{e^{iy}-1} 
+		\end{align*}
+		whereby the assumptions, the left term is bounded near $y=0$ and the right term approaches $\frac{1}{i}$ as $y \to 0$. Then, $h$ is bounded on some interval $[-\epsilon,\epsilon]$ for $\epsilon > 0$. Outside of this interval, $h$ is a product of a bounded function and an $L^{2}$ function, so that in total, $h \in L^{2}(\bT)$. Thus,
+		\begin{align*}
+			f(x) -S_{n}[f](x) = c_{-n-1}[h] - c_{n}[h]
+		\end{align*}
+		and the right-hand side approaches $0$ as $n \to \infty$ by Bessel's inequality.
+	\end{pf}
+	
+	
+	\subsection{Uniform Convergence}
+	
+	We've used uniform convergence previously under a different name. We previously used 
+	\begin{align*}
+		\sup_{x \in K} |f(x)|
+	\end{align*}
+	as the ``sup norm'' on a compact set $K$, operating on continuous functions. Uniform convergence is convergence with respect to this norm, and the following result shows it is exactly the norm we would desire for the space of continuous functions
+	
+	\begin{res}
+		Suppose $\{f_{n}\} \subset C^{0}(\Omega)$ for a domain $\Omega \subset \R^{n}$. If $\{f_{n}\}$ converges uniformly to a function $f:\Omega \to \R$, then $f$ is also continuous.
+	\end{res}
+	\begin{pf}
+		This is called the ``$\epsilon/3$ argument''. Fix $x \in \Omega$ and fix $\epsilon > 0$. For some large $n$, we have that $|f(y) - f_{n}(y)| < \epsilon/3$ for all $y \in \Omega$.  We notice that $f_{n}$ is continuous, so we may find some $\delta>0$ such that for $|x-y| \leq \delta$, 
+		\begin{align*}
+			|f_{n}(x) - f_{n}(y)| < \epsilon/3 
+		\end{align*} 
+		
+		By the triangle inequality, 
+		\begin{align*}
+			|f(x) - f(y)| \leq |f(x) - f_{n}(x)| + |f_{n}(x) - f_{n}(y)| + |f_{n}(y) - f(y)| < \epsilon 
+		\end{align*}
+		so $f$ is continuous at $x$. 
+	\end{pf}
+	
+	
+	The Fourier series of functions with discontinuities won't converge uniformly, since the partial Fourier sums are themselves continuous. There are even continuous functions whose Fourier series fail to converge pointwise, though such functions are usually created using some theory we have not developed here (like the Banach-Steinhaus theorem). However, it turns out that if we look for higher regularity, we obtain the desired convergence. 
+	
+	\begin{res}
+		For $f \in C^{1}(\bT)$, the sequence of partial sums $S_{n}[f]$ converges uniformly to $f$. 
+	\end{res}
+	\begin{pf}
+		
+		Notice that, integrating by parts,
+		\begin{align*}
+			c_{k}[f'] = \frac{1}{2\pi} \int_{-\pi}^{\pi} f'(y)e^{-iky}dy = \frac{1}{2\pi} f(y)e^{-iky}|_{-\pi}^{\pi}+ ikc_{k}[f] \\
+			= ikc_{k}[f]
+		\end{align*}
+		
+		so the fact that $f' \in C^{0}(\bT) \subset L^{2}(\bT)$ implies, by Bessel's inequality, 
+		\begin{align*}
+			\sum_{k \in \Z} |kc_{k}[f]|^{2} < \infty
+		\end{align*} 
+		
+		\textit{Higher regularity relates to faster decay of Fourier coefficients} (we will see this again shortly). 
+		
+		Let $l^{2}(\Z \backslash \{0\})$ denote the discrete $L^{2}$ space of two-sided sequences, and $a_{k} = |kc_{k}[f]|$ define one such sequence. If we set $b_{k} = k^{-1}$, then, by Cauchy-Schwarz
+		\begin{align*}
+			\sum_{k \neq 0} |c_{k}[f]| = \langle a,b\rangle_{l^{2}}\\
+			\leq \norm{a}_{l^{2}} \norm{b}_{l^{2}} = \left[ \sum |k c_{k}[f]|^{2}\right]\left[\sum \frac{1}{k^{2}} \right] < \infty
+		\end{align*}
+		
+		and so we conclude that 
+		\begin{align*}
+			\sum |c_{k}[f]| < \infty
+		\end{align*}
+		Since we already know that $S_{n}[f] \to f$ pointwise, then
+		\begin{align*}
+			|S_{n}[f](x) - f(x)| =| \sum_{|k|>n} c_{k}[f] e^{ikx}| \leq \sum_{|k|>n} |c_{k}[f]|
+		\end{align*}
+		The final sum is both independent of $x$ and converges to $0$ as $n \to \infty$, so $S_{n}[f] \to f$ uniformly. 
+		
+		
+		\begin{res}
+			[Corollary] If $\sum |c_{k}[f]| < \infty$, then the partial Fourier sums converge uniformly to $f$. 
+		\end{res}
+	\end{pf}
+	
+	\subsection{Convergence in $L^{2}$}
+	
+	Our last type of convergence, convergence in $L^{2}$, claims that these Laplace eigenfunctions are an orthonormal basis for $L^{2}(\bT)$. We already know this $L^{2}$ convergence to be true in the case the $f \in C^{1}$, since uniform convergence implies 
+	\begin{align*}
+		\norm{f_{n} - f}_{2}^{2} = \int_{-\pi}^{\pi} |f_{n} - f|dx \leq 2\pi \sup_{x \in \bT} |f_{n}-f|^{2}
+	\end{align*}
+	
+	This opens the possibility for $L^{2}$ convergence because, as we noted in lecture 6, any $L^{2}$ function may be taken as a limit of a sequence of $C^{1}$ functions (in the $L^{2}$ norm). 
+	
+	\begin{res}
+		The periodic Fourier eigenfunctions
+		\begin{align*}
+			\frac{1}{\sqrt{2 \pi}} e^{ikx} 
+		\end{align*}
+		for $k \in \Z$ form an orthonormal basis for $L^{2}(\bT)$. 
+	\end{res}
+	\begin{pf}
+		We use the orthogonality critereon for bases. Assume that there exists some $u$ orthogonal to all of the Fourier eigenfunctions. If we prove $u$ must be $0$, then we have a basis. 
+		
+		Recall $S_{n}[\psi] \to \psi$ uniformly when $\psi \in C^{1}$. From lecture $6$, we may generate a sequence $\psi_{n}$ of $C^{1}$ functions such that $\psi_{n} \to u$ in $L^{2}(\bT)$. Thus, 
+		\begin{align*}
+			\norm{u}_{L^{2}} = \lim_{n \to \infty} \langle u,\psi_{n} \rangle 
+		\end{align*}
+		but we also see that 
+		\begin{align*}
+			\langle u,\psi_{n} \rangle = \lim_{k \to \infty} \langle u, S_{k}[\psi_n] \rangle  \\
+			= \lim_{k \to \infty} \sum_{-k}^{k} c_{m}[\psi_n] \langle u, e^{-imx} \rangle =0
+		\end{align*}
+		so the orthogonality assumption implies 
+		\begin{align*}
+			\norm{u}_{L^{2}} = 0
+		\end{align*}
+		Finally, $u=0$ as desired. 
+	\end{pf}
+	
+	
+	Bessel's inequality then gives a different, well-know equality of Fourier coefficients
+	
+	\begin{res}
+		[Parseval's Identity] 
+		
+		1.) For $f \in L^{2}(\bT)$, the periodic Fourier coefficients satisfy 
+		\begin{align*}
+			\sum_{k \in \Z} |c_{k}[f]|^{2} = \frac{1}{2\pi} \norm{f}_{L^{2}}
+		\end{align*}
+		
+		2.) For $f,g \in L^{2}(\bT)$, 
+		\begin{align*}
+			\langle f,g \rangle = 2 \pi \sum_{k \in \Z} c_{k}[f] \cl{c_{k}[g]}
+		\end{align*}
+	\end{res}
+	\begin{pf}
+		The first conclusion is immediate by the previous theorem and Bessel's inequality. For the second, 
+		\begin{align*}
+			\langle f+g, f+g \rangle  = \norm{f}^{2} + \langle f,g\rangle +\langle g,f\rangle  + \norm{g}^{2}
+		\end{align*}
+		whereas
+		\begin{align*}
+			\langle f+g,f+g \rangle = \sum |c_{k}[f] + c_{k}[g]|^{2} = \sum |c_{k}[f]|^{2} + c_{k}[f]\cl{c_{k}[g]} + \cl{c_{k}[f]} c_{k}[g] + |c_{k}[g]|^{2}
+		\end{align*}
+		
+		Combining these with the first conclusion, we have the equality 
+		\begin{align*}
+			\langle f,g\rangle +\langle g,f\rangle = \sum  c_{k}[f]\cl{c_{k}[g]} + \cl{c_{k}[f]} c_{k}[g]
+		\end{align*}
+		If $f$ and $g$ are real functions, we are then done. For general functions, we split into real and imaginary parts. 
+	\end{pf}
+	
+	\vspace{0.25 cm}
+	
+	\textbf{Example:}
+	
+	Previously, for $h = 1_{[\pi/2,3\pi/2]}$, we computed $c_{k}[h] = \pm \frac{1}{\pi k}$ for odd $k$, $c_{0}[h] = 1/2$ and that other coefficients are $0$. Hence,
+	
+	\begin{align*}
+		\sum_{k \in \Z} |c_{k}[h]|^{2} = \frac{1}{4} + 2 \sum_{k \in \N_{\text{odd}}} \frac{1}{\pi^{2}k^{2}}
+	\end{align*}
+	and $\norm{h}_{2}^{2} = \pi$. Parseval's identity then says 
+	\begin{align*}
+		\sum_{k \in \N_{\text{odd}}} \frac{1}{k^{2}} = \frac{\pi^{2}}{8}
+	\end{align*}
+	
+	\section{Regularity and Fourier Coefficients}
+	
+	In the uniform convergence proof above, we integrated by parts to show that the Fourier coefficients decreased more quickly than in the usual case. In fact, if $f \in C^{m}(\bT)$, we may repeat this process:
+	
+	\begin{align*}
+		c_{k}[f^{(m)}] = \int_{-\pi}^{\pi} f^{(m)} e^{-ikx}dx = \int_{-\pi}^{\pi}f e^{-ikx}(ik)^{m} dx \\
+		 =c_{k}[f](ik)^{m}
+	\end{align*}
+	so that by Bessel's inequality, 
+	\begin{align*}
+		\sum |k|^{2m} |c_{k}[f]|^{2k} < \infty
+	\end{align*}
+	
+	In particular, we may quantify this by saying $k^m c_{k}[f] \to 0$ as $k \to \infty$. Summarizing this, a highly regular function has rapidly decreasing Fourier coefficients because differentiation of a function means multiplication by the index of the Fourier coefficient. This makes sense, as larger coefficients correspond to tighter oscillations, and smooth functions should not have extreme levels of oscillations. 
+	
+	We also know that, for $c_{k}$ a rapidly decreasing sequence, $\sum c_{k} e^{ikx}$ converges to some function. The natural question becomes: how regular is this function?
+	
+	\begin{res}
+		Suppose $f \in L^{2}(\bT)$ has Fourier coefficients satisfying $\sum_{k \in \Z} |k^{m}c_{k}[f]| < \infty$ for $m \in \N_{0}$. Then, $f \in C^{m}(\bT)$. 
+	\end{res}
+	\begin{pf}
+		First consider $m=0$. If $\sum |c_{k}[f]| < \infty$, we showed previously that $S_{n}[f] \to f$ uniformly. Since the $S_{n}[f]$ are continuous, $f$ must also be continuous. 
+		
+		Next, we reduce to the case $m=1$. Indeed, consider that we know that $\sum |kc_{k}[f]| < \infty$ implies $f \in C^{1}(\bT)$. For $g$ so $\sum |k^{m}c_{k}| < \infty$, we know $g^{(m-1)}$ has $\sum |kc_{k}[g^{(m-1)}]| < \infty$, and so $g^{(m-1)} \in C^{1}$, and $g \in C^{m}$. 
+		
+		For the $m=1$ case, notice that 
+		\begin{align*}
+			S_{n}[f]'(x) = \sum_{k=-n}^{n} ik c_{k} e^{ikx}
+		\end{align*}
+		and, by the $m=0$ case, we know this converges uniformly to some $g \in C^{0}(\bT)$. Our goal is to show $g = f'$. To do this, we break down the difference quotient
+		\begin{align*}
+			\frac{f(x+t)-f(x)}{t} - g(x) = \\
+			\left[\frac{S_{n}[f](x+t) - S_{n}[f](x)}{t} - S_{n}[f]'(x) \right] \\
+			+ S_{n}[f]'(x) - g(x)\\
+			+ \sum_{|k| > n} c_{k}[f] \frac{e^{ik(x+t)} - e^{ikx}}{t}
+		\end{align*}
+		
+		Fix $\epsilon > 0$, and we shall show this sum is at-most $\epsilon$. 
+		
+		The third term is the easiest, since using the trick that, by the mean-value theorem
+		\begin{align*}
+		 |\frac{e^{ik(x+t)} - e^{ikx}}{t}| = |\frac{e^{ikt} - 1}{t}| = |\frac{t(ik e^{ik\xi})}{t}| \leq |k|
+		\end{align*}
+		for nonzero $t$ shows
+		\begin{align*}
+			|\sum_{|k| > n} c_{k}[f] \frac{e^{ik(x+t)} - e^{ikx}}{t}| \leq \sum_{|k| >n} |c_{k}| |k|
+		\end{align*}
+		
+		The final sum here approaches $0$ as $n \to \infty$, so we may take some $N_{3}$ such that it is at-most $\epsilon/3$ for $n \geq N_{3}$. 
+		
+		The second term is also treated quickly, since $S_{n}[f]' \to g$ uniformly, so there is some $N_{2}$ such that for $n \geq N_{2}$, $|S_{n}[f]'(x) - g(x)| < \epsilon/3$ for all $x$. 
+		
+		Fix some $n > \max\{N_{2},N_{3}\}$. Lastly, $S_{n}[f]$ is differentiable at $x$, so there is some $\delta > 0$ such that when $0 < |t| < \delta$, 
+		\begin{align*}
+			|\frac{S_{n}[f](x+t) - S_{n}[f](x)}{t} -S_{n}[f]'(x)| < \epsilon/3 
+		\end{align*}
+		
+		Hence, for such $n$ and such $t$, 
+		\begin{align*}
+			|\frac{f(x+t)-f(x)}{t} - g(x)| < \epsilon
+		\end{align*}
+		We conclude $f' = g$, so $ \in C^{1}$. 
+	\end{pf}
+	
+	\vspace{0.25 cm}
+	
+	\textbf{Example:} Recall that for $h(x) = 3 \pi x^{2} - 2x^{3}$ on $(0,\pi)$, an even extension of $h$ to $\bT$ gave coefficients 
+	\begin{align*}
+		c_{k}[h]  = C \frac{1}{k^{4}}
+	\end{align*} 
+	when $k$ is odd, and $0$ when $k$ is even and nonzero. Therefore, we obtain from the most recent theorem that the function is $C^{2}$. One may check that this even function is indeed $C^{2}$. However, being $C^{2}$ actually implies a slightly weaker convergence, so we have more rapidly decreasing coefficients than predicted by the first computation of this section. 
+	
+	\vspace{0.25 cm}
+	
+	We may now finally return to the heat equation, and using our new theory, say quite a bit about the solution. 
+	
+	\begin{res}
+	For $h \in C^{1}(\bT)$, the heat equation on $[0,\infty) \times \bT$ admits a solution $u \in C^{\infty}((0,\infty) \times \bT)$ defined for $t>0$ by 
+	\begin{align*}
+		u(t,x) = \sum_{k \in \Z} c_{k}[h] e^{-k^{2}t}e^{ikx}
+	\end{align*}
+	and satisfying 
+	\begin{align*}
+		\lim_{t \to 0} u(t,x) = h(x)
+	\end{align*}
+	for each $x \in \bT$
+	\end{res}
+	\begin{pf}
+		
+		We break the argument into 3 steps. First, we show the desired regularity. Second, we show that the PDE is satisfied. Lastly, we show the initial condition. 
+		
+		1.) For $t>0$, the coefficients of $u(t,\cdot)$ are $c_{k}[h] e^{-k^{2}t}$, which decay exponentially in $k$. In particular, we have that for any $m>0$, $e^{-k^{2}t} < \frac{C_{m}}{t^{m/2}}|k|^{-m}$ (use a power series) for some $C_{t,m}$ and $|k| \geq 1$.
+		
+		Since the $c_{k}[h]$ are bounded, this means that 
+		\begin{align*}
+			\sum |c_{k}[h] k^{m} e^{-k^{2}t} | < \infty
+		\end{align*}
+		for any $m>0$. In particular, $u(t,\cdot) \in C^{\infty}(\bT)$. Set 
+		\begin{align*}
+			u_{n}(t,x) = \sum_{k=-n}^{n} c_{k}[h] e^{-k^{2}t}e^{ikx}
+		\end{align*}
+		and this also shows that the $\pd_{t} u_{n}$ converge to some function $g(t,x)$ as $n \to \infty$ and that the convergence is uniform if $t \geq \epsilon > 0$. Therefore, the limit $g$ is continuous in $(\epsilon,\infty) \times \bT$ for all $\epsilon > 0$, and so is continuous in $(0,\infty) \times \bT$. Furthermore,
+		
+		\begin{align*}
+			\frac{u(t+h,x) - u(t,x)}{h} -g(t,x) = \\
+			\left[\frac{u_{n}(t+h,x) - u_n(t,x)}{h} - \pd_{t}u_{n}(t,x) \right] \\
+			+ \pd_{t}u_{n}(t,x) - g(t,x)\\
+			+ \sum_{|k| > n} c_{k}[h]e^{-k^{2}t}e^{ikx} \left( \frac{e^{-k^{2}h}-1}{h}\right)
+		\end{align*}
+		We use an $\epsilon/3$ argument exactly as before to show $u = g$, so $\pd_{t} u $ is continuous. Repeating this gives higher $t$ derivatives. 
+		
+		
+		2.) From step 1, we notice that $\pd_{t} u_{n} \to \pd_{t} u$, and that $\pd_{x}^{2} u_{n} \to \pd_{x}^{2}u$. Therefore, 
+		\begin{align*}
+			\pd_{t} u- \pd_{x}^{2} u = \lim (\pd_{t} - \pd_{x}^{2})u_{n} = 0
+		\end{align*}
+		
+		3.) Since $h \in C^{1}$ we have that $\sum |c_{k}[h]| < \infty$. Therefore, the uniform convergence allows that 
+		\begin{align*}
+			u(t,x) - h(x) = \sum c_{k}[h] ( e^{-k^{2}t}-1)e^{ikx}
+		\end{align*}
+		
+		First, pick $\epsilon > 0$. We may find some $n$ such that $\sum_{|k| > n} |c_{k}| < \epsilon/4$. Then, since $|c_{k}| \leq M$ for some $M > 0$, we may also find $\delta > 0$ such that $|e^{-k^{2}t}-1| \leq \frac{\epsilon}{4Mn}$ for $|k| \leq n$ and $|t| <\delta$. For such $t$,
+		
+		\begin{align*}
+			|u(t,x) - h(x)| \leq \sum_{|k|>n} |c_{k}[h] ( e^{-k^{2}t}-1)| + \sum_{|k|\leq n} |c_{k}[h] ( e^{-k^{2}t}-1)| \\
+			\leq \sum_{|k|>n} 2|c_{k}[h] | + \sum_{|k|\leq n} \frac{\epsilon}{4n} < \epsilon
+		\end{align*} 
+		as desired, so that $\lim_{t \to 0} u(t,x) = h(x)$
+	\end{pf}
+	
+	In fact, the smoothing goes far beyond this and given even just $h \in L^{2}$, the solution is smooth.  
+
+\end{document}

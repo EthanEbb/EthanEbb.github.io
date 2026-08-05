@@ -1,0 +1,178 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+
+
+%Math
+\usepackage{multirow, longtable, amsmath, amssymb, amsthm}
+\usepackage{indentfirst, graphicx, tabularx, fancyhdr, xcolor, todonotes}
+\usepackage[mathscr]{euscript}
+
+%Formatting
+\usepackage[margin = 1 in]{geometry}
+\usepackage{hyperref, cite}
+
+%Commands
+\newcommand{\Q}{{\mathbb{Q}}}
+\newcommand{\F}{{\mathbb{F}}}
+\newcommand{\Z}{{\mathbb{Z}}}
+\newcommand{\N}{{\mathbb{N}}}
+\newcommand{\R}{{\mathbb{R}}}
+\newcommand{\C}{{\mathbb{C}}}
+\newcommand{ \norm }[1]{{ || {#1}||}}
+\newcommand{\abs}[1]{{|{#1}|}}
+\newcommand{\cl}[1]{{\overline{#1}}}
+\newcommand{\pd}{\partial}
+\newcommand{\ip}[2]{ \langle {#1},{#2}\rangle }
+\newcommand{\ls}{\lesssim}
+\newcommand{\gs}{\gtrsim}
+
+%Result Environment
+\newcounter{result}[section]
+\newenvironment{myresult}[1][]{\refstepcounter{result}\par\medskip
+	\noindent \textbf{[\thesection.\theresult] #1} \rmfamily}{\medskip}
+
+%Proof Environment
+\newenvironment{myproof}{%
+	\par%
+	\medskip
+	\leftskip=2em\rightskip=2em%
+	\noindent\ignorespaces \textit{Proof:} \newline}{%
+	\,\, \newline \textit{Q.E.D.}\par\medskip}
+
+
+
+
+\begin{document}
+
+
+\title{Math 126 Midterm 1}
+\author{UCB Summer 2026}
+\date{July 9, 2026}
+\maketitle
+
+Remember that the exam is closed book. You will have 50 minutes to complete the Exam. You may use the front and back of each page. Please write your full name and SID below. Good luck!
+
+
+\textbf{Name:} 
+
+\vspace{0.5 cm}
+
+\textbf{SID:}
+
+\vspace{1 cm}
+
+\textbf{Formulas:}
+Characteristic ODEs: 
+\begin{align*}
+	x'(s) = D_p F \\
+	z'(s) = D_p F \cdot p \\
+	p'(s) = -D_{x} F - D_{z}(F) p
+\end{align*}
+
+Divergence: $$\int_{\Omega} \nabla \cdot F dx = \int_{\pd \Omega} F \cdot \eta dS$$
+
+D'Alembert: $$u(t,x) = \frac{1}{2} \left[g(x+ct) + g(x-ct) \right] + \frac{1}{2c} \int_{x-ct}^{x+ct} h(\tau) d\tau $$
+
+$$\mathcal{D}_{t,x} = \{ (s,y) \in \R_{+} \times \R \mid x-c(t-s) \leq y \leq x+c(t-s)\}$$
+
+Inhomogeneous Wave: $$u(t,x) = \frac{1}{2c} \int_{\mathcal{D}_{t,x}} f(s,y) dsdy$$
+
+Poisson: $$u(t,x) = \frac{\pd}{\pd t} \left( \frac{t}{2\pi} \int_{D} \frac{g(t-xy)}{\sqrt{1 - |y|^{2}}} dy\right) + \frac{t}{2\pi} \int_{D} \frac{h(t-xy)}{\sqrt{1-|y|^{2}}} dy$$
+
+Kirchoff: $$ u(t,x) = \frac{\pd}{\pd t} \left(\frac{1}{4 \pi t} \int_{\pd B(x,t)} g(y) dS(y) \right) + \frac{1}{4\pi t} \int_{\pd B(x,t)} h(y) dS(y)$$
+
+
+
+
+
+
+\newpage
+
+
+\textbf{Problem 1:} \\
+
+The following may be answered true or false. You do not need to explain your answer, but please write clearly and box your final answer. 
+
+
+
+\vspace{1 cm}
+A.) For all $u \in C^{\infty}(\Omega)$, for $\Omega \subset \R^{n}$ a domain with piecewise $C^{1}$ boundary,  
+\begin{align*}
+	\int_{U} u \Delta u dx = \int_{\pd U} \frac{\pd U}{\pd \eta} dS + \int_{U} |\nabla u |^{2}
+\end{align*}
+
+
+\vspace{3 cm}
+B.) The wave equation on $[0,l]$ with Dirichlet boundary conditions and satisfying initial conditions $(u,u_{t})|_{t=0} = (g,h)$ admits a solution of the form 
+
+\begin{align*}
+	u(t,x) = \frac{1}{2} \left[g(x+ct) + g(x-ct) \right] + \frac{1}{2c} \int_{x-ct}^{x+ct} h(\tau) d\tau
+\end{align*}
+if and only if $g,h$ may be extended to $2l$-periodic even functions with $g \in C^{2}$ and $h \in C^{1}$. 
+
+\vspace{3 cm}
+C.) The eigenvalues of the Laplace equation on $[0,l]$ correspond to frequencies we hear when a string of length $l$ fixed at both ends vibrates (as governed by the wave equation). 
+
+
+\newpage
+
+This page is for work
+\newpage
+
+
+
+\textbf{Problem 2:} \\
+
+Let $u(t,x) \in C^{2}([0,\infty) \times \R_{x})$ satisfy
+
+\begin{align*}
+	\begin{cases}
+		\pd_{t}u + \pd_{x}u = 1 & \{(t,x) \mid t \geq 0, x \geq 0\} \\
+		u(0,x) = x & x \geq 0 \\
+		u(t,0) = t & t \geq 0
+	\end{cases}
+\end{align*}
+
+Find an explicit formula for $u(t,x)$ when $t \geq 0$ using the method of characteristics. 
+
+
+\newpage
+
+\vspace{0.5 cm}
+
+\newpage
+
+This page is for work
+\newpage
+
+
+
+\textbf{Problem 3:} \\
+
+Using the method of separation of variables, solve the wave equation on $[0,\infty)_{t} \times [0,1]^{2}$, 
+\begin{align*}
+	\pd_{t}^{2} u - \Delta u = 0 & [0,\infty)_{t} \times [0,1]^{2} \\
+	u|_{\pd [0,1]^{2}} = 0
+\end{align*}
+by assuming $u(t,x,y) = v(t)h(x)g(y)$. 
+
+\newpage
+
+\vspace{0.5 cm}
+
+\newpage
+
+This page is for work
+\newpage
+
+
+\textbf{Problem 4:} \\
+
+
+Assume $u$ is a classical solution to the 1D wave equation 
+\begin{align*}
+	\pd_{t}^{2}u - \pd_{x}^{2}u = 0 & (0,\infty)_{t} \times \R_{x}
+\end{align*}
+with $(u,u_t)|_{t=0} = (g,0)$ for $g \in C^{2}(\R)$ such that $\text{supp}(g) \subset [-1,1]$. Suppose I am an observer at $x=10$. For what time values am I guaranteed to be \textbf{unable} to observe the wave $u$? 
+
+\end{document}

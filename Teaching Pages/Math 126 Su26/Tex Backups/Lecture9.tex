@@ -1,0 +1,872 @@
+
+\DocumentMetadata{tagging=on,
+	tagging-setup={math/setup=mathml-SE},
+	pdfstandard=ua-2,
+	lang=en-US
+}
+\documentclass{article}
+
+%Math Libraries
+\usepackage{multirow, longtable, amsmath, amssymb, amsthm}
+\usepackage[mathscr]{euscript}
+
+%Formatting
+\usepackage[margin = 1 in]{geometry}
+\usepackage{indentfirst}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage{tabularx}
+\usepackage{cite}
+
+%Diagram Packages
+\usepackage{tikz}
+\usetikzlibrary{automata,positioning,arrows}
+
+%Standard Commands
+\newcommand{\mm}{\mathscr}
+\newcommand{\B}{{\mathcal{B}}}
+\newcommand{\A}{{\mathcal{A}}}
+\newcommand{\N}{{\mathbb{N}}}
+\newcommand{\R}{{\mathbb{R}}}
+\newcommand{\C}{{\mathbb{C}}}
+\newcommand{\Q}{{\mathbb{Q}}}
+\newcommand{\Z}{{\mathbb{Z}}}
+
+
+\newcommand{\abs}[1]{{|{#1}|}}
+\newcommand{ \norm }[1]{{ || {#1}||}}
+\newcommand{\cl}[1]{{\overline{#1}}}
+\newcommand{\pd}{\partial}
+\newcommand{\ip}[2]{ \langle {#1},{#2}\rangle }
+\newcommand{\ls}{\lesssim}
+\newcommand{\gs}{\gtrsim}
+\newcommand{\supp}{\text{supp}}
+\newcommand{\CC}{C_{c}^{\infty}}
+
+%Result Environment
+\newcounter{result}[section]
+\newenvironment{res}[1][]{\refstepcounter{result}\par\medskip
+	\noindent \textbf{[\thesection.\theresult] #1} \rmfamily}{\medskip}
+
+\newenvironment{defn}[1][]{\refstepcounter{result}\par\medskip \noindent \textbf{Definition [\thesection.\theresult] #1} \rmfamily}{\medskip}
+
+%Proof Environment
+\newenvironment{pf}{%
+	\par%
+	\medskip
+	\leftskip=2em\rightskip=2em%
+	\noindent\ignorespaces \textit{Proof:} \newline}{%
+	\,\, \newline \textit{Q.E.D.}\par\medskip}
+
+\title{Lecture 9: Weak Solutions}
+\author{Ethan Ebbighausen}
+\date{Jul 19th, 2026}
+
+\begin{document}
+	\pagestyle{fancy}
+	\fancyfoot{} 
+	\fancyfoot[L]{Topics Document, Ethan Ebbighausen}
+	
+	\maketitle
+	
+	\section{Introduction}
+	
+	Throughout the course, we've been working to find solutions for many different equations, but they always must have a level of regularity. In particular, this restricts the initial data that we may use. For example, consider 
+	\begin{align*}
+		\begin{cases}
+			u_{t} + x u_{x} = 0 & [0,\infty) \times \R \\
+			u(0,x) = g(x)
+		\end{cases}
+	\end{align*}
+	
+	We know from characteristics that the solution is $u(t,x) = g(xe^{-t})$. As long as $g \in C^{1}$, we have a solution. What if $g$ were piecewise constant, so it's still mostly $C^{1}$ and only fails at, say, 1 point. For $g(x) = 1_{[0,\infty)}$, 
+	\begin{align*}
+		u(t,x) = \begin{cases} 1 & x>0 \\ 0 & x<0 \end{cases}
+	\end{align*}
+	
+	so it is still mostly well behaved. We could then approximate some very tricky initial conditions without losing too much information. This may motivate us to allow some non-differentiable and even discontinuous functions as solutions, which also makes showing the existence of solutions much easier since we have more candidates. We then only need to decide on how to verify that the functions are ``mostly'' well behaved. 
+	
+	\vspace{1 cm}
+	\textbf{Learning Objectives:}
+	
+	\begin{itemize}
+		\item Define weak derivatives and verify the definition for example solutions
+		\item Connect the weak derivative to Sobolev spaces
+		\item Analyze a function's regularity (with respect to Sobolev spaces) through its Fourier coefficients
+		\item derive weak solution definitions for a variety of PDEs with boundary and initial data
+	\end{itemize}
+	
+	\section{Integrals Define Derivatives}
+	
+	When we introduced advanced integration, we started allowing things to change on null sets, which were able to be ignored by integrals. To break down the idea of being ``mostly'' well behaved, we want to use the same concept. In fact, thanks to integration by parts, this becomes even stronger. For example, consider $u \in C^{1}$. Given any smooth $\psi \in C_{c}^{\infty}$, we can take 
+	\begin{align*}
+		\int_{\R} u' \psi dx = -\int_{\R} u \phi' dx
+	\end{align*}
+	and, if 
+	\begin{align*}
+		\int_{\R} u' \psi dx = -\int_{\R} g \psi' dx
+	\end{align*}
+	for all $\psi$ and for any integrable function $g$, then $g = u'$! This means that allowing some smooth bumps lets us \textit{test} the function $u'$ at any point, and that we may measure the derivative on $u$ by testing against the derivatives of smooth functions (therefore not taking derivatives on $u$ itself). 
+	
+	For this reason, we call $C_{c}^{\infty}(\Omega)$ the set of \textit{test functions} on $\Omega$. We also consider functions that can be integrated when paired with these test functions, which is the set 
+	\begin{align*}
+		L^{1}_{loc}(\Omega) = \{ f: \Omega \to \C \mid f|_{K} \in L^{1}(K) \text{ for all compact } K \subset \Omega\}
+	\end{align*}
+	of locally integrable functions. We also call this ``integral derivative'' the \textit{weak derivative}, where $f$ is the weak derivative of $g$, or $f = D^{\alpha} g$ weakly, if
+	\begin{align*}
+		\int_{\Omega} f \psi dx = (-1)^{|\alpha|}\int_{\Omega} g D^{\alpha}\psi dx
+	\end{align*}
+	for all $\psi \in C_{C}^{\infty}(\Omega)$. 
+	
+	This condition uniquely determines $f$ by the following:
+	\begin{res}
+		If $f \in L^{1}_{loc}(\Omega)$ satisfies 
+		\begin{align*}
+			\int_{\Omega} f \psi dx = 0
+		\end{align*}
+		for all $\psi \in C_{c}^{\infty}(\Omega)$, then $f =0$. 
+	\end{res}
+	\begin{pf}
+	[This proof is incorrect in the textbook. Here we correct is using only facts presented in the course. The result is something technical and perhaps a bit beyond the course, so it may be skipped if desired.]
+
+	We show that the integral of $f$ over any compact set is $0$.  
+	
+	
+	Pick $K \subset \Omega$ compact. There exists $r>0$ such that $B(K,r) \subset \Omega$.  Then, for $\epsilon_ < r$, we may take smooth nonnegative bump $\psi$ supported in $B(K,\epsilon)$, equal to $1$ on $K$, and at-most $1$ everywhere. Therefore,
+	\begin{align*}
+		\int_{B(K,\epsilon) }f \psi dx  = 0 =  \int_{K} f dx + \int_{B(K,\epsilon) \backslash K} f \psi dx
+	\end{align*}
+	
+	Let $A(K,,\delta,\epsilon) = B(K,\epsilon) \backslash B(k,\delta)$. We now have 
+	\begin{align*}
+	|\int_{K} f dx | \leq | \int_{B(K,\epsilon) \backslash K} f \psi dx| \leq  \int_{A(k,0,\epsilon)} |f| dx
+	\end{align*}
+	
+	We will complete the argument when we show that the integral over this annulus of $|f|$ approaches $0$ as $\epsilon \to 0$.
+	
+	 Indeed, since 
+	\begin{align*}
+		\int_{A(K,0,\epsilon)} |f|dx < \infty
+	\end{align*}
+	we may split it up as 
+	\begin{align*}
+		\int_{A(K,0,\epsilon)} |f|dx \geq \sum_{k=0}^{\infty} \int_{A(K,\epsilon2^{-k-1},\epsilon2^{-k})} |f|dx
+	\end{align*}
+	
+	Then, the fact that this sum is finite shows $\sum_{k=K_0}^{\infty}\int_{A(K,\epsilon2^{-k-1},\epsilon2^{-k})} |f|dx \to 0$ as $K_0 \to \infty$, but the tail sum is just 
+	\begin{align*}
+		\int_{A(K,0,\epsilon 2^{-K_0})} |f|dx
+	\end{align*}
+	completing the desired limit. 
+
+	We now claim $f = 0$ almost everywhere in $\Omega$. By contradiction, let $f$ be positive on some set of positive measure. Then, there is some $c>0$ such that $f > c$ on a set $A$ of positive measure $a$. We may assume that $A$ is contained in some compact set $K \subset \Omega$ (if this is not apparent, ask in OH because it is a weird technical fact). Therefore, we may take that $\cl{B(A,\delta)} \subset \cl{B(K,\delta)} \subset \Omega$ for small $\delta>0$. Notice that this set is also compact. We then have 
+	\begin{align*}
+		0 = \int_{\cl{B(A,\delta)} } f dx = \int_{A} f dx + \int_{\cl{B(A,\delta)} \backslash A} f dx
+	\end{align*} 
+	
+	so 
+	\begin{align*}
+		|\int_{A} f dx| \leq \int_{B(A,\delta) \backslash A} |f|dx 
+	\end{align*}
+	
+	We use the same argument as above to prove that as $\delta \to 0$, the right side of this inequality decays to $0$. Therefore, $\int_{A} f dx = 0$, contradicting the assumption. 
+	\end{pf}
+	
+	\vspace{0.25 cm}
+	\textbf{Example 1:}
+	Consider 
+	\begin{align*}
+		g(x) = \begin{cases}
+			-1 & x < -1 \\
+			x & x \in [-1,0] \\
+			x^{2} & x \in (0,1) \\
+			1 & x \geq 1
+		\end{cases}
+	\end{align*}
+	
+	Since we only fail to be differentiable on a null set, we may expect the weak derivative to be 
+	\begin{align*}
+		f(x) = \begin{cases}
+			0 & x < -1 \\
+			1 & x \in [-1,0] \\
+			2x & x \in (0,1) \\
+			0 & x \geq 1
+			\end{cases}
+	\end{align*}
+	
+	and, indeed, for any $\psi \in \CC(\R)$, 
+	\begin{align*}
+		\int g \psi' dx = \int_{-\infty}^{-1} -\psi' dx + \int_{1}^{\infty} \psi' dx + \int_{-1}^{0} x\psi' dx + \int_{0}^{1} x^{2} \psi' dx \\
+		= -\psi(-1) - \psi(1) + [x\psi(x)\_{-1}^{0} - \int_{-1}^{0} \psi(x)dx] + [x^{2}\psi(x)\_{0}^{1} - \int_{0}^{1} 2x \psi(x)dx] \\ 
+		[ - \int_{-1}^{0} \psi(x)dx] + [ - \int_{0}^{1} 2x \psi(x)dx]\\
+		= -\int f \psi dx
+	\end{align*}
+	
+	\textbf{Example 2:}
+	
+	Let 
+	\begin{align*}
+		w(t) = \begin{cases}
+			w_{-}(t) & t<0 \\ w_{+}(t) & t \geq 0
+		\end{cases}
+	\end{align*}
+	for $w_{\pm} \in C^{1}$. For $\psi \in \CC(\R)$,
+	\begin{align*}
+		-\int w \psi'dt = - \int_{-\infty}^{0} w_{-}\psi' dt - \int_{0}^{\infty} w_{+} \psi'dt \\
+		= \int_{-\infty}^{0} w_{-}'\psi dt - w_{-}(0)\psi(0) + \int_{0}^{\infty} w_{+}' \psi dt + w_{+}(0)\psi(0)
+	\end{align*}
+	
+	Now, if $\psi$ is supported in $(-\infty,0)$, we only see the term $\int_{-\infty}^{0} w_{-}'\psi dt$ appear, so any weak derivative $f$ of $w$ must have $f = w_{-}'$ on $t<0$. Similarly, consider $\psi$ supported on $(0,\infty)$ shows $f = w_{+}'$ for $t>0$. Integrating $f$ against $\psi$ at $0$ is 0! Therefore, for a weak derivative to exist, we must have that $w_{-}(0) = w_{+}(0)$, i.e. that $w$ is continuous. This is a special case for the real line. 
+	
+	\vspace{0.25 cm}
+	
+	Now, to justify the name ``weak derivative'', as well as the notation, we have the following
+	\begin{res}
+		If $u \in C^{m}(\Omega)$, then $u$ is weakly differentiable to order $m$ and the weak derivatives are precisely the classical derivatives. 
+		
+		Conversely, if $u \in L^{1}_{loc}(\Omega)$ admits weak derivatives $D^{\alpha}u$ for $|\alpha| \leq m$, and each $D^{\alpha}u$ may be represented by a continuous function, then $u$ may be represented by a $C^{m}$ function whose classical derivatives are the weak derivatives
+	\end{res}
+	\begin{pf}
+		The first statement is immediate by integration-by-parts. 
+		
+		For the second statement, we check only the one dimensional case (the general case adds many technical details), where $\Omega = (a,b)$. First, if this result holds in the $k=1$ case, it holds for all $k$, so we need only check that case. Let $u$ have weak derivative $v \in C((a,b))$. Let $x_{0} \in (a,b)$ and  $\tilde{u}(x) = u(x_0) + \int_{x_0}^{x} v(t)dt$. Then, $\tilde{u}$ and $u$ both have weak derivative $v$. Let $w = u - \tilde{u}$, which has weak derivative $0$. We must show $w$ is constant, so the fact that $w(x_0) = 0$ shows $w=0$. 
+		
+		To do this, first notice that if $\psi$ has antiderivative $\Psi \in C_{c}^{\infty}$, then
+		\begin{align*}
+			\int w \psi dx = \int 0 \Psi dx= 0
+		\end{align*}
+		
+		Notice $\psi \in C_{c}^{\infty}(\R)$ has an antiderivative if $\int \psi dx = 0$ given by $\Psi(x) = \int_{-\infty}^{x} \psi(t)dt$. We artificially enforce this property to finish the proof. Let $\chi$ be any $C_{c}^{\infty}(\Omega)$ function with integral 1. Notice that $\psi - \int \psi dx \chi$ has total integral $0$, so 
+		\begin{align*}
+			\int w [\psi - c_{\psi} \chi] dx = 0 \\
+			\Leftrightarrow \\
+			\int w\psi dx = [\int w \chi dx] \int \psi dx
+		\end{align*}
+		
+		Since this holds for all $\psi$, $w$ is constant as desired. 
+	\end{pf}
+	
+	\section{Sobolev Theory}
+	
+	We have one major problem when reducing to locally integrable functions: boundary values are not well defined (because the boundary is a null set). The main trick to fix this is to consider higher regularity. Combined with the fact that we want to investigate functions with weak derivatives, we define 
+	\begin{align*}
+		W^{p,k}(\Omega) = \{ u \in L^p(\Omega) \mid D^{\alpha} u \in L^{p}(\Omega) \text{ for all } |\alpha| \leq k\}
+	\end{align*}
+	
+	In particular, we often work with $H^{m}(\Omega) = W^{2,m}(\Omega)$. These spaces are called Sobolev spaces, named after Russian analyst Sergei Sobolev, who, along with Gagliardo and Nirenberg, studied these spaces in depth and proved many useful inequalities about them calle the Sobolev embeddings or the GNS inequalities. One related inequality, Morrey's Inequality, was proved by a Berkeley professor in the 1950s (Charles Morrey).
+	
+	Recall from the prior section that, on the line, functions with a weak derivative were actually continuous, justifying this choice of space. There is also another practical consideration: in higher dimensions and for bounded domain $\Omega$, $H^{1}(\Omega)$ includes the continuous piecewise linear functions. Therefore, this includes the approximations of data we may usually construct in practice. 
+	
+	We consider the inner product on $H^{m}$, 
+	\begin{align*}
+		\langle u,v \rangle  = \sum_{|\alpha| \leq m} \langle D^{\alpha}u,D^{\alpha} v \rangle_{L^{2}}
+	\end{align*}
+	
+	and the Sobolev space is quite well behaved with respect to this inner product
+	
+	\begin{res}
+		For $\Omega \subset \R^{n}$ and $m \in \N_{0}$, $H^{m}(\Omega)$ is a Hilbert space (complete inner product space). 
+	\end{res}
+	
+	However, we do not have the useful property of $L^{2}$ that $\CC$ is dense. Instead, we give a special name to the closure of $\CC$ in $L^{2}$ with respect to the $H^{1}$-norm:
+	\begin{align*}
+		H^{1}_{0}(\Omega) = \{ u \in H^{1}(\Omega) \mid \lim_{k \to \infty} \norm{u-\psi_{k}}_{H^{1}} = 0 \text{ for some } \psi_{k} \in \CC(\Omega) \}
+	\end{align*}
+	
+	The theory of boundary restrictions is quite involved when it comes to Sobolev spaces, so we will primarily use simple cases such as the following
+	
+	\begin{res}
+		If $u \in H^{1}_{0}((a,b))$, then $u$ is continuous on $[a,b]$ and $u(a) = u(b) = 0$. 
+	\end{res}
+	\begin{pf}
+		Suppose $u \in H^{1}_{0}((a,b))$, so there is some sequence $\{\psi_{k}\} \subset \CC$ such that 
+		\begin{align*}
+			\psi_{k}\to_{H^{1}} u
+		\end{align*}
+		
+		This immediately implies the $L^{2}$-convergence of the $\{\psi_{k}\}$, and we can use this, since the domain is bounded, to show uniform convergence. Indeed,
+		\begin{align*}
+			|\psi_{k}(x)-\psi_{j}(x)| \leq \int_{a}^{x} |\psi_{k}'(t) - \psi_{j}'(t)| dt \\
+			\leq \norm{\psi_{k}' - \psi_{j}'}_{L^{2}}\sqrt{b-a} \\
+			\Rightarrow \\
+			\norm{\psi_{k} - \psi_{j}}_{L^{\infty}} \leq \norm{\psi_{k}- \psi_{k}}_{H^{1}}\sqrt{b-a}
+		\end{align*}
+		
+		Since they are uniformly Cauchy and converge to $u$ in $L^{2}$, the uniform limit must be $u$. Therefore, $u$ is continuous and $u(a) = \lim_{k \to \infty} \psi_{k}(a) = 0$. 
+	\end{pf}
+	
+	Therefore, we usually interpret $H^{1}_{0}$ as the functions with Dirichlet boundary conditions. One of the useful ways we will use this is the following 
+	
+	\begin{res}
+		For $\Omega \subset \tilde{\Omega} \subset \R^{n}$, the extension by $0$ of an element of $H^{1}_{0}(\Omega)$ gives an element of $H_{0}^{1}(\tilde{\Omega})$. 
+	\end{res}
+	
+	\begin{pf}
+		Let $\tilde{u}$ denote the extension by $0$ of $u$ to $\tilde{\Omega}$. The weak gradient $\nabla u$ may also be extended by $0$ to $\widetilde{\nabla u}\in L^{2}$. We wish to show that this is precisely $\nabla \tilde{u}$. 
+		
+		Indeed, take $\{\psi_{k}\} \subset \CC(\Omega)$ converging to $u$ in $H^{1}$, and this sequence also converges to $\tilde{u}$ in $H^{1}(\tilde{\Omega})$. Therefore, $\nabla \psi_{k} \to \widetilde{\nabla u}$ in $H^{1}(\tilde{\Omega})$, and for $\phi \in \CC(\tilde{\Omega})$, 
+		\begin{align*}
+			\int_{\tilde{\Omega}} \phi \nabla \psi_{k} dx = - \int_{\tilde{\Omega}} \psi_{k} \nabla \phi dx 
+		\end{align*}
+		Taking the limit as $k \to \infty$, 
+		\begin{align*}
+			\int_{\tilde{\Omega}} \phi \widetilde{\nabla u} dx = - \int_{\tilde{\Omega}} \tilde{u} \nabla \phi dx 
+		\end{align*}
+		so that this is indeed the weak gradient. 
+	\end{pf}
+	
+	
+	\subsection{Sobolev Regularity}
+	
+	We now consider the generalization of the one-dimensional result that having a weak derivative implies (absolute) continuity. 
+	
+	\begin{res}
+		[Sobolev Embedding] Suppose $\Omega \subset \R^{n}$ is a bounded domain. It $m > k + \frac{n}{2}$, then 
+		\begin{align*}
+			H^{m}(\Omega) \subset C^{k}(\Omega)
+		\end{align*}
+	\end{res}
+	
+	This result is central to the application of Sobolev spaces to PDEs, and has many extensions. We will prove this by using our Fourier coefficient regularity results. In particular, we allow for the multi-dimensional torus
+	\begin{align*}
+		\mathbb{T}^{n} = \R^{n} / 2\pi \Z^{n}
+	\end{align*}
+	and define multi-dimensional coefficients
+	\begin{align*}
+		c_{k}[f] = \frac{1}{(2\pi)^{n}} \int_{\mathbb{T}^{n}} e^{-ik\cdot x}f(x) dx
+	\end{align*}
+	for $k \in \Z^{n}$. Using the same arguments as the 1D case, $\sum_{k \in \Z^{n}} c_{k}[f]e^{ik\cdot x} \to f$ in $L^2$ for $f \in L^{2}$. Similarly, Parseval's identity
+	\begin{align*}
+		\langle f,g\rangle = (2\pi)^{n} \sum_{k \in \Z} c_{k}[f] \cl{c_{k}[g]}
+	\end{align*}
+	still holds. There is only one caveat to Sobolev spaces on the torus, and that is that we define a weak derivative of $f$ to be a function $g$ so 
+	\begin{align*}
+		\int_{[0,2\pi]^{n}} \psi g dx = (-1)^{|\alpha|} \int_{[0,2\pi]^{n}} f D^{\alpha} \psi dx
+	\end{align*}
+	for all $\psi \in C^{\infty}(\mathbb{T}^{n})$ (NOT $\CC$). 
+	
+	\begin{res}
+		A function $f \in L^{2}(\mathbb{T})$ lies in $H^{m}(\mathbb{T})$ for $m \in \N$ if and only if
+		\begin{align*}
+			\sum_{k \in \Z^{n}} |k|^{2m} |c_{k}[f]|^{2} < \infty
+		\end{align*}
+	\end{res}
+	
+	\begin{pf}
+		Notice that if $f \in H^{m}$, the we may put $e^{ik \cdot x}$ into the definition of a weak derivative to see that 
+		\begin{align*}
+			c_{k}[D^{\alpha}f] = (ik)^{\alpha} c_{k}[f]
+		\end{align*}
+		and so, since $D^{\alpha} f \in L^{2}$, the given sequence converges. 
+		Conversely, if $\sum_{k \in \Z^{n}} |k|^{2m} |c_{k}[f]|^{2} < \infty$, then 
+		\begin{align*}
+			g_{\alpha}(x) = \sum (ik)^{\alpha} c_{k}[f]e^{ik \cdot x}
+		\end{align*}
+		is an $L^{2}$ function, whereby Parseval's identity implies it is the weak derivative of $f$: for $\psi \in C^{\infty}$,
+		\begin{align*}
+			\langle g, \psi \rangle  = (2\pi)^{n} \sum (ik)^{\alpha} c_{k}[f] \cl{c_{k}[\psi]} \\
+			= (2\pi)^{n}(-1)^{|\alpha|}  c_{k}[f] \cl{c_{k}[D^{\alpha}\psi]} = (-1)^{|\alpha|}\langle f, D^{\alpha}\psi \rangle 
+		\end{align*}
+		so $f \in H^{m}$. 
+	\end{pf}
+	For our second step, we translate this back into normal regularity. 
+	\begin{res}
+		[Periodic Sobolev Embedding] If $m > q + \frac{n}{2}$, then 
+		\begin{align*}
+			H^{m}(\mathbb{T}^{n}) \subset C^{q}(\mathbb{T}^{n}) 
+		\end{align*}
+	\end{res}
+	\begin{pf}
+		If $f \in H^{m}$ for such an $m$, we know that $\sum |k^m c_{k}[f]|^{2} < \infty$. We want to use this to show that, when we reduce to the exponent $q$, the convergence is actually uniform. This fact implies that $D^{\alpha}f$ is continuous, and hence that $f \in C^{q}$. 
+		
+		We obtain this fact, and the factor of $n/2$, by considering the sum $\sum_{\Z^{n}}|k|^{-2l}$. To avoid the zero term causing issues, we increase slightly to 
+		\begin{align*}
+			\sum_{\Z^{n}} (1+|k|)^{-2l}
+		\end{align*} 
+		where, by comparing this to the integral of $(1+|x|)^{2l}$:
+		\begin{align*}
+			\sum_{\Z^{n}} (1+|k|)^{-2l} \leq \int_{\R^{n}} (1+|x|)^{-2l} = |B(0,1)| \int_{0}^{\infty} r^{n-1}(1+r)^{-2l}dr
+		\end{align*}
+		we see convergence as long as $2l > n$, or $l > \frac{n}{2}$. 
+		
+		By Cauchy-Schwarz,
+		\begin{align*}
+			\sum |k^{l}c_{k}[f]| \leq (\sum (1+|k|)^{-2s})^{1/2}(\sum(1+|k|)^{2s}|k|^{2l}|c_{k}[f]|^{2})^{1/2}
+		\end{align*}
+		where both terms on the right converge when $s > \frac{n}{2}$ and $s+l \leq m$. This implies that derivatives of $f$ of order $l$ are continuous as we discussed before when $l < m - \frac{n}{2}$. 
+	\end{pf}
+	
+	
+	Finally, we prove the non-periodic version
+	
+	\begin{pf}
+		Suppose $u \in H^{m}(\Omega)$ for $\Omega \subset\R^{n}$ a domain. Let $x_0 \in \Omega$. Because $\Omega$ is open, we may find 
+		\begin{align*}
+			B(x_0,\epsilon) \subset \Omega
+		\end{align*}
+		Suppose $\psi \in \CC(\Omega)$ has support in $B(x_0,\epsilon)$ and is $1$ inside $B(x_0,\epsilon/2)$. Then, assuming $\epsilon < 2\pi$, we can extend by $0$ to reach a $2\pi$-cube and extend by periodicity to show $u\psi \in H^{m}(\mathbb{T}^{n}) \subset C^{q}(\mathbb{T}^{n})$. This shows that $u$ has $q$ continuous derivatives at $x_0$. Since $x_0$ was arbitrary, we are done. 
+	\end{pf}
+	
+	
+	
+	
+	
+	
+	\section{Weak Solutions of Equations}
+	
+	\subsection{Continuity Equations}
+	
+	Recall the general form of the continuity equation 
+	\begin{align*}
+		\pd_{t} u + \pd_{x} q = 0 \\
+		u|_{t=0} = g
+	\end{align*}
+	for flux $q$ depending on $u,t,x$. We looked at one example of noncontinuous initial data in the introduction, and let us now look at the general case. Suppose, first, that $q$ and $u$ are truly differentiable and $u$ is a classical solution. For $\psi \in \CC([0,\infty) \times \R])$, pairing gives 
+	\begin{align*}
+		\int_{0}^{\infty} \psi\pd_{t} udt = -u\psi|_{t=0} - \int_{0}^{\infty} u \pd_{t}\psi dt \\
+		\int_{-\infty}^{\infty} \psi \pd_{x}q dx = - \int_{-\infty}^{\infty} q \pd_{x} \psi dx
+	\end{align*}
+	
+	such that, putting them together,
+	
+	\begin{align*}
+		\int_{0}^{\infty} \int_{-\infty}^{\infty} u \pd_{t} \psi + q \pd_{x} \psi dx dt + \int_{-\infty}^{\infty} g \psi |_{t=0} dx = 0
+	\end{align*}
+	
+	As long as $g \in L_{loc}^{1}$, this integral makes sense. Therefore, we define a weak solution $u \in L^{1}_{loc}((0,\infty) \times \R; \R)$ to be a solution, provided $q \in L_{loc}^{1}((0,\infty) \times \R;\R)$, if the above condition holds for all test functions $\psi$. 
+	
+	\vspace{0.25 cm}
+	
+	\textbf{Example:} When velocity is constant, $q = c u$ for some $c$ and $u$ is constant on characteristics $x(t) = x_0 + ct$. Therefore, 
+	\begin{align*}
+		u(t,x) = g(x-ct)
+	\end{align*}
+	is given by the method of characteristics. Let us check that this is a weak solution when $g$ is locally integrable. 
+	
+	For $\psi \in \CC$, 
+	\begin{align*}
+		\int_{0}^{\infty} \int_{-\infty}^{\infty} u \pd_{t} \psi + q \pd_{x} \psi dx dt = \int_{0}^{\infty} \int_{-\infty}^{\infty} g(x-ct) \pd_{t} \psi + cg(x-ct) \pd_{x} \psi dx dt \\
+		= \int_{0}^{\infty} \int_{-\infty}^{\infty} g(x-ct) [1,c] \cdot \nabla \psi dx dt
+	\end{align*}
+	we notice that this again looks like a derivative of $\psi$ along the direction of the characteristic, so let $\tau = t$, $y = x-ct$, so $\tilde{\psi}(\tau,y) = \psi(\tau,y+c\tau) = \psi(t,x)$ and this function has 
+	\begin{align*}
+		\frac{\pd \tilde{\psi}}{\pd \tau} = [1,c] \cdot \nabla \psi
+	\end{align*}
+	
+	The integral change of variables then shows 
+	\begin{align*}
+		\int_{0}^{\infty} \int_{-\infty}^{\infty} g(x-ct) [1,c] \cdot \nabla \psi dx dt = \int_{0}^{\infty} \int_{-\infty}^{\infty} g(y) \pd_{\tau} \tilde{\psi} dy d\tau \\
+		= \int_{-\infty}^{\infty} -g(y) \tilde{\psi}(0,y) dy  = \int_{-\infty}^{\infty} -g(y) \psi(0,y) dy
+	\end{align*}
+	which gives the desired condition. Notice that \textit{continuity along characteristics} was enough to prove this, and we didn't have issues with discontinuities like in early examples. 
+	\vspace{0.25 cm}
+	
+	Let us recall another example: Burger's Equation
+	\begin{align*}
+		\pd_{t}u - u \pd_{x}u = 0 \\
+		u(0,x) = \begin{cases}
+			0 & x < 0 \\
+			1 & x \geq 0
+		\end{cases}
+	\end{align*}
+	
+	where the characteristic lines are $x(t) = x_0 + u(0,x_0)t$, so having a increasing initial condition like this means that the characteristics will intersect. We now wish to rectify these problems. In the introduction, we just allowed a curve to split the two regions of different values of $u$, and we try to do the same thing here in more generality. What we arrive at was developed by a pair of engineers, William Rankine and Pierre Hugoniot, in the context of gas dynamics. 
+	
+	\begin{res}
+		[Rankine-Hugoniot Condition] Let $C$ be a curve paratemerized as $(t,\sigma(t))$ with $\sigma \in C^{1}([0,\infty))$. Suppose $u$ is a weak solution of 
+		\begin{align*}
+			\pd_{t} u - \pd_{x}q(u) = 0
+		\end{align*}
+		given by 
+		\begin{align*}
+			u(t,x) = \begin{cases} 
+				u_{-}(t,x) & x < \sigma(t) \\
+				u_{+}(t,x) & x > \sigma(t)
+				\end{cases}
+		\end{align*}
+		for classical solutions $u_{\pm}$ and $q$ differentiable. Then, along $C$, 
+		\begin{align*}
+			q(u_+) - q(u_-) = (u_+ - u_-)\sigma'
+		\end{align*}
+	\end{res}
+	\begin{pf}
+		We test $\psi \in \CC((0,\infty) \times \R)$ since we needn't worry about boundary conditions at $t=0$. Let $C_{1}$ be the region $\{t \geq 0\} \times \{ x < \sigma(t)\}$ and $C_{2} = \{t \geq 0\} \times \{ x > \sigma(t)\}$. Then,
+		\begin{align*}
+			0 =\int_{0}^{\infty} \int_{-\infty}^{\infty} \left[u \pd_{t} \psi + q(u)\pd_{x} \psi \right] dx dt \\
+			= \int_{C_1} \left[u_+ \pd_{t} \psi + q(u_+)\pd_{x} \psi \right]dxdt + \int_{C_2} \left[u_- \pd_{t} \psi + q(u_-)\pd_{x} \psi \right]dxdt
+		\end{align*}
+		
+		Set $F_{\pm} = [u_{\pm},q(u_{\pm})]$, and this is 
+		\begin{align*}
+			\int_{C_1} F_+ \cdot \nabla \psi dxdt + \int_{C_2} F_- \cdot \nabla \psi dxdt
+		\end{align*}
+		
+		Since we have classical solutions on each region, $F$ is $C^{1}$ so that we may apply the Divergence theorem
+		\begin{align*}
+			\int_{C_1} F_+ \cdot \nabla \psi dxdt = \int_{C} F_{+} \cdot \eta_1 \psi dS - \int_{C_1} \psi\nabla \cdot F_+ dxdt \\ = \int_{C} F_{+} \cdot \eta_{1} \psi dS+0
+		\end{align*}
+		where the 0 appears since we have a classical solution. Notice that the normal to the curve $(t,\sigma(t))$ point outward from $C_{1}$ is $(-\sigma'(t),1)$, so $\eta_{1}$ is proportional to this vector. 
+		
+		Similarly, on $C_{2}$
+		\begin{align*}
+			\int_{C_2} F_- \cdot \nabla \psi dxdt = \int_{C} F_{-} \cdot \eta_{2} \psi dS
+		\end{align*}
+		with $\eta_2$ proportional to $(\sigma'(t),-1)$. 
+		
+		Adding these back together, 
+		\begin{align*}
+			0 = \int_{C} [F_{+} - F_{-}] \cdot \frac{\eta_{1}}{\norm{\eta_1}}\psi dS \\
+		0 	= \int_{C} \psi \left[-u_{+}\sigma'(t) + q(u_+) + u_{-} \sigma'(t) - q(u_-) \right] dS
+		\end{align*}
+		
+		Since this holds for any $\psi \in \CC$, 
+		\begin{align*}
+			-u_{+}\sigma'(t) + q(u_+) + u_{-} \sigma'(t) - q(u_-) = 0
+		\end{align*}
+		on the curve $C$, which is the claimed condition. 
+	\end{pf}
+	
+	\vspace{0.25 cm}
+	
+	Recall the traffic equation 
+	\begin{align*}
+		\pd_{t} u + (1-2u) \pd_{x}u = 0
+	\end{align*}
+	gave shocks with 
+	\begin{align*}
+		u(0,x) = \begin{cases}
+			a & x<0 \\
+			b & x>0
+		\end{cases}
+	\end{align*}
+	Our characteristic lines were 
+	\begin{align*}
+		x(t) = \begin{cases}
+			x_0 + (1-2a)t & x_0 < 0 \\
+			x_0 + (1-2b)t & x_0 > 0
+		\end{cases}
+	\end{align*}
+	so we see shocks when $a<b$. The predicted solution from characteristics is $u_- = a$, $u_+ = b$. Can we pick a curve to make this work? Indeed, notice that $q(u) = u - u^2$ and the R-H condition is 
+	\begin{align*}
+		q(b)-q(a) = (b-a) \sigma' \\
+		\frac{(b-a)(1-b-a)}{b-a} = \sigma'(t)
+	\end{align*}
+	
+	so for $\sigma(t) = (1-b-a)t$, we have a weak solution 
+	\begin{align*}
+		u(t,x) = \begin{cases}
+			a & x < (1-b-a)t \\ b & x>(1-b-a)t
+		\end{cases}
+	\end{align*}
+	
+	\textbf{Example 2:}
+	
+	What happens when $a>b$. Now, the characteristics move away from each other. This is called a rarefaction, and means that the middle area is left undetermined. Let us consider the case 
+	
+	\begin{align*}
+		\pd_{t}u - u \pd_{x}u = 0 \\
+		u(0,x) = \begin{cases}
+			1 & x < 0 \\
+			0 & x \geq 0
+		\end{cases}
+	\end{align*}
+	
+	so the region $ 0 < x < t$ is left undefined. In this case, $q(u) = \frac{1}{2} u^{2}$, so 
+	\begin{align*}
+		\frac{q(u_+)-q(u_-)}{u_+ - u_-} = \frac{1}{2}(u_- + u_+). 
+	\end{align*}
+	
+	We can define this middle region in several ways.
+	
+	1.) We could extend the two regions on either side. This would give $u_- = 1$ and $u_+ = 0$, so 
+	\begin{align*}
+		u(t,x) = \begin{cases}
+			1 & x < \frac{1}{2}t \\
+			0 & x > \frac{1}{2} t
+		\end{cases}
+	\end{align*}
+	
+	2.) We could put some constant $c \in (0,1)$ in the middle. This would give
+	\begin{align*}
+		u(t,x) = \begin{cases}
+			1 & x < \frac{1+c}{2}t \\
+			c &  \frac{1+c}{2}t < x < \frac{c}{2} t \\
+			0 & x > \frac{c}{2} t
+		\end{cases}
+	\end{align*}
+	
+	3.) We could do this again, making ever more shock curves
+
+	4.) We could take the limit of this process as we get infinitely many small regions. This would mean we have $u(t,x) = U(\frac{x}{t})$ in the middle region, for 
+	\begin{align*}
+		\frac{1}{2}(1+U(1)) = 1 \\
+		\frac{1}{2}(0 + U(0)) = 0
+	\end{align*}
+	and $U$ continuous. We also have the PDE giving 
+	\begin{align*}
+		-\frac{x}{t^2}U'(\frac{x}{t}) + U(\frac{x}{t})U'(\frac{x}{t})(\frac{1}{t}) = 0
+	\end{align*} 
+	
+	The only solution to fit both is $U(\frac{x}{t}) = \frac{x}{t}$, so 	
+	
+	\begin{align*}
+		u(t,x) = \begin{cases}
+			1 & x < t \\
+			\frac{x}{t} &  t < x < 0 \\
+			0 & x > 0
+		\end{cases}
+	\end{align*}
+	
+	This is an example of an \textit{entropy solution}. We will not investigate these in more depth, but it is a concept that reduces to a unique solution in the rarefaction case. 
+	
+	
+	
+	\subsection{Laplace-like Equations}
+	
+	We want to extend the idea of a weak solution to account for broader domains now. Because boundary data is important, this is always done on a case-by-case level as opposed to generating a broad definition, though the techniques are relatively similar in most situations.
+	
+	If $\Omega$ is a bounded domain and $u, \psi \in \CC(\Omega)$, we know 
+	\begin{align*}
+		\int_{\Omega} \psi \Delta u dx = -\int_{\Omega} \nabla u \cdot \nabla \psi dx
+	\end{align*}
+	which is quite similar to the $H^{1}$-inner product
+	\begin{align*}
+		\langle u,\psi \rangle_{H^{1}} = \langle u,\psi \rangle_{L^{2}} + \int_{\Omega} \nabla u \cdot \nabla \psi dx
+	\end{align*}
+	where the second integral is well-defined if we have $u \in H^{1}$ (though we usually take $u \in H^{1}_{0}$). Let us consider the equation 
+	\begin{align*}
+		-\Delta u = \lambda u +f \\
+		u|_{\pd \Omega} = 0
+	\end{align*}
+	for $f \in L^{2}$. We say $u \in H^{1}_{0}(\Omega)$ is a weak solution if 
+	\begin{align*}
+		\int_{\Omega} \left[ \nabla u \cdot \nabla \psi - \lambda u \psi -f\psi \right]dx = 0
+	\end{align*}
+	for all $\psi \in \CC(\Omega)$. 
+	
+	\vspace{0.25 cm}
+	\textbf{Remark:} Given a general elliptic operator 
+	\begin{align*}
+		L = -\sum a_{ij} \pd_{i}\pd_{j} + \sum b_{j} \pd_{j}
+	\end{align*}
+	we say that $u \in H^{1}_{0}(\Omega)$ is a weak solution to 
+	\begin{align*}
+		Lu = \lambda u + f \\
+		u|_{\pd \Omega} = 0
+	\end{align*}
+	if 
+	\begin{align*}
+		\int_{\Omega} \left[ \nabla u [a_{ij}] \nabla \psi + \psi b \cdot \nabla u - \lambda u \psi -f\psi \right]dx = 0
+	\end{align*}
+	
+	\vspace{0.25 cm}
+	\textbf{Example:} On the interval $[0,2]$, consider
+	\begin{align*}
+		u'' = f \\
+		u(0)=u(2)=0
+	\end{align*}
+	with 
+	\begin{align*}
+		f(x) = \begin{cases}
+			x & 0 \leq x \leq 1 \\ -1 & 1 \leq x \leq 2
+		\end{cases}
+	\end{align*}
+	
+	Since $f$ is piecewise linear, we try to integrate on each definition (also applying boundary and continuity constraints) and obtain a family of solutions 
+	\begin{align*}
+		u(x) = \begin{cases}
+			\frac{1}{6} x^{3} - ax & 0 \leq x \leq 1 \\
+			-\frac{1}{2}x^{2} + (a+\frac{4}{3})x-2a-\frac{2}{3} & 1 \leq x \leq 2
+		\end{cases}
+	\end{align*}
+	
+	we determine $a$ from the weak solution definition
+	\begin{align*}
+		\int_{0}^{2}[u'\psi' + f\psi ]=0
+	\end{align*}
+	since
+	\begin{align*}
+		\int_{0}^{2} u'\psi'dx = \int_{0}^{1} (\frac{1}{2}x^{2}-a)\psi'(x)dx + \int_{1}^{2}(-x+a+\frac{4}{3})\psi'(x)dx \\
+		= (\frac{1}{2}-a)\psi(1) - \int_{0}^{1} x \psi(x) - (1+\frac{1}{3})\psi(1) + \int_{1}^{2}\psi(x)dx\\
+		= (\frac{1}{6} - 2a)\psi(1) - \int_{0}^{2}f \psi dx
+	\end{align*}
+	
+	so that the above is $0$ only when $a = \frac{1}{12}$. This is the same as forcing the first derivative to be continuous. 
+	
+	
+	\subsection{Evolution Equations}
+	
+	We now consider the wave and heat equations, using the same strategy of starting with a classical solution and integrating by parts to reach a definition that works with weak derivatives. The only complication is choosing the appropriate regularity in time. 
+	
+	Consider first the wave equation on a bounded domain $\Omega \subset \R^{n}$, with Dirichlet boundary conditions
+	\begin{align*}
+		\pd_{t}^{2} u - \Delta u = 0 \\
+		u|_{\pd \Omega} = 0 \\
+		(u,u_{t})|_{t=0} = (g,h)
+	\end{align*}
+	
+	Assuming $u$ is a classical solution and pairing the wave equation for $u$ with a test function $\psi \in \CC([0,\infty) \times \Omega)$ gives
+	\begin{align*}
+		0=\int_{0}^{\infty} \int_{\Omega} \left[\psi \pd_{t}^{2}u - \psi \Delta u \right]dxdt \\
+		= \int_{0}^{\infty} \int_{\Omega} \psi \pd_{t}^2 u + \nabla \psi \cdot \nabla u dx \\
+		= \int_{\Omega} -h \psi(0,x) + g \pd_{t}\psi(0,x)dx + \int_{0}^{\infty} \int_{\Omega} u \pd_{t}^{2}\psi  - \nabla \psi \cdot \nabla u dx
+	\end{align*}
+	and the final line gives our condition for a weak solution $u$ so $u(t,\cdot) \in H^{1}_{0}(\Omega)$ for all $t$ so $\norm{u(t,\cdot)}_{H^{1}} \in L^{1}([0,\infty))$, and lastly so $g,h \in L^{1}_{loc}([0,\infty))$:
+	
+	\begin{align*}
+		0= \int_{\Omega} -h \psi(0,x) + g \pd_{t}\psi(0,x)dx + \int_{0}^{\infty} \int_{\Omega} u \pd_{t}^{2}\psi  - \nabla \psi \cdot \nabla u dx
+	\end{align*}
+	
+	\textbf{Remark:} Combining the regularity on $t$ and on $x$ leads to symbolic expression: 
+	\begin{align*}
+		u \in L^{1}(H^{1}_{0}(\Omega),\R)
+	\end{align*}
+	where it means that $u$ maps $t \mapsto u(t,\cdot) \in H^{1}_{0}$. As a shorthand, mathematicians tend to crush the two symbols together to be $u \in L^{1}H^{1}_{0}$. 
+	
+	
+	\vspace{0.25 cm}
+	\textbf{Example:}
+	Let $h = 0$ and 
+	\begin{align*}
+		g = \begin{cases}
+			x & 0 \leq x \leq 1 \\ 2-x & 1 \leq x \leq 2
+		\end{cases}
+	\end{align*}
+	
+	By D'Alembert's formula, we extend $g$ to be odd and $4$-periodic, and expect 
+	\begin{align*}
+		u(t,x) = \frac{1}{2} [ g(x+t)+g(x-t)]
+	\end{align*}
+	to be the solution. 
+	
+	Notice that for $\psi \in \CC([0,\infty) \times \R)$, 
+	\begin{align*}
+		\int_{0}^{\infty} \int_{0}^{2} \left[u \pd_{t}^{2} \psi + \pd_{x}u \pd_{x}\psi \right]dxdt
+	\end{align*}
+	
+	may be split by the piecewise definition of $u$. In particular, we consider only the box $[0,1) \times (0,2)$, where (draw out the definition of $u$ on the box)
+	\begin{align*}
+		\int_{0}^{1} \int_{0}^{2} u \pd_{t}^{2} \psi dxdt = \int_{0}^{1} \int_{0}^{1-x} x \pd_{t}^{2} \psi dt + \int_{1-x}^{1} (1-t) \pd_{t}^{2} \psi dt dx \\
+		+ \int_{1}^{2} \int_{x-1}^{1} (1-t)\pd_{t}^{2} \psi dt + \int_{0}^{x-1} (2-x)\pd_{t}^{2} \psi dt dx \\
+		= \int_{0}^{1}  -x\pd_{t} \psi (0,x) - \psi (1-x,x)dx + \int_{1}^{2}-(2-x)\pd_{t} \psi(0,x) - \psi(x-1,x) dx
+	\end{align*}
+	
+	The spatial component becomes
+	\begin{align*}
+		\int_{0}^{\infty} \int_{0}^{2} \pd_{x}u \pd_{x}\psi dxdt = \int_{0}^{1} \int_{0}^{1-t} \pd_{x}\psi dxdt - \int_{0}^{1} \int_{1+t}^{2} \pd_{x} \psi dxdt\\
+		= \int_{0}^{1} \psi(t,1-t) dt + \int_{0}^{1} \psi(1,1+t)dx
+	\end{align*}
+	a change of variables then turns this into 
+	\begin{align*}
+		\int_{0}^{1} \psi(1-x,x) dx + \int_{1}^{2} \psi(x-1,x)dx
+	\end{align*}
+	that matches the second term of each integrand in the time term expression. Adding them back together yields 
+	
+	\begin{align*}
+		\int_{0}^{\infty} \int_{0}^{2} \left[u \pd_{t}^{2} \psi + \pd_{x}u \pd_{x}\psi \right]dxdt =  \int_{0}^{1}  -x\pd_{t} \psi (0,x) dx + \int_{1}^{2}-(2-x)\pd_{t} \psi(0,x) dx
+		= - \int_{0}^{2} g(x) \pd_{t} \psi(0,x) dx
+	\end{align*}
+	
+	as desired. 
+	
+	\vspace{0.25 cm}
+	
+	
+	The heat equation is strikingly similar. Taking a classical solution
+	\begin{align*}
+		\pd_{t} u - \Delta u = 0 \\
+		u|_{\pd \Omega} = 0 \\
+		u|_{t=0} = h
+	\end{align*}
+	
+	and pairing with a test function $\psi$ gives
+	
+	\begin{align*}
+		 0 = \int_{0}^{\infty} \int_{\Omega} \psi \pd_{t}u - \psi \Delta u dxdt \\
+		 = \int_{0}^{\infty} \int_{\Omega} -u \pd_{t} \psi + \nabla u \cdot \nabla \psi dxdt - \int_{\Omega} h \psi(0,x) dx 
+	\end{align*}
+	
+	This then defines a weak solution for $u \in L^{1}H^{1}_{0}(\Omega)$.
+	
+	\vspace{0.25 cm}
+	
+	\textbf{Example:}
+	
+	We have previously shown that the expected solutions indeed satisfy out criteria twice, and we would like to do the same here with the series solution to the heat equation. On $(0,\pi)$ with initial condition $h$ and Dirichlet boundary conditions, we have 
+	\begin{align*}
+		\phi_{k}(x) = \sqrt{\frac{2}{\pi}} \sin(kx)
+	\end{align*}
+	as eigenfunctions of $-\Delta$ for $k \in \N$. Using the coefficients defined from these, we expect a solution 
+	\begin{align*}
+		u(t,x) = \sum_{k=1}^{\infty} a_{k}[h] e^{-k^{2}t} \phi_{k}(x)
+	\end{align*}
+	which indeed converges when $h$ is continuous. If $h \in L^{2}$, however, we must do some extra work to arrive at a weak solution. First, let us define time-dependent Fourier coefficients 
+	\begin{align*}
+		b_{k}(t) = \int_{0}^{\pi} \psi(t,x) \phi_{k}(x) dx
+	\end{align*}
+	where, for $\psi \in \CC([0,\infty) \times (0,\pi); \R)$, the smoothness of $\psi$ implies these coefficients decrease very rapidly. Then
+	\begin{align*}
+		\psi(t,x) = \sum b_{k}(t) \phi_{k}(x)
+	\end{align*}
+	converges uniformly as well in $L^{2}$, as does 
+	\begin{align*}
+		\pd_{t} \psi (t,x) = \sum b_{k}'(t) \phi_{k}(x)
+	\end{align*}
+	
+	By Parseval's identity, 
+	\begin{align*}
+		\int_{0}^{\infty} u \pd_{t} \psi dt = \sum a_{k} e^{-k^{2}t} b_{k}'(t)
+	\end{align*}
+	for $t \geq 0$, while 
+	\begin{align*}
+		\int_{0}^{\pi} \pd_{x} u \pd_{x} \psi dx = \sum k^{2} a_{k} e^{-k^{2}t} b_{k}(t) \frac{2}{\pi}
+	\end{align*}
+	Combining these, 
+	\begin{align*}
+		\int_{0}^{\infty} \int_{\Omega} -u \pd_{t} \psi + \nabla u \cdot \nabla \psi dxdt \\
+		= \int_{0}^{\infty} \sum a_{k}e^{-k^{2}t} \left(k^{2}b_{k}(t) - b_{k}'(t) \right) dt
+	\end{align*}
+	
+	Notice that 
+	\begin{align*}
+		\int_{\Omega} h \psi (0,x)dx = \sum a_{k}b_{k}(0)
+	\end{align*}
+	and $\pd_{t}(e^{-k^{2}t}b_{k}(t)) = e^{-k^{2}t} \left(k^{2}b_{k}(t) - b_{k}'(t) \right)$. Thus, if we could switch the order of the sum and the integral above, we would have 
+	\begin{align*}
+		\int_{0}^{\infty} \sum a_{k}e^{-k^{2}t} \left(k^{2}b_{k}(t) - b_{k}'(t) \right) dt = \sum a_{k}b_{k}(0)
+	\end{align*}
+	or what we desire. We simply need to justify this swap. First, take some $N$ and we look at the partial sum 
+	\begin{align*}
+		\int_{0}^{\infty} \sum_{k=1}^{N}a_{k}e^{-k^{2}t} \left(k^{2}b_{k}(t) - b_{k}'(t) \right) dt = \sum_{k=1}^{N} a_{k}b_{k}(0)
+	\end{align*}
+	
+	and attempt to estimate the tail. Recall that since $\psi$ is smooth, 
+	\begin{align*}
+		\int_{0}^{\pi} \phi_{k}(x) \frac{\pd^{2m}}{\pd x^{2m}} \psi(t,x) dx = (-1)^{m}k^{2m}b_{k}(t)
+	\end{align*}
+	and
+	\begin{align*}
+		|b_{k}(t)| \leq C_{m} k^{-2m}
+	\end{align*}
+	fro $C_{m}$ independent of time and $|a_{k}| \leq P$ for some $P$ since $h \in L^{2}$. Therefore, taking $m=2$, 
+	\begin{align*}
+		|a_{k}e^{-k^{2}t}(k^{2}b_{k}(t) - b_{k}'(t))| \leq PC_{2}k^{-2}e^{-k^{2}}t
+	\end{align*}
+	so 
+	\begin{align*}
+		\sum_{k=N+1}^{\infty} a_{k}e^{-k^{2}t}(k^{2}b_{k}(t) - b_{k}'(t)) \leq C N^{-1}e^{-(N+1)^{2}}t
+	\end{align*}
+	
+	independently of $t$. Since $\psi$ is compactly supported, the $b_{t}$ are as well (in time) and we may change the constant $C$ and arrive at 
+	\begin{align*}
+		\int_{0}^{\infty} \sum_{k=N+1}^{\infty} a_{k}e^{-k^{2}t}(k^{2}b_{k}(t) - b_{k}'(t)) dt \leq CN^{-1}
+	\end{align*}
+	
+	so that 
+	\begin{align*}
+		\int_{0}^{\infty} \sum_{k=1}^{\infty}a_{k}e^{-k^{2}t} \left(k^{2}b_{k}(t) - b_{k}'(t) \right) dt = \sum_{k=1}^{\infty} a_{k}b_{k}(0)
+	\end{align*}
+	
+	as desired, and we have a weak solution. 
+
+\end{document}

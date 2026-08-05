@@ -1,0 +1,147 @@
+
+\DocumentMetadata{tagging=on,
+	tagging-setup={math/setup=mathml-SE},
+	pdfstandard=ua-2,
+	lang=en-US
+}
+\documentclass{article}
+
+%Math Libraries
+\usepackage{multirow, longtable, amsmath, amssymb, amsthm}
+\usepackage[mathscr]{euscript}
+
+%Formatting
+\usepackage[margin = 1 in]{geometry}
+\usepackage{indentfirst}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage{tabularx}
+\usepackage{cite}
+
+%Diagram Packages
+\usepackage{tikz}
+\usetikzlibrary{automata,positioning,arrows}
+
+%Standard Commands
+\newcommand{\mm}{\mathscr}
+\newcommand{\B}{{\mathcal{B}}}
+\newcommand{\A}{{\mathcal{A}}}
+\newcommand{\N}{{\mathbb{N}}}
+\newcommand{\R}{{\mathbb{R}}}
+\newcommand{\C}{{\mathbb{C}}}
+\newcommand{\Q}{{\mathbb{Q}}}
+\newcommand{\Z}{{\mathbb{Z}}}
+
+
+\newcommand{\abs}[1]{{|{#1}|}}
+\newcommand{ \norm }[1]{{ || {#1}||}}
+\newcommand{\cl}[1]{{\overline{#1}}}
+\newcommand{\pd}{\partial}
+\newcommand{\ip}[2]{ \langle {#1},{#2}\rangle }
+\newcommand{\ls}{\lesssim}
+\newcommand{\gs}{\gtrsim}
+\newcommand{\supp}{\text{supp}}
+
+%Result Environment
+\newcounter{result}[section]
+\newenvironment{res}[1][]{\refstepcounter{result}\par\medskip
+	\noindent \textbf{[\thesection.\theresult] #1} \rmfamily}{\medskip}
+
+\newenvironment{defn}[1][]{\refstepcounter{result}\par\medskip \noindent \textbf{Definition [\thesection.\theresult] #1} \rmfamily}{\medskip}
+
+%Proof Environment
+\newenvironment{pf}{%
+	\par%
+	\medskip
+	\leftskip=2em\rightskip=2em%
+	\noindent\ignorespaces \textit{Proof:} \newline}{%
+	\,\, \newline \textit{Q.E.D.}\par\medskip}
+
+\title{Math 126 Summer 2026 HW 3}
+\author{Lec 001, Ebbighausen}
+
+
+\begin{document}
+	\pagestyle{fancy}
+	\fancyfoot{} 
+	\fancyfoot[L]{Math 126}
+	
+	\maketitle
+	
+	\textbf{Problem 1:} Consider the example of a nonlinear diffusion equation 
+	\begin{align*}
+		\pd_{t} u - \Delta u^2 =0 \hspace{0.5cm} \{t \geq 0\} \times \R^{n} 
+	\end{align*}
+	
+	Part A.) Assume that $u(t,x) = h(t)\phi(x)$. Find differential equations for $v$ and $\phi$ (we will solve in parts B. and C). 
+	
+	Part B.) Solve for $v(t)$. If we are given the initial condition $v(0) = a>0$, what happens to the solution at time $a$?
+	
+	Part C.) Assume $\phi$ is radial and a monomial in the radius, so $\phi(r) = r^{\alpha}$ for some $\alpha > 0$. What must $\alpha$ be to solve the equation from part A? 
+	
+	Part D.) Form the product solutions. 
+	
+	\textbf{Problem 2:} (Borthwick 5.7 Modified)
+	
+	The quantum energy levels of a harmonic oscillator in $\R^{n}$ are the eigenvalues of 
+	\begin{align*}
+		(-\Delta + |x|^{2}) \phi = \lambda \phi
+	\end{align*}
+	
+	In the $n=1$ case, using an exponential term $\phi(x) = q(x)e^{-x^{2}/2}$ reduces to 
+	\begin{align*}
+		k qe^{-x^{2}/2} = -q''e^{-x^{2}/2} +2xq'e^{-x^{2}/2} - x^{2}qe^{-x^{2}/2} +q'e^{-x^{2}/2} + x^{2}qe^{-x^{2}/2}
+	\end{align*}
+	or
+	\begin{align*}
+		0 = -q'' +2xq' - (k+1)q
+	\end{align*}
+	
+	Try a solution form $q(x) = \sum_{n=0}^{\infty} a_{n}x^{n}$ and derive a relationship for $a_{n+2}$ in terms of $a_{n}$ (Do not try to get a closed form for the coefficients). For what $k$ does the power series truncate (cut off) to be a polynomial? These are called the Hermite polynomials. 
+	
+	
+	
+	\textbf{Problem 3:} (Integrating the heat kernel) Recall that we used that the integral $\int_{\R^{n}} H_{t}(x) dx$ was finite during our proofs. In this exercise, we are going to verify this fact.
+	
+	Part A.) First, compute the Gaussian integral
+	\begin{align*}
+		I = \int_{-\infty}^{\infty} e^{-x^{2}} dx
+	\end{align*} 
+	\textit{Hint:} Try to instead compute $I^{2}$ by writing the integral as $I^2 \int_{-\infty}^{\infty}  \int_{-\infty}^{\infty} e^{-x^{2}-y^{2}} dy dx$. 
+	
+	Part B.) Use Part A to compute 
+	\begin{align*}
+		\int_{\R^{n}} e^{-|x|^{2}} dx
+	\end{align*}
+	
+	Part C.) Use a change-of-variables to compute 
+	\begin{align*}
+		\int_{\R^{n}} (4\pi t)^{-n/2}e^{-|x|^{2}/4t} dx
+	\end{align*}
+	
+	
+	
+	
+	
+	
+	\textbf{Problem 4:} (Energy Estimates, Borthwick Problem 6.3 + 6.4) Recall that we used $u(t,x)$ to model the temperature when deriving the heat equation $\pd_{t}u - \Delta u = 0$. Assuming $u$ is a solution to this equation on $(0,\infty) \times \Omega$ for some bounded domain $\Omega \subset \R^{n}$, we define the total thermal energy 
+	\begin{align*}
+		U(t) = \int_{\Omega} u(t,x) dx
+	\end{align*}
+	
+	Part A.) Assuming $u(t,x)$ satisfies Neumann boundary conditions 
+	\begin{align*}
+		\frac{\pd}{\pd \nu} |_{\pd \Omega} = 0
+	\end{align*}
+	(for normal vector $\nu$ to $\pd \Omega$), show $U(t)$ is constant. Interpret the meaning of this physically. 
+	
+	Part B.) Define the energy of the function
+	\begin{align*}
+		\eta(t) = \int_{\Omega} u(t,x)^{2} dx
+	\end{align*}
+	and assume $u(t,x) |_{\pd \Omega} = 0$. Show that $\eta$ decreases as a function of time. 
+	
+	Part C.) Use B.) to show that a solution $u(t,x)$ satisfying $u|_{t=0} = g$ and $u|_{\pd \Omega} = h$, for $g,h$ continuous on $\Omega$ and $\pd \Omega$, us uniquely determined by $g$ and $h$.
+	
+	
+\end{document}

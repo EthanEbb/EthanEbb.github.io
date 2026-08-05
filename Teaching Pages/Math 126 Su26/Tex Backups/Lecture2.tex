@@ -1,0 +1,525 @@
+
+\DocumentMetadata{tagging=on,
+	tagging-setup={math/setup=mathml-SE},
+	pdfstandard=ua-2,
+	lang=en-US
+}
+\documentclass{article}
+
+%Math Libraries
+\usepackage{multirow, longtable, amsmath, amssymb, amsthm}
+\usepackage[mathscr]{euscript}
+
+%Formatting
+\usepackage[margin = 1 in]{geometry}
+\usepackage{indentfirst}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage{tabularx}
+\usepackage{cite}
+
+%Diagram Packages
+\usepackage{tikz}
+\usetikzlibrary{automata,positioning,arrows}
+
+%Standard Commands
+\newcommand{\mm}{\mathscr}
+\newcommand{\B}{{\mathcal{B}}}
+\newcommand{\A}{{\mathcal{A}}}
+\newcommand{\N}{{\mathbb{N}}}
+\newcommand{\R}{{\mathbb{R}}}
+\newcommand{\C}{{\mathbb{C}}}
+\newcommand{\Q}{{\mathbb{Q}}}
+\newcommand{\Z}{{\mathbb{Z}}}
+
+
+\newcommand{\abs}[1]{{|{#1}|}}
+\newcommand{ \norm }[1]{{ || {#1}||}}
+\newcommand{\cl}[1]{{\overline{#1}}}
+\newcommand{\pd}{\partial}
+\newcommand{\ip}[2]{ \langle {#1},{#2}\rangle }
+\newcommand{\ls}{\lesssim}
+\newcommand{\gs}{\gtrsim}
+\newcommand{\supp}{\text{supp}}
+
+%Result Environment
+\newcounter{result}[section]
+\newenvironment{res}[1][]{\vspace{0.5 cm} \refstepcounter{result}\par\medskip
+	\noindent \textbf{[\thesection.\theresult] #1} \rmfamily}{\vspace{0.5 cm}}
+
+\newenvironment{defn}[1][]{\refstepcounter{result}\par\medskip \noindent \textbf{Definition [\thesection.\theresult] #1} \rmfamily}{\medskip}
+
+%Proof Environment
+\newenvironment{pf}{%
+	\par%
+	\medskip
+	\leftskip=2em\rightskip=2em%
+	\noindent\ignorespaces \textit{Proof:} \newline}{%
+	\,\, \newline \textit{Q.E.D.}\par\medskip}
+
+\title{Lecture 2}
+\author{Ethan Ebbighausen}
+\date{May 14, 2025}
+
+\begin{document}
+	\pagestyle{fancy}
+	\fancyfoot{} 
+	\fancyfoot[L]{Topics Document, Ethan Ebbighausen}
+	
+	\maketitle
+	
+	\section{References, Goals}
+	
+	The topics of these notes will be based on the contents of Borthwick's \textit{Introduction to Partial Differential Equations}, Evans' \textit{Partial Differential Equations}, and Sung-Jin Oh's Lecture notes on the subject. My goal is to add information to and contextualize the information presented. 
+	
+	Our learning objectives for this lecture are 
+	
+	\begin{itemize}
+		\item Use a physical model to understand conservation equations
+		\item Compute the Lagrangian derivative, and use it to solve some PDEs
+		\item Analyze the characteristics of equations to understand the underlying structure
+		\item Generalize the concept of characteristics to a broad case. 
+	\end{itemize}
+	
+	\section{Model Problems: The Transport Equation}
+	
+	One of the simplest PDEs to begin with actually concerns fluid dynamics (a generally difficult subject for PDEs). In particular, we want to track the concentration of a substance in a fluid. 
+	
+	For our example, consider water in a brackish pond, which is modeled as a bounded domain $\Omega \subset \R^{3}$ with a $C^{1}$ boundary.
+	
+	 We denote the location in the pond by $x \in \Omega$. Let $u(t,x)$ denote the concentration of salt in the water at location $x$ and time $t$, in units of mass per unit volume. We are going to derive an equation from conservation of mass by measuring how mass changes in two ways. 
+	 
+	 First, we may obtain the total mass of salt in some region $R$ in the pond by integrating across the cube (multiplying by volume, in some sense)
+	
+	\begin{align*}
+		m(t) = \int_{R} u(t,x)dx
+	\end{align*} 
+	
+	We assume that mass is conserved, so the change of the amount of salt in this region $R$ is precisely the amount coming in minus the amount leaving. To quantify this concept, we use a function called flux density, $q(t,x)$. 
+	
+	Flux density measures the amount of our salt ``passing through any spot in space". Precisely, if we have some surface $S$ in our region, the amount of salt passing through the surface is $-\int_{S} \nu \cdot q dS$ (the surface integral of $q$ across this surface). 
+	
+	 Then,
+	
+	\begin{align*}
+		\frac{dm}{dt}(t) = - \int_{\pd R} \nu \cdot q dS
+	\end{align*}
+	
+	whereby the Divergence theorem, this is 
+	\begin{align*}
+		\int_{R}\nabla \cdot q dx
+	\end{align*}
+	
+	Using the Leibniz rule, we also have 
+	\begin{align*}
+		\frac{dm}{dt} = \int_{R} \pd_{t} u dx
+	\end{align*}
+	
+	and so 
+	\begin{align*}
+		\int_{R} \pd_{t} u + \nabla \cdot q dx = 0
+	\end{align*}
+	
+	Since this holds in any $C^{1}$ region $R$, and we assume that the integrand is continuous, we must have that 
+	\begin{align*}
+	\pd_{t} u + \nabla \cdot q = 0
+	\end{align*}
+	at every value of $t$ and $x$. This relationship is called the transport equation, but to reduce to a PDE in just $u$, we need to relate $q$ to $u$ in another way. It is reasonable to assume a linear relationship $q = v(t,x)u(t,x)$, where $v$ is the velocity field (i.e. flux = velocity x concentration), giving 
+	\begin{align*}
+		\pd_{t}u + v\cdot \nabla u + u \cdot \nabla v = 0
+	\end{align*}
+	the linear conservation equation (called such for the use of the conservation law to derive it).
+	
+	
+	\section{Characteristics}
+	
+	\subsection{Solving the Transport Equation}
+	
+	If we assume the velocity above is constant, we get a different version of what is often referred to as the transport equation. This is 
+	
+	\begin{align*}
+		u_{t} + b \cdot Du = 0  \hspace{1 cm} \{t \geq 0 \} \times \R^{n}
+	\end{align*}
+	for $b \in \R^{n}$. To solve this, notice that it looks a bit like $(1,b) \cdot \nabla_{t,x} u = 0$. Therefore, if we enforce a direction of change for $x$, we are saying that the derivative in this direction is constant. More precisely, take $z(s) = u(t+s,x+sb)$, then $z'(s)= 0$ is the same as the above PDE. Thus, we can draw lines where the function is constant. If we have some sort of boundary data, for example 
+	
+	\begin{align*}
+		u = g \,\,\,\, \text{ on } \{t=0\} \times \R^{n}
+	\end{align*}
+	
+	then we can follow the lines to $t=0$ to get the value [Draw out a picture]. This is to say that we use the ODE to deduce $u(t,x) = u(0,x-bt) = g(x-tb)$ and solve for $u$ everywhere. For the associated nonhomogeneous case
+	
+	\begin{align*}
+		\begin{cases}
+			u_{t} + b \cdot Du = f(t,x) & \{t \geq 0 \} \times \R^{n} \\
+			u = g & \text{ on } \{t=0\} \times \R^{n}
+		\end{cases}
+	\end{align*}
+	
+	the solution amounts to integrating $f$:
+	\begin{align*}
+		u(t,x) = g(x-tb) + \int_{0}^{t} f(x+(s-t)b,s)ds
+	\end{align*}
+	
+	This is exactly what we will generalize to solve more conservation equations.   
+	
+	
+	
+	\subsection{The Lagrange Derivative}
+	
+	The principle used to solve the transport equation may be used on any first-order ODE of the form
+	
+	\begin{align*}
+		\pd_{t} u + v(t,x) \cdot Du + w = 0  \hspace{1 cm} (A)
+	\end{align*} 
+	where we will assume $v$ and $\pd_{x} v$ are continuous. 
+	
+	First, define a \textit{characteristic} for the equation to be a trajectory $t \mapsto x(t)$ where 
+	\begin{align*}
+		x'(t) = v(t,x(t))
+	\end{align*}
+	(Technically, this is a projected characteristic). In other words, $x$ is a flow for the vector field $v$. Each characteristic also needs a starting point $(t_0,x_0)$. Given this, the characteristic exists for at least $t$ near $t_0$ by the Picard-Lindel{\"o}f theorem. Following these trajectories will again convert the PDE into a (system of) ODEs. 
+	
+	Define 
+	\begin{align*}
+		\frac{Du}{dt}(t) = \frac{d}{dt} u(t,x(t))
+	\end{align*}
+	to be the \textit{Lagrangian derivative} of $u$. This does depend on the initial value $(t_0,x_0)$, but we suppress that from the notation. 
+	
+	\begin{res}
+		On each characteristic, the PDE $(A)$ reduces to the ODE 
+		\begin{align*}
+			\frac{Du}{dt} + \tilde{w} = 0
+		\end{align*}
+		where $\tilde{w}(t) = w(t,x(t),u(t,x(t)))$ is the restriction to the characteristic. 
+	\end{res}
+	
+	\begin{proof}
+		By the chain rule,
+		\begin{align*}
+			\frac{Du}{dt} = \pd_{t} u + \nabla u \cdot \frac{dx}{dt} = \pd_{t}u + v \cdot Du
+		\end{align*}
+		where the partial derivatives are evaluated at 
+	\end{proof}
+	
+	
+	In many cases, we may solve these ODE to get an explicit formula for $u(t,x)$. This almost always involves inverting the characteristics: we need to solve for when $x(t)$ intersects the boundary. Thus, we have a restriction on when we can apply the method based on when these are invertible (we will touch on this again later). 
+	
+	\vspace{0.25 cm}
+	
+	\textbf{Example:}
+	
+	Consider the one-dimensional case of a pipe. If the diameter of the pipe changes, the pressure and hence the flow changes. Our velocity may depend on position. Consider the case $v(t,x) = a+bx$ for $a,b>0$ and $x \geq 0$. Let us assume $u(t,0) = f(t)$ is a condition on the beginning of the pipe. 
+	
+	The characteristics solve the ODE 
+	\begin{align*}
+		x'(t) = a+bx
+	\end{align*}
+	Let us take $x(t_0) = 0$. Applying either separation of variables or an integrating factor, we obtain 
+	\begin{align*}
+		x(t) = \frac{a}{b} \left[ e^{b(t-t_0)}-1\right]
+	\end{align*}
+	
+	The conservation equation is 
+	\begin{align*}
+		\pd_{t} u + (a+bx) \pd_{x}u + bu = 0 \\
+		\Leftrightarrow \frac{Du}{dt} + bu = 0
+	\end{align*}
+	
+	so we solve $u(t,x(t)) = Ae^{-bt}$ for some $A$. Using $u(t_0,0) = A = f(t_0)$, we have that 
+	\begin{align*}
+		u(t,x(t)) = f(t_0)e^{-b(t-t_0)}
+	\end{align*}
+	To fully solve for $u$, we need to find $t_0$ given arbitrary $(t,x)$. We solve from 
+	\begin{align*}
+		x = \frac{a}{b} \left[ e^{b(t-t_0)}-1\right] \to t_0 = t + \frac{1}{b} \ln(\frac{a}{a+bx})
+	\end{align*}
+	
+	to finally obtain 
+	
+	\begin{align*}
+		u(t,x) = \left(\frac{a}{a+bx} f \left(t + \frac{1}{b} \ln \left(\frac{a}{a+bx} \right)\right) \right) 
+	\end{align*}
+	
+	To solve this, we assumed $a,b > 0$ and $x \geq 0$. This allows that the natural log is not infinite and that we don't divide by $0$. If we had, for example, $b < 0$, we could have a point in the pipe where water moves backwards. This would create a sort of ``shock" where two directions of water impact each other. Since water is noncompressible, we could not have this issue in the real world, but such a shock would also be visible in the mathematics because our solution would break down (by having a singularity). 
+	
+	\vspace{0.25 cm}
+	
+	\textbf{Example:}
+	
+	Consider the two-dimensional channel modeled as $\Omega = \R \times [-1,1]$ with coordinates $x = (x_1,x_2)$. The velocity field $v(t,x) = (1-(x^2)^2,0)$ is \textit{solenoidal} since $\nabla \cdot v = 0$. The velocity also vanishes on the boundary. Let us assume initial conditions $u(0,x) = g(x)$.
+	
+	The characteristic lines are 
+	\begin{align*}
+		x(t) = (a+(1-b^{2})t,b)
+	\end{align*}
+	
+	and the PDE $u_{t} + v\nabla u + u \nabla v = 0$ reduces to 
+	\begin{align*}
+		\frac{Du}{dt} =0
+	\end{align*}
+	so $u$ is constant on characteristics. This gives
+	\begin{align*}
+		u(t,a+(1-b^2)t,b) = g(a,b)
+	\end{align*}
+	or 
+	\begin{align*}
+		u(t,x,y) = g(x-(1-y^2)t,y)
+	\end{align*}
+	
+	Try to draw the evolution of a disc under this flow. The area will stay the same due to the conservation of mass, but the shape will distort. 
+	
+	\vspace{0.25 cm}
+	
+	
+	\subsection{The Quasilinear Case} 
+	
+	In the above cases, we looked at linear PDE where the flux did not depend on the concentration. We will now consider the case where $q = q(u)$, with no explicit dependence on time or location. The linear conservation equation becomes
+	\begin{align*}
+		\pd_{t}u + \frac{dq}{du} \cdot \nabla u = 0 \hspace{1 cm} (B)
+	\end{align*}
+	
+	The coefficient function $\frac{dq}{du}$ now plays the role of velocity, so we give it a special name $a(u)$. 
+	\begin{res}
+		Suppose that $u \in C^{1}([0,T] \times \Omega )$ is a solution to $(B)$ for some region $\Omega \subset \R^{n}$, with $a \in C^{1}(\R; \R^{n})$. Then, for each $x_0 \in \Omega$, $u$ is constant along the characteristic defined by 
+		\begin{align*}
+			x(t) = x_0 + a(u(0,x_0)) t
+		\end{align*}
+	\end{res}
+	
+	\begin{pf}
+		Suppose a solution $u$ exists. Let $x(t)$ be the solution to the ODE
+		\begin{align*}
+			x'(t) = a(u(t,x(t))), \,\,\,\, x(0) = x_0
+		\end{align*}
+		(existence of a solution in small $t$ is again given by Picard-Lindel{\"o}f). We apply the chain rule to $u$ along the characteristic:
+		\begin{align*}
+			\frac{d}{dt} u(t,x(t)) = u_{t}(t,x(t)) + \nabla u(t,x(t)) \cdot x'(t) \\
+			= u_{t}(t,x(t)) + \nabla u(t,x(t)) \cdot a(u(t,x(t))) = 0
+		\end{align*}
+		so that $u(t,x(t)) = u(0,x_0)$. This also implies $a(u(t,x(t)))$ is constant, and so we can solve directly from the ODE to get 
+		\begin{align*}
+			x(t) = x_0 + a(u(0,x_0)) t
+		\end{align*}
+	\end{pf}
+	
+	In contrast to the linear case, we are not claiming that a solution does exist. To illustrate why, we view a couple examples. 
+	
+	
+	
+	\vspace{0.25 cm}
+	
+	\textbf{Example:}
+	
+	Let us consider the model of traffic on a single-lane road of infinite length, parameterized by $x$. Let $u(t,x)$ denote the linear density of cars at a given point and time (cars per unit length). While cars are discrete, if our units of length are quite large compared to the length of the car, we can approximate via a model with $u \in C^{1}$.
+	
+	Since having many cars slows velocity, we set a simple velocity function where cars move at the speed limit $v_m$ if density is $0$ and come to a full stop if we reach some maximum velocity $u_{m}$, modeled by 
+	\begin{align*}
+		v(u) = v_{m} \left(1-\frac{u}{u_m} \right) 
+	\end{align*}
+	For simplicity, assume $v_{m} = u_{m}=1$. The corresponding flux is $q = vu = u - u^2$. The resulting PDE is called the traffic equation
+	\begin{align*}
+		\pd_{t} u + (1-2u) \pd_{x}u = 0
+	\end{align*}
+	
+	If we impose initial conditions $u(0,x) = h(x)$ and assume some solution exists, we obtain characteristics 
+	\begin{align*}
+		x(t) = x_0 + (1-2h(x_0))t
+	\end{align*}
+	on which $u(t,x_0+(1-2h(x_0))t) = h(x_0)$. 
+	
+	\vspace{0.25cm}
+	
+	Case 1: $h(x) = \frac{1}{2} - \frac{1}{\pi} \arctan(20x)$. 
+	
+	This models that we have nearly full density approaching some stop (like a light or construction), followed by $0$ density. While it is not possible to analytically invert $h$, using numerical methods shows that the density levels out as time moves forward. 
+	
+	\vspace{0.25cm}
+	
+	Case 2: To invert the above manually, consider the simpler version
+	\begin{align*}
+		h(x) = \begin{cases}1 & x \leq 0 \\ 1-x & x \in (0,1) \\ 0 & x \geq 1 \end{cases}
+	\end{align*}
+	Then, the characteristics become 
+	\begin{align*}
+		x(t) = \begin{cases} x_0 - t & x_0 \leq 0 \\ x_0 + (2x_0 -1)t & x_0 \in(0,1) \\ x_0 + t & x_0 \geq 1 \end{cases}
+	\end{align*}
+	
+	To solve this for $x_0$, consider cases. If $x_0 < 0$, $x_0 = x+t \leq 0$ gives $x \leq -t$. Repeating on the other two cases gives
+	\begin{align*}
+		x_0 = \begin{cases}x + t & x \leq -t \\
+		\frac{x+t}{1+2t} & -t < x < 1+t \\
+		x-t & x \geq 1+t\end{cases}
+	\end{align*}
+	
+	for a final solution 
+	\begin{align*}
+		u(t,x) = \begin{cases} 1 & x \leq -t \\ 1-\frac{x+t}{1+2t} & -t < x < 1+t \\ 0 & x \geq 1+t\end{cases}
+	\end{align*}
+	
+	We have some issues (irregularity) at the lines $x=-t$ and $x=1+t$, but away from these, the solution is reasonable. This roughly models how cars must wait for space ahead of them before they can move forward and decrease the density of the stopped line. 	
+	
+	\vspace{0.25cm}
+	
+	Case 3: $h(x) = \frac{1}{2} + \frac{1}{\pi} \arctan(20x)$
+	
+	This models a traffic jam, via the reverse of the situation with the light. Cars can't move forward, and so we can't really look forward in time. If we try to compute characteristics, they cross (hence we can't solve things appropriately). The crossing of characteristics is called a \textit{shock}, which we shall see again. 
+	
+	
+	\vspace{0.25 cm}
+	
+	
+	\subsection{More General Characteristics}
+	
+	Consider a general nonlinear scalar first-order equation
+	
+	\begin{align*}
+		F(x,u,Du) = 0
+	\end{align*}
+	where $F: \Omega \times \R\times \R^{n} \to \R$. While this looks alien in comparison to the conservation equations above, we can actually solve many equations like this (at least locally) in the same way by reducing to a system of ODEs. The full scope of this existence theory is beyond these notes (see Evans, Chapter 3), but we will derive the system of ODEs and look at some examples.
+	
+	Taking inspiration from the simpler cases above, we are going to start with some curve $x(s)$ and keep track of the values of $u$ and $Du$ along this curve. Define
+	\begin{align*}
+		z(s) = u(x(s)), \,\,\,\, p_{j}(s) = \pd_{j}u (x(s))
+	\end{align*}
+	We will also denote $F$ as a function with entires $F(x,z,p)$ for taking partials. 
+	
+	In trying to obtain an ODE for the $p_j$, we should expect to see second derivatives of $u$:
+	\begin{align*}
+		p_{j}'(s) = \frac{d}{ds} \pd_{j}u(x(s)) = \sum_{k} (x^k)' \pd_{j}\pd_{k}u(x(s))
+	\end{align*}
+	
+	which is beyond our first-order PDE. Therefore, we shall differentiate the PDE again in the variable $x^j$: 
+	\begin{align*}
+		0 = (\pd_{x^j}F)(x,u(x),Du(x)) + (\pd_{x^j}u)(\pd_{z}F(x,u(x),Du(x))) \\
+		+ \sum_{k}(\pd_{j}\pd_{k} u)(\pd_{p_k}F)(x,u(x),Du(x))
+	\end{align*}
+	
+	This third term so happens to resemble $p_{j}'$ above. To make them align perfectly, we take 
+	\begin{align*}
+		(x^k)' = \pd_{p_k}F(x,z,p)
+	\end{align*} 
+	
+	and obtain the ODE
+	\begin{align*}
+		p_{j}' = -(\pd_{x^j}F)(x,z,p) - p_{j}(\pd_{z}F)(x,z,p)
+	\end{align*}
+	
+	Finally, to solve for $z'$, we notice 
+	\begin{align*}
+		z' = \frac{d}{ds} u(x(s)) = \sum_{j} (x^j)' \pd_{j}u(x(s)) = \sum \pd_{p_j}F(x,z,p)p_j
+	\end{align*}
+	
+	This give the \textit{characteristic equations}
+	\begin{align*}
+		x'(s) = D_p F(x(s),z(s),p(s)) \\
+		z'(s) = \sum_{j}\pd_{j}F(x(s),z(s),p(s))p_{j}(s) \\
+		p'(s) = D_{x}F(x(s),z(s),p(s)) - \pd_{z}F(x(s),z(s),p(s))p_j(s)
+	\end{align*}
+	
+	A solution $(x,z,p)$ to this system given initial value $(x_0,z_0,p_0)$ is called a \textit{characteristic}. The curve $x(s)$ is called a \textit{projected characteristic}, but in many situations, like the sections above, it may just be called a characteristic. 
+	
+	Exactly this derivation implies the following:
+	
+	\begin{res}
+		Let $u \in C^{2}(\Omega)$ be a solution to $F(x,u,Du) = 0$ in $\Omega$, where $F$ is $C^{1}$. If $x(s): I \to \Omega$, solves the first characteristic equation, then $z(s) = u(x(s))$ and $p_{j}(s) = \pd_{j}u(x(s))$ solve the following two characteristic equations. 
+	\end{res}
+	
+	
+%	\vspace{0.25 cm}
+%	
+%	\textbf{Example:} Burgers' Equation 
+%	\begin{align*}
+%		\begin{cases}
+%			u_{x^1} + uu_{x^{2}} = 0 & \text{ in } \Omega \\
+%			u = g & \text{ on } \{x^{1} = 0\}
+%		\end{cases}
+%	\end{align*}
+%	
+%	Here, the characteristic equations are 
+%	\begin{align*}
+%		x'(s) = \begin{bmatrix} 1 \\ z\end{bmatrix}, \,\,\,\, z'(s) = 0
+%	\end{align*}
+%	
+%	So we have, for initial conditions $x(0) = y$
+%	\begin{align*}
+%		x(s) = \begin{bmatrix} s \\ y+sg(y)\end{bmatrix}, \,\,\,\, z(s) = g(y)
+%	\end{align*}
+%	
+%	Depending on the choice of $g$, our characteristics may collide!
+	
+	\vspace{0.25 cm}
+	
+	\textbf{Example:} $F$ nonlinear
+	\begin{align*}
+		\begin{cases}
+			u_{x^1}u_{x^2} =u & \text{ in } \{x^{1} > 0 \} \\
+			u = (x^2)^2 & \text{ on } \{x^{1} = 0\}
+		\end{cases}
+	\end{align*}
+	
+	
+	Notice $F(x,z,p) = p_1p_2 - z$, so the characteristic ODEs are
+	\begin{align*}
+		x'(s) = \begin{bmatrix}p_2 \\ p_1 \end{bmatrix} \\
+		z'(s) = p_1p_2+p_2p_1 = -2z \\
+		p'(s) = \begin{bmatrix} p_1 \\ p_2\end{bmatrix} \\
+		(x(0),z(0),p(0)) = (0,x^{2}_{0},(x^{2}_{0})^{2},p_{1}^{0},p_{2}^{0})
+	\end{align*}
+	
+	Solving gives $p_i(s) = p_{i}^{0} e^{s}$, $z(s) = e^{-2s}(x^{2}_{0})^{2}$, $x(s) = \begin{bmatrix}p_{2}^{0}(e^s-1) \\ p_{1}^{0}(e^{s}-1)+x^{2}_{0} \end{bmatrix} $.
+	
+	We have a lot of variables involved, so let us try to simplify some. First, call $x^{2}_{0}$ by $y$, and notice $p_{1}^{0}p_{2}^{0} - y^2 = 0$ by the PDE. Since we also have $p_{2}^{0} = g'(y)$ from the boundary conditions, $p_{2}^{0} = 2y$ and when $y \neq 0$, $p_{1}^{0} = y/2$. Therefore, we have
+	
+	\begin{align*}
+		x(s) = \begin{bmatrix}2y(e^s-1) \\ (y/2)(e^{s}-1)+y \end{bmatrix} \\
+		z(s) = y^{2}e^{-2s} \\
+		p(s) = \begin{bmatrix}(y/2)e^{s} \\ 2ye^{2s} \end{bmatrix}
+	\end{align*}
+	
+	To solve for $u(x)$, we must determine $y,s$ such that $(x^{1},x^{2}) = (2y(e^s-1), (y/2)(e^{s}-1)+y)$. The solution is 
+	\begin{align*}
+		y = \frac{4x^2 - x^1}{4}, \,\,\,\, s = \ln \left(\frac{x^{1}+4x^{2}}{4x^{2}-x^{1}}\right)
+	\end{align*}
+	
+	in which case 
+	\begin{align*}
+		u(x) = z(s) = \frac{(x^1 + 4x^2)^{2}}{16}
+	\end{align*}
+	
+	
+	Now we have a candidate solution, and can put $u$ into the PDE to check it is indeed a solution. 
+	
+	\vspace{0.25 cm}
+	
+	\textbf{Example:} Burgers' Equation 
+	\begin{align*}
+		\begin{cases}
+		u_{t} + u u_{x} = 0 &  \{ t \geq 0\} \\
+		u(0,x) = g(x) & t=0	
+		\end{cases}
+	\end{align*} 
+	
+	Burgers' Equation models gas flow. It also gives an amazing example of shocks. Consider the characteristic equations 
+	\begin{align*}
+		t' = 1, \,\,\,\, x' = z, \,\,\,\, z' =0
+	\end{align*}
+	
+	so that the characteristics are 
+	\begin{align*}
+		t(s) = s \\
+		x(s) = x_0 + sg(x_0) \\
+		z(s) = g(x_0)
+	\end{align*}
+	
+	and it is clear we can have characteristics cross for some choices of $g$. If we consider the derivatives 
+	\begin{align*}
+		p_{2} '  = -p_{2}^{2} \Rightarrow 
+		p_{2} = \frac{1}{g'(x_0) - s}
+	\end{align*}
+	we see that some ``blowup" of the second derivative will always happen if $g' > 0$ for any $x$. This ``explosion of density" matches what we saw in the traffic equation, and occurs exactly when these characteristics cross. This is the original context for the term \textit{shock}. 
+	
+	
+	\vspace{0.25cm}
+	
+	
+\end{document}

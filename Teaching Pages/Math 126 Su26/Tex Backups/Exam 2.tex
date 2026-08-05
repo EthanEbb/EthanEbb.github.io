@@ -1,0 +1,237 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+
+
+%Math
+\usepackage{multirow, longtable, amsmath, amssymb, amsthm}
+\usepackage{indentfirst, graphicx, tabularx, fancyhdr, xcolor, todonotes}
+\usepackage[mathscr]{euscript}
+
+%Formatting
+\usepackage[margin = 1 in]{geometry}
+\usepackage{hyperref, cite}
+
+%Commands
+\newcommand{\Q}{{\mathbb{Q}}}
+\newcommand{\F}{{\mathbb{F}}}
+\newcommand{\Z}{{\mathbb{Z}}}
+\newcommand{\N}{{\mathbb{N}}}
+\newcommand{\R}{{\mathbb{R}}}
+\newcommand{\C}{{\mathbb{C}}}
+\newcommand{ \norm }[1]{{ || {#1}||}}
+\newcommand{\abs}[1]{{|{#1}|}}
+\newcommand{\cl}[1]{{\overline{#1}}}
+\newcommand{\pd}{\partial}
+\newcommand{\ip}[2]{ \langle {#1},{#2}\rangle }
+\newcommand{\ls}{\lesssim}
+\newcommand{\gs}{\gtrsim}
+
+%Result Environment
+\newcounter{result}[section]
+\newenvironment{myresult}[1][]{\refstepcounter{result}\par\medskip
+	\noindent \textbf{[\thesection.\theresult] #1} \rmfamily}{\medskip}
+
+%Proof Environment
+\newenvironment{myproof}{%
+	\par%
+	\medskip
+	\leftskip=2em\rightskip=2em%
+	\noindent\ignorespaces \textit{Proof:} \newline}{%
+	\,\, \newline \textit{Q.E.D.}\par\medskip}
+
+
+
+
+\begin{document}
+
+
+\title{Math 126 Midterm 2}
+\author{UCB Summer 2026}
+\date{July 28, 2026}
+\maketitle
+
+Remember that the exam is closed book. You will have 50 minutes to complete the Exam. You may use the front and back of each page. There are 3 total problems, so ensure that you have attempted all 3. Please write your full name and SID below. Good luck!
+
+\vspace{1 cm}
+
+\textbf{Name:} 
+
+\vspace{1 cm}
+
+\textbf{SID:}
+
+\vspace{1 cm}
+
+\textbf{Honor Pledge:}
+
+\vspace{1 cm}
+
+\textbf{Formulas:}
+Characteristic ODEs: 
+\begin{align*}
+	x'(s) = D_p F \\
+	z'(s) = D_p F \cdot p \\
+	p'(s) = -D_{x} F - D_{z}(F) p
+\end{align*}
+
+Divergence: $$\int_{\Omega} \nabla \cdot F dx = \int_{\pd \Omega} F \cdot \eta dS$$
+
+D'Alembert: $$u(t,x) = \frac{1}{2} \left[g(x+ct) + g(x-ct) \right] + \frac{1}{2c} \int_{x-ct}^{x+ct} h(\tau) d\tau $$
+
+$$\mathcal{D}_{t,x} = \{ (s,y) \in \R_{+} \times \R \mid x-c(t-s) \leq y \leq x+c(t-s)\}$$
+
+Inhomogeneous Wave: $$u(t,x) = \frac{1}{2c} \int_{\mathcal{D}_{t,x}} f(s,y) dsdy$$
+
+Poisson: $$u(t,x) = \frac{\pd}{\pd t} \left( \frac{t}{2\pi} \int_{D} \frac{g(t-xy)}{\sqrt{1 - |y|^{2}}} dy\right) + \frac{t}{2\pi} \int_{D} \frac{h(t-xy)}{\sqrt{1-|y|^{2}}} dy$$
+
+Kirchoff: $$ u(t,x) = \frac{\pd}{\pd t} \left(\frac{1}{4 \pi t} \int_{\pd B(x,t)} g(y) dS(y) \right) + \frac{1}{4\pi t} \int_{\pd B(x,t)} h(y) dS(y)$$
+
+Helmholtz 1D: $$\phi_{k}(x) = \sin(\frac{k\pi}{l}x), \hspace{0.5 cm} k \in \Z$$
+solve $$-\phi(x) = \lambda \phi \hspace{0.5 cm} \phi(0) = \phi(l) = 0$$ for $\lambda = (\frac{k\pi}{l})
+^{2}$.
+
+Helmholtz Solutions on the Torus: $$\phi_{k}(x) = e^{ikx} \hspace{0.5 cm} k \in \Z$$
+
+Heat Separation of Variables on the Torus: 
+
+$u(t,x) = e^{-k^{2}t}e^{ikx}$ for $k \in \Z$. 
+
+
+Heat Kernel:$$ H_{t}(x) = (4\pi t)^{-n/2} e^{-\frac{|x|^{2}}{4t}} $$
+
+Heat Solution on $\R^{n}$ with initial condition $f \in C^{0}(\R^{n})$: $$u(t,x) = H_{t}(x) * f(x)$$
+
+Fourier Coefficient: $$c_{k}[f] = \frac{1}{2\pi}\int_{0}^{2\pi} f(x) e^{-ikx} dx$$
+
+Poisson Kernel: 
+
+$$P_{r}(\theta) = \sum_{\Z} r^{|k|}e^{ik\theta}$$
+
+Laplace Solution with boundary condition $g$:
+$$u(r,\theta) = P_{r}(\theta)*g(\theta)$$
+
+Mean Value Formula:
+$$ u(x_0) = \frac{1}{|\pd B(x_0,R)|} \int_{\pd B(x_0,R)} u(x)dS + \int_{B(x_0,R)} G_{R}(x-x_0) \Delta u(x)dx$$
+for 
+$$ G_{R}(x) = \begin{cases} \frac{1}{2\pi} \ln(\frac{r}{R})& n=2 \\ \frac{1}{(n-2)|\pd B(0,1)|} \left[ \frac{1}{R^{n-2}} - \frac{1}{r^{n-2}}\right] & n \geq 3\end{cases}$$
+
+
+
+
+
+
+
+
+\newpage
+
+
+\textbf{Problem 1:} \\
+
+The following may be answered true or false. You do not need to explain your answer, but please write clearly and box your final answer. 
+
+
+
+\vspace{1 cm}
+A.) Let $u(t,x)$ be a solution of the heat equation on $(0,\infty) \times \mathbb{T}$ with initial condition $h \in C^{2}(\mathbb{T})$. Then, $u(t,x)$ is at-most $C^{2}$. 
+
+
+\vspace{3 cm}
+B.) 
+\begin{align*}
+	\lim_{n \to \infty} n^{-1/2}1_{[0,n]} = 0
+\end{align*}
+in $L^{2}(\R)$. 
+
+\vspace{3 cm}
+C.) Let $u(t,x)$ be a heat solution with initial condition $g(x)$, where $\text{supp}(g) \subset [-1,1]$ and $g( x) \geq 0$. Then, $u(10^{-5},10^{5}) > 0$. 
+
+\vspace{3 cm}
+D.) Let $f \in C^{3}(\mathbb{T})$. Then, 
+\begin{align*}
+	\sum_{k \in \Z} |c_{k}[f]k^{3}|^{2} < \infty 
+\end{align*}
+
+
+\newpage
+
+This page is for work
+\newpage
+
+
+
+\textbf{Problem 2:} [This question has two parts]\\
+
+Assume for this problem that heat solutions are \textbf{unique} given initial condition $g(x) \in C^{0}$ (so they align with your known solution formulas). 
+
+\vspace{1 cm}
+
+Part A.) Let $u(t,x) \in C^{2}((0,\infty) \times \R^{n})$ have 
+\begin{align*}
+	\pd_{t}u - \Delta u =0 \hspace{0.25 cm} \text{in } (0,\infty) \times \R^{n}\\
+	\lim_{t \to 0 } u(t,x) = g(x)
+\end{align*}
+for some bounded function $g(x) \in C^{0}(\R^{n})$. Then, show that 
+\begin{align*}
+	 u(t,x) \leq \norm{g}_{\infty} 
+\end{align*}
+or that \textit{heat is not gained}.
+
+
+
+\newpage
+
+\vspace{0.5 cm}
+
+Part B.) Let $u(t,x) \in C^{2}((0,\infty) \times \mathbb{T})$ have 
+\begin{align*}
+	\pd_{t}u - \Delta u =0 \hspace{0.25 cm} \text{in } (0,\infty) \times \mathbb{T}\\
+	\lim_{t \to 0 } u(t,x) = g(x)
+\end{align*}
+for $g(x) \in C^{1}(\mathbb{T})$ and $g(x) \leq M$. Let $\int_{0}^{2\pi} g(x)dx = 0$ (what does this mean for Fourier coefficients?). 
+
+For what time can we guarantee 
+\begin{align*}
+	\norm{u(t,x)}_{L^{2}(\mathbb{T})} \leq \frac{1}{10} \norm{g}_{L^{2}(\mathbb{T})}
+\end{align*}
+
+ 
+
+
+
+
+\newpage
+
+This page is for work
+\newpage
+
+
+
+\textbf{Problem 3:}[This question has two parts] \\
+
+Let $\Omega \subset \R^{2}$ be a bounded domain and let $u \in C^{2}(\Omega) \cap C^{0}(\cl{\Omega})$ be subharmonic. Let the graph of $u$ be 
+\begin{align*}
+	G(u) = \{(x,y,z) \in \R^{3} : z = u(x,y)\}
+\end{align*}
+\vspace{0.5 cm}
+
+Part A.) Let $z(x,y) = 3x+2y$ be the equation for a plane $V$ in $\R^{3}$. Assume that $V$ intersects the graph of $U$ in a circle on the place $C$, so that the region inside the circle is an open ball on the plane $B(0,1) \cap V$. What can we say about $u$ on $B(0,1) \cap V$ (inside the circle)?
+
+
+\newpage
+
+\vspace{0.5 cm}
+
+Part B.) Let $v \in C^{2}(\Omega) \cap C^{0}(\cl{\Omega})$ be superharmonic such that $v(x,y) = z(x,y)$ on $\pd \Omega$. If $(0,0)$ and $(1,2)$ are both in $\Omega$ and $v(0,0) = 0$, what is $v(1,2)$? 
+
+
+
+
+\newpage
+
+This page is for work
+\newpage
+
+
+
+
+\end{document}

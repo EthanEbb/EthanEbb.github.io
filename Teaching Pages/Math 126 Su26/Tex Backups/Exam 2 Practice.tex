@@ -1,0 +1,176 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+
+
+%Math
+\usepackage{multirow, longtable, amsmath, amssymb, amsthm}
+\usepackage{indentfirst, graphicx, tabularx, fancyhdr, xcolor, todonotes}
+\usepackage[mathscr]{euscript}
+
+%Formatting
+\usepackage[margin = 1 in]{geometry}
+\usepackage{hyperref, cite}
+
+%Commands
+\newcommand{\Q}{{\mathbb{Q}}}
+\newcommand{\F}{{\mathbb{F}}}
+\newcommand{\Z}{{\mathbb{Z}}}
+\newcommand{\N}{{\mathbb{N}}}
+\newcommand{\R}{{\mathbb{R}}}
+\newcommand{\C}{{\mathbb{C}}}
+\newcommand{ \norm }[1]{{ || {#1}||}}
+\newcommand{\abs}[1]{{|{#1}|}}
+\newcommand{\cl}[1]{{\overline{#1}}}
+\newcommand{\pd}{\partial}
+\newcommand{\ip}[2]{ \langle {#1},{#2}\rangle }
+\newcommand{\ls}{\lesssim}
+\newcommand{\gs}{\gtrsim}
+
+%Result Environment
+\newcounter{result}[section]
+\newenvironment{myresult}[1][]{\refstepcounter{result}\par\medskip
+	\noindent \textbf{[\thesection.\theresult] #1} \rmfamily}{\medskip}
+
+%Proof Environment
+\newenvironment{myproof}{%
+	\par%
+	\medskip
+	\leftskip=2em\rightskip=2em%
+	\noindent\ignorespaces \textit{Proof:} \newline}{%
+	\,\, \newline \textit{Q.E.D.}\par\medskip}
+
+
+
+
+\begin{document}
+
+
+\title{Math 126 Midterm 2 Practice}
+\author{UCB Summer 2026}
+\date{July 22, 2026}
+\maketitle
+
+Remember that the exam is closed book. You will have 50 minutes to complete the Exam. You may use the front and back of each page. There are 3 total problems, so ensure that you have attempted all 3. Please write your full name and SID below. Good luck!
+
+\vspace{1 cm}
+
+\textbf{Name:} 
+
+\vspace{1 cm}
+
+\textbf{SID:}
+
+\vspace{1 cm}
+
+\textbf{Honor Pledge:}
+
+\vspace{1 cm}
+
+\textbf{Formulas:}
+Characteristic ODEs: 
+\begin{align*}
+	x'(s) = D_p F \\
+	z'(s) = D_p F \cdot p \\
+	p'(s) = -D_{x} F - D_{z}(F) p
+\end{align*}
+
+Divergence: $$\int_{\Omega} \nabla \cdot F dx = \int_{\pd \Omega} F \cdot \eta dS$$
+
+D'Alembert: $$u(t,x) = \frac{1}{2} \left[g(x+ct) + g(x-ct) \right] + \frac{1}{2c} \int_{x-ct}^{x+ct} h(\tau) d\tau $$
+
+$$\mathcal{D}_{t,x} = \{ (s,y) \in \R_{+} \times \R \mid x-c(t-s) \leq y \leq x+c(t-s)\}$$
+
+Inhomogeneous Wave: $$u(t,x) = \frac{1}{2c} \int_{\mathcal{D}_{t,x}} f(s,y) dsdy$$
+
+Poisson: $$u(t,x) = \frac{\pd}{\pd t} \left( \frac{t}{2\pi} \int_{D} \frac{g(t-xy)}{\sqrt{1 - |y|^{2}}} dy\right) + \frac{t}{2\pi} \int_{D} \frac{h(t-xy)}{\sqrt{1-|y|^{2}}} dy$$
+
+Kirchoff: $$ u(t,x) = \frac{\pd}{\pd t} \left(\frac{1}{4 \pi t} \int_{\pd B(x,t)} g(y) dS(y) \right) + \frac{1}{4\pi t} \int_{\pd B(x,t)} h(y) dS(y)$$
+
+Helmholtz 1D: $$\phi_{k}(x) = \sin(\frac{k\pi}{l}x), \hspace{0.5 cm} k \in \Z$$
+solve $$-\phi(x) = \lambda \phi \hspace{0.5 cm} \phi(0) = \phi(l) = 0$$ for $\lambda = (\frac{k\pi}{l})
+^{2}$.
+
+Helmholtz Solutions on the Torus: $$\phi_{k}(x) = e^{ikx} \hspace{0.5 cm} k \in \Z$$
+
+Heat Separation of Variables on the Torus: $u(t,x) = e^{-k^{2}t}e^{ikx}$ for $k \in \Z$. 
+
+
+Heat Kernel:$$ H_{t}(x) = (4\pi t)^{-n/2} e^{-\frac{|x|^{2}}{4t}} $$
+
+Heat Solution on $\R^{n}$ with initial condition $f \in C^{0}(\R^{n})$: $$u(t,x) = H_{t}(x) * f(x)$$
+
+Fourier Coefficient: $$c_{k}[f] = \frac{1}{2\pi}\int_{0}^{2\pi} f(x) e^{-ikx} dx$$
+
+Poisson Kernel: 
+
+$$P_{r}(\theta) = \sum_{\Z} r^{|k|}e^{ik\theta}$$
+
+Laplace Solution with boundary condition $g$:
+$$u(r,\theta) = P_{r}(\theta)*g(\theta)$$
+
+
+
+
+\newpage
+
+
+\textbf{Problem 1:} \\
+
+True/False
+
+Part A.) $C_{c}^{\infty}(\Omega)$ is a complete subspace of $L^{1}(\Omega)$ (in the $L^{1}$ norm). 
+
+Part B.) Under the mixed boundary conditions $u(0) = 0$, $u'(l) = 0$ on $(0,l)$, the Laplacian is self-adjoint. 
+
+Part C.) The partial Fourier sums of a function $f \in C^{1}(\mathbb{T})$ converge pointwise to $f$. 
+
+Part D.) If $\sum |c_{k}[f]^{2} k^{4}| < \infty$, then $f$ must be $C^{2}$.  
+
+Part E.) The heat equation may be used to describe the motion of particles. 
+
+
+
+
+\textbf{Problem 2:} \\
+
+Let $u(t,x)$ be the solution to the heat equation on $(0,\infty) \times \R$ given by 
+\begin{align*}
+	u(t,x) = H_{t}(x) * g(x)
+\end{align*}
+for $g \in C_{c}^{\infty}(\R)$ so $\text{supp}(g) \subset [-1,1]$ and $ 0 \leq g(x) \leq 1$. Show that 
+\begin{align*}
+	\lim_{t \to \infty} u(t,x) = 0
+\end{align*}
+for all $x$.  
+
+\textbf{Extension:} what bounds can we put on $u(t,x)$ compared to $g$?
+
+
+\textbf{Problem 3:}
+
+
+Suppose $u,\phi \in C^{2}(\Omega) \cap C^{0}(\cl{\Omega})$ for a bounded domain $\Omega \subset \R^{n}$. Let $u$ be subharmonic and $\phi$ harmonic, so $u|_{\pd \Omega} \leq \phi|_{\pd \Omega}$. Show $u \leq \phi$ on $\Omega$. 
+
+
+
+\textbf{Problem 4:} 
+
+Let $g(\theta) = (\theta-\pi)^{2}$ on $[0,2\pi)$. Does the Laplace equation admit a solution on $B(0,1) \subset \R^{2}$ with this boundary data? If so, what is it (your solution will be a sum). 
+
+\textbf{Problem 5:} 
+
+Let $u(t,x)$ be a heat solution on the torus with initial condition $f$, so 
+\begin{align*}
+	u(t,x) = \sum_{\Z} c_{k}[f] e^{-k^{2}t}e^{ikx}
+\end{align*}
+
+Under what condition on $f$ does $u(t,x)$ decay in time? 
+
+\textbf{Problem 6:}
+
+Recall that $\{\frac{1}{\sqrt{2\pi}}e^{ikx}\}$ is a basis for $L^{2}(-\pi,\pi))$. Show that the functions $\phi_{k}(x) = \sqrt{\frac{2}{\pi}} \sin(kx)$ form a basis for $L^{2}((0,\pi))$, assuming the $\phi_{k}$ already have magnitude 1. \textit{Hint:} Any function on $L^{2}((0,\pi))$ may be extended to an odd function on $(-\pi,\pi)$. 
+
+
+
+
+\end{document}

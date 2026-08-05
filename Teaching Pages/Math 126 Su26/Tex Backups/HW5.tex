@@ -1,0 +1,148 @@
+
+\DocumentMetadata{tagging=on,
+	tagging-setup={math/setup=mathml-SE},
+	pdfstandard=ua-2,
+	lang=en-US
+}
+\documentclass{article}
+
+%Math Libraries
+\usepackage{multirow, longtable, amsmath, amssymb, amsthm}
+\usepackage[mathscr]{euscript}
+
+%Formatting
+\usepackage[margin = 1 in]{geometry}
+\usepackage{indentfirst}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage{tabularx}
+\usepackage{cite}
+
+%Diagram Packages
+\usepackage{tikz}
+\usetikzlibrary{automata,positioning,arrows}
+
+%Standard Commands
+\newcommand{\mm}{\mathscr}
+\newcommand{\B}{{\mathcal{B}}}
+\newcommand{\A}{{\mathcal{A}}}
+\newcommand{\N}{{\mathbb{N}}}
+\newcommand{\R}{{\mathbb{R}}}
+\newcommand{\C}{{\mathbb{C}}}
+\newcommand{\Q}{{\mathbb{Q}}}
+\newcommand{\Z}{{\mathbb{Z}}}
+
+
+\newcommand{\abs}[1]{{|{#1}|}}
+\newcommand{ \norm }[1]{{ || {#1}||}}
+\newcommand{\cl}[1]{{\overline{#1}}}
+\newcommand{\pd}{\partial}
+\newcommand{\ip}[2]{ \langle {#1},{#2}\rangle }
+\newcommand{\ls}{\lesssim}
+\newcommand{\gs}{\gtrsim}
+\newcommand{\supp}{\text{supp}}
+
+%Result Environment
+\newcounter{result}[section]
+\newenvironment{res}[1][]{\refstepcounter{result}\par\medskip
+	\noindent \textbf{[\thesection.\theresult] #1} \rmfamily}{\medskip}
+
+\newenvironment{defn}[1][]{\refstepcounter{result}\par\medskip \noindent \textbf{Definition [\thesection.\theresult] #1} \rmfamily}{\medskip}
+
+%Proof Environment
+\newenvironment{pf}{%
+	\par%
+	\medskip
+	\leftskip=2em\rightskip=2em%
+	\noindent\ignorespaces \textit{Proof:} \newline}{%
+	\,\, \newline \textit{Q.E.D.}\par\medskip}
+
+\title{Math 126 Summer 2026 HW 5}
+\author{Lec 001, Ebbighausen}
+
+
+\begin{document}
+	\pagestyle{fancy}
+	\fancyfoot{} 
+	\fancyfoot[L]{Math 126}
+	
+	\maketitle
+	
+	\textbf{Problem 1:} [Maximum Failure]
+	
+	Create an example to show that the wave equation 
+	\begin{align*}
+		\pd_{t}^{2}u - \pd_{x}^{2}u = 0 \\
+		u_x(a) = u_x(b) = 0
+	\end{align*}
+	
+	fails to satisfy a weak maximum principle on $[0,\infty) \times (a,b)$ (Hint: superposition of waves).
+	
+	
+	\textbf{Problem 2:} [RH Condition Solutions]
+	
+	Recall that we proved a piecewise-defined weak solution $u$ would satisfy a certain condition along its piecewise-boundary. Suppose $u \in L^{1}_{loc}$ is a function so 
+	\begin{align*}
+		u = \begin{cases}
+			u_{-} & x < \sigma(t) \\ u_+ & x > \sigma(t)
+		\end{cases}
+	\end{align*}
+	for some classical solutions $u_-$ and $u_+$ to $\pd_{t}v + \pd_{x} q(v) = 0$ ($q$ is $C^1$) and some curve$(t,\sigma(t))$ satisfying 
+	\begin{align*}
+		\sigma'(t)(u_+ - u_-) = q(u_+) - q(u_-) 
+	\end{align*}
+	
+	where the classical solutions also match boundary conditions 
+	\begin{align*}
+		g(x) = \begin{cases}
+			g_- & x<x_0 \\ g_+ & x>x_0
+		\end{cases}
+	\end{align*}
+	for $\sigma(0) = x_0$. Prove that $u$ is a weak solution to 
+	\begin{align*}
+		\pd_{t} u + \pd_{x}q(u) = 0 \\
+		u(0,x) = g(x)
+	\end{align*}
+	Hint: use the RH-condition proof. 
+	
+	\textbf{Problem 3:} [RH Condition Application]
+	
+	Find a weak solution to Burgers' equation $\pd_{t} u + u \pd_{x}u=0$ with initial condition 
+	\begin{align*}
+		u(0,x) = \begin{cases}
+			1 & x < -1 \\
+			0 & x \in (-1,0) \\
+			2 & x>0
+		\end{cases}
+	\end{align*}
+	
+	Draw a picture of the shock curves and regions of definition. 
+	
+	
+	\textbf{Problem 4:} [Weak Solutions]
+	
+	Create a suitable definition for the weak solution of the PDE
+	
+	\begin{align*}
+		\begin{cases}
+			\pd_{t}^{2} u + 2a \pd_{t}u + a^{2}u - \pd_{x}^{2} u = 0 & [0,\infty) \times (a,b) \\
+			(u,u_{t})|_{t=0} = (g,0) \\
+			u(a)=u(b)=0
+		\end{cases}
+	\end{align*} 
+
+	Find a weak solution provided $g \in L^{1}_{loc}((a,b))$. 
+	
+	\textbf{Problem 5:}
+	
+	Use Integration-by-parts to compute the distributional limit 
+	\begin{align*}
+		\lim_{j \to \infty} j^{2}|x|\cos(jx)
+	\end{align*}
+	
+	
+	\textbf{Problem 6:}
+	
+	Find the Greens' function on $\{(x,y) \in \R^{2} \mid x,y > 0\}$. 
+	
+\end{document}

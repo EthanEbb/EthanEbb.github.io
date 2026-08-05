@@ -1,0 +1,928 @@
+
+\DocumentMetadata{tagging=on,
+	tagging-setup={math/setup=mathml-SE},
+	pdfstandard=ua-2,
+	lang=en-US
+}
+\documentclass{article}
+
+%Math Libraries
+\usepackage{multirow, longtable, amsmath, amssymb, amsthm}
+\usepackage[mathscr]{euscript}
+
+%Formatting
+\usepackage[margin = 1 in]{geometry}
+\usepackage{indentfirst}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage{tabularx}
+\usepackage{cite}
+
+%Diagram Packages
+\usepackage{tikz}
+\usetikzlibrary{automata,positioning,arrows}
+
+%Standard Commands
+\newcommand{\mm}{\mathscr}
+\newcommand{\B}{{\mathcal{B}}}
+\newcommand{\A}{{\mathcal{A}}}
+\newcommand{\N}{{\mathbb{N}}}
+\newcommand{\R}{{\mathbb{R}}}
+\newcommand{\C}{{\mathbb{C}}}
+\newcommand{\Q}{{\mathbb{Q}}}
+\newcommand{\Z}{{\mathbb{Z}}}
+
+
+\newcommand{\abs}[1]{{|{#1}|}}
+\newcommand{ \norm }[1]{{ || {#1}||}}
+\newcommand{\cl}[1]{{\overline{#1}}}
+\newcommand{\pd}{\partial}
+\newcommand{\ip}[2]{ \langle {#1},{#2}\rangle }
+\newcommand{\ls}{\lesssim}
+\newcommand{\gs}{\gtrsim}
+\newcommand{\supp}{\text{supp}}
+
+%Result Environment
+\newcounter{result}[section]
+\newenvironment{res}[1][]{\refstepcounter{result}\par\medskip
+	\noindent \textbf{[\thesection.\theresult] #1} \rmfamily}{\medskip}
+
+\newenvironment{defn}[1][]{\refstepcounter{result}\par\medskip \noindent \textbf{Definition [\thesection.\theresult] #1} \rmfamily}{\medskip}
+
+%Proof Environment
+\newenvironment{pf}{%
+	\par%
+	\medskip
+	\leftskip=2em\rightskip=2em%
+	\noindent\ignorespaces \textit{Proof:} \newline}{%
+	\,\, \newline \textit{Q.E.D.}\par\medskip}
+
+\title{Lecture 3}
+\author{Ethan Ebbighausen}
+\date{}
+
+\begin{document}
+	\pagestyle{fancy}
+	\fancyfoot{} 
+	\fancyfoot[L]{Topics Document, Ethan Ebbighausen}
+	
+	\maketitle
+	
+	
+	\section{Introduction: Why Waves?}
+	
+	Waves are all around us, as light and sound. Many other physical objects have some oscillating motion (like a pendulum or rotating objects) that may be modelled using waves. In fact, the wave-particle duality tells us that just about everything may be viewed as a wave. This physical importance is exactly why the wave equation was one of the first complex PDEs studied and solved, and why we still need it for many physical applications today. We will develop the theory of a solution method first in one spatial dimension, adding complexity as we go, then return to the problem in a few specific higher-dimensional cases. We will only briefly touch on the general higher-dimensional solution (as it is more complicated and a true study involves distribution theory). 
+	
+	
+	\textbf{Learning Objectives:}
+	
+	\begin{itemize}
+		\item Derive the Wave Equation from the motion of a string.
+		\item Derive and apply D'Alembert's 1-dimensional solution formula.
+		\item Describe how initial data affects the solution.
+		\item Apply Duhamel's method to resolve forcing terms.
+		\item Apply spherical averaging to solve the wave equation in 3D.
+		\item Analyze the solution process to generate robust methods to solve for higher dimensions and uniqueness. 
+	\end{itemize}
+	
+	
+	
+	\section{1D Wave Equation}
+	
+	\subsection{Model Problem: A Vibrating String Generates a PDE}
+	
+	Consider the string of a violin, stretched tight between two ends and allowed to vibrate to produce noise. Imagine we pluck the string then don't interfere, and model the height of the string at position $x$ and time $t$ after we let go by $u(t,x)$. Let the string have length $l$, so $x \in [0,l]$. 
+	
+	To model this, let the string be under tension force $T$ and assume that gravity is negligible. The mass of the string affects movement via inertia, so we consider its linear mass density $\rho$, measured in mass per unit length. We also assume its total displacement is very small compared to its length and that any stretching of the string is negligible. This justifies taking $T$ to be constant.
+	
+	It's quite hard to model something continuous, so we try to model a chain of ``point masses'' and consider the forces on them. This is called discretization, and we separate into $n$ segments of length $\Delta x = l/n$.  This chunk has mass $\rho \Delta x$. 
+	
+	Let $x_j = j \Delta x$ denote the position of the $j$th piece, with vertical displacement $u(t,x_j)$. The tension pulls each particle in either direction, and the vertical displacements mean this is at an angle. We break it into horizontal and vertical components. 
+	
+	Let $\alpha_{j}$ be the angle that $u(t,x_j-1)$ sits above the horizontal at $u(t,x_j)$, and $\beta_j$ that between $u(t,x_{j+1})$ and $u(t,x_j)$. The net vertical force is 
+	\begin{align*}
+		\Delta F(t,x_j) = T \sin(\alpha_j) + T \sin(\beta_j)
+	\end{align*}
+	
+	From Newton's law, $F = MA$ means $\Delta F(t,x_j) = (\rho \Delta x) \frac{\pd^{2} u}{\pd t^{2}}(t,x_j)$, so simplifying the force in terms of $u$ will give a PDE for $u$. Assuming angles are small, we may approximate  
+	\begin{align*}
+		\sin(\alpha_{j}) \approx \frac{u(t,x_{j-1}) - u(t,x_j)}{\Delta x}
+	\end{align*}
+	
+	where this is taking that the hypoteneuse of the triangle is approximately $\Delta x$. 
+	
+	Applying the same to $\beta_j$,
+	\begin{align*}
+		\Delta F(t,x_j) = \frac{T}{\Delta x} \left[ u(t,x_{j+1}) + u(t,x_{j-1}) - 2u(t,x_j)\right]
+	\end{align*}
+	and 
+	\begin{align*}
+		\frac{\pd^{2} u}{\pd t^{2}}(t,x_j) = \frac{T}{\rho} \left( \frac{u(t,x_{j+1}) + u(t,x_{j-1}) - 2u(t,x_j)}{(\Delta x)^{2}} \right) \\
+		\approx \frac{T}{\rho} \frac{\pd^{2}u}{\pd x^{2} }(t,x_j)
+	\end{align*}
+	
+	
+	As we take $\Delta x \to 0$, the approximations we took become truly valid and we obtain the 1D wave equation 
+	\begin{align*}
+		(\pd_{t}^{2} - c^{2} \pd_{x}^{2} )u = 0
+	\end{align*}
+	
+	with Dirichlet boundary conditions $u(t,0) = u(t,l) = 0$. Here, $c$ denotes the speed of the wave (and $T/\rho$ is that speed!). 
+	
+	
+	\subsection{Characteristics}
+	
+	First, consider $x \in \R$ instead of a restricted domain. Second, recall from your experience with ODEs a second-order equation of the form 
+	\begin{align*}
+		y'' + 3y' + 2y = 0 \\
+		\Leftrightarrow (d_{x}^{2} +3d_{x}+2)y = 0
+	\end{align*}
+	
+	We solved this heuristically by saying that for $y \in C^{2}$, this is precisely $\left(\frac{d}{dx}+2\right)(\frac{d}{dx}+1)y=0$ and finding solutions to $(\frac{d}{dx}+2)y=0$ and $(\frac{d}{dx}+1)y = 0$. 
+	
+	If we apply the same to the wave equation, we see a difference of squares, so for $u \in C^{2}$, we are trying to solve
+	\begin{align*}
+		(\pd_{t} + c \pd_{x})(\pd_{t}-c\pd_{x})u=0
+	\end{align*}
+	
+	This is now the transport equation twice over, with characteristics $t \mapsto x_0 \pm ct$. As with the method of characteristics, assume there are initial conditions
+	\begin{align*}
+		u(0,x) = g(x), \,\,\,\, \pd_{t}u(0,x) = h(x)
+	\end{align*}
+	
+	First, let 
+	\begin{align*}
+		w = \pd_{t} u - c \pd_{x}u
+	\end{align*}
+	and we have that $w$ is constant on characteristics $x_0 + ct$ or that $w(t,x) = w(0,x-ct)$.
+	
+	We bring on the first factor by taking 
+	\begin{align*}
+		w = \pd_{t} u - c \pd_{x}u
+	\end{align*}
+	as an equation to solve with a forcing term, i.e. 
+	\begin{align*}
+		\frac{d}{dt} u(t,x_0 - ct) = w(t,x_0-ct) \Rightarrow 
+		u(t,x) = u(0,x_0) + \int_{0}^{t} w(s,x_0-cs)ds
+	\end{align*}  
+	
+	Next, relate this back to the initial conditions
+	\begin{align*}
+		u(t,x) = g(x+ct) + \int_{0}^{t} w(0,x_0-c(s-t))ds \\
+		= g(x+ct) + \frac{1}{2c} \int_{x-ct}^{x+ct} w(0,\tau)d\tau \\
+		= g(x+ct) + \frac{1}{2c} \int_{x-ct}^{x+ct} h(\tau) - c g'(\tau)d\tau \\
+		= \frac{1}{2}\left[g(x+ct)+g(x-ct)  \right] + \frac{1}{2c} \int_{x-ct}^{x+ct} h(\tau) d\tau
+	\end{align*}
+	Notice at each step, uniqueness of ODE solutions forced our hand. We have proven the following:
+	
+	\begin{res}
+		[D'Alembert's Formula] Under the initial conditions 
+		\begin{align*}
+			u(0,x) = g(x), \,\,\,\, \pd_{t}u(0,x) = h(x)
+		\end{align*}
+		for $g \in C^{2}(\R)$ and $h \in C^{1}(\R)$, the wave equation admits a unique solution 
+		\begin{align*}
+			u(t,x) = \frac{1}{2}\left[g(x+ct)+g(x-ct)  \right] + \frac{1}{2c} \int_{x-ct}^{x+ct} h(\tau) d\tau
+		\end{align*}
+	\end{res}
+	
+	This solution method is very enlightening, as we will see momentarily, but there is another famous method to derive this solution. It involves the same factoring of the operator (assuming $c=1$)
+	
+	\begin{align*}
+		(\pd_{t} +  \pd_{x})(\pd_{t}-\pd_{x})u=0
+	\end{align*}
+	
+	where, instead, our goal is to reduce this to $-\pd_{w}\pd_{v} u = 0$ by a change-of-variables $w = \frac{1}{2}(x-t),\,\, v = \frac{1}{2}(x+t)$ (this is called the Galilean transformation). Notice that this is exactly displaying the behavior along the characteristics, in a more explicit form. 
+	
+	By differentiation theory,
+	\begin{align*}
+		\pd_{v}u = \tilde{F}(v) \\
+		u(v,w) = \int \tilde{F}(v) dv + G(w) = F_0(v) + G_0(w) = F(x-t) + G(x+t)
+	\end{align*}
+	whereby 
+	\begin{align*}
+		g(x) = F(x)+G(x), \,\,\,\, h(x) = - F'(x) + G'(x) 
+		\Rightarrow \\
+		F(x) = \frac{1}{2} \left[ g - \int_{0}^{x} h(\xi) d\xi  + C\right] \\
+		G(x) = \frac{1}{2} \left[ g + \int_{0}^{x} h(\xi) d\xi + C \right]
+	\end{align*}
+	
+	giving the same solution as before (this is the historical solution method of D'Alembert).
+	
+	\vspace{0.25 cm}
+	\textbf{Example:} Consider the wave equation with the initial conditions $h = 0$ and $g(x) = e^{-x^{2}}$. The solution is then 
+	
+	\begin{align*}
+		u(t,x) = \frac{1}{2}\left[ e^{-(x-t)^2} + e^{-(x+t)^2} \right] 
+	\end{align*}
+	
+	Draw this out at time $t$ large. We notice that this starts as one bump, and diverges into two distinct bumps traveling left and right. This is exactly what we would expect from a wave traveling, and it highlights that the two characteristics above are the two directions in which the wave travels.
+	
+	\vspace{0.25 cm}
+	
+	
+	
+	There is another point to highlight about the traveling bumps above: they don't suddenly jump, and the primary changes sit within a region determined by the speed of the wave. This is formally called Huygens' principle, first stated in 1678:
+	
+	\begin{res}
+		[Huygen's Principle] Suppose $u$ solves the wave equation for $t \geq 0$, $x \in \R$, with initial data $g,h$ as given above. If $g$ and $h$ are both supported in the interval $[a,b]$, then 
+		\begin{align*}
+			\text{supp}(u) \subset \{(t,x) : x \in [a-ct,b+ct] \}
+		\end{align*}
+	\end{res}
+	
+	We can actually be even more precise, though it is not usually necessary: $g$ only affects the pair of intervals $[a-ct,b-ct]$ and $[a+ct,b+ct]$, while $h$ may affect the entire interval $[a-ct,b+ct]$. 
+	
+	
+	\subsection{Boundary Problems}
+	
+	The universe is, as far as we are currently aware, of finite length and so solutions in bounded intervals $[0,l]$ are necessary as well. In our first example, we considered a string with fixed ends. This amounts to $u(t,0) = u(t,l) = 0$ for all $t \geq 0$. 
+	
+	Suppose again that we have $u(0,x) = g(x)$ and $\pd_{t}u(0,x) = h(x)$, where both $g$ and $h$ also vanish at the endpoints. We could try to come up with a new solution method for the finite interval, but that is not guaranteed to work. Alternately, we can try to extend these functions to the whole real line, and then use our previous work to solve the wave equation. 
+	
+	\begin{res}
+		The wave equation on $[0,l]$ with homogeneous Dirichlet boundary conditions, satisfying initial conditions $(u,u_t)|_{t = 0} = (g,h)$ admits a solution of the form 
+		\begin{align*}
+			u(t,x) = \frac{1}{2}\left[g(x+ct)+g(x-ct)  \right] + \frac{1}{2c} \int_{x-ct}^{x+ct} h(\tau) d\tau
+		\end{align*}
+		if and only if $g$ and $h$ may be extended to $\R$ as odd, $2l$-periodic functions so $g \in C^{2}(\R)$ and $h \in C^{1}(\R)$. 
+	\end{res}
+	\begin{pf}
+		If such extensions exist, applying the previous theorem gives such a solution.
+		
+		If a solution of the given type exists, we show that the extensions of $g$ and $h$ must both be odd, with the claimed regularity. First, we may use linearity to reduce to considering one term at a time. If a solution $u$ exists with the given formula, then it is easy to check that $u_1 = \frac{1}{2}\left[g(x+ct)+g(x-ct)  \right]$ is a solution with $\pd_{t} u_1(0,x) = 0$ and so we may consider only $g$. A similar solution means we may consider only $h$. 
+		
+		
+		For $u_1$ a solution as above, $u_1(t,0) = 0$ implies $g(ct) + g(-ct) = 0$, giving that $g$ is an odd function. Similarly, $u_1(t,l) = 0$ implies $g(l+ct) + g(l-ct) = 0$, so $g$ is odd with respect to $l$. Each action extends where $g$ is defined. The first case extends $g$ to $[-l,l]$, then the second reflects about $l$ to $[-l,3l]$. Then, we may apply the condition at $0$ again to extend to $[-3l,3l]$. Repeating this process shows $g$ extends to the whole real line in an odd, $2l$-periodic manner. 
+		
+		Let $u_2$ be a solution with initial data $(0,h)$. Similarly, that $u_2(t,0) = 0 = \int_{-ct}^{ct}h(\tau) d\tau$ for all time $t$ implies $h(ct) = h(-ct)$ by taking a derivative. As in the case with $g$, considering next $x=l$ and moving back and forth shows $h$ must be odd and $2l$-periodic. 
+	\end{pf}
+	
+	
+	
+	\vspace{0.25 cm}
+	
+	\textbf{Example:}
+	What happens in the real world when a wave on a string hits a fixed endpoint? Try it out very carefully, and you'll notice that the wave \textit{reflects} against the wall. In other words, it returns with negative magnitude. If our model is correct, we should expect to see the same thing. Let $c=l=1$. Let us consider $h=0$, and $g$ a smooth bump supported in $(0.5-\epsilon, 0.5+\epsilon)$ (then we extend $g$ as given in the theorem, and we also assume $g$ is increasing on $[0,0.5]$ and decreasing on $[0.5,1]$ so this truly looks like a bump). 
+	
+	Our solution $u(t,x) = \frac{1}{2}[g(x+t)+g(x-t)]$ should see the left wave hit $x=0$ just before $t=1/2$. If we look at $x=0$, the positive and negative bumps of $g$ will always cancel, but if we look at small positive $x$, then for $t<1/2$ but close to $1/2$, $g(x+t) > -g(x-t)$, and so we have a positive displacement. For $t$ just after $1/2$, $g(x+t) < -g(x-t)$, and so we instead see negative displacement. As we expected, the wave bounces off the wall!
+	
+	
+	\vspace{0.25cm}
+	
+	\subsection{Aside: Duhamel's Principle}
+	
+	The French mathematician Jean-Marie Duhamel was able to solve the \textit{inhomogeneous} heat equation 
+	\begin{align*}
+		\begin{cases}
+		u_{t} - \Delta u = f & \R^{n} \times (0,\infty) \\
+		u(x,0) = 0 & x \in \R^{n}
+		\end{cases}
+	\end{align*} using a technique that converted the extra term $f$ into an appropriate initial condition. This technique can be broadly applied to \textit{evolution} equations (such as our wave equation), earning it the name Duhamel's principle. The main idea is that this PDE may be viewed as many homogeneous PDEs where the forcing term gives initial data and we integrate across these homogeneous solutions over a very specific domain.
+	
+	To understand, consider $F: \R \to \R^{n}$ some function, $A$ a matrix, and the ODE
+	\begin{align*}
+		F'(t) = AF(t) \\
+		F(0) = F_0
+	\end{align*}
+	
+	Denote $R_{t}$ to be the solution operator at time $t$, i.e. $F(t) = R_{t}F_0$. Let $G(t)$ be another vector-valued function and consider
+	\begin{align*}
+		H(t) = \int_{0}^{t} R_{t-s}G(s)ds
+	\end{align*}
+	Differentiation under the integral sign shows
+	\begin{align*}
+		(\frac{d}{dt} - A)H(t) = R_{t-s}G(s)|_{s=t} = G(t)
+	\end{align*}
+	so $H(t)$ solves the inhomogeneous problem
+	\begin{align*}
+		H'(t) - AH(t) = G(t) \\
+		H(0) = 0
+	\end{align*}
+	
+	Applying this to the PDE just means we extend that matrix $A$ (which is just a linear transformation) to a linear differential operator that does not depend on time, $L$, such as in the PDE
+	
+	\begin{align*}
+		\begin{cases}
+			u_{t} - Lu = f & \R^{n} \times (0,\infty) \\ 
+			u(x,0) = 0 
+		\end{cases}
+	\end{align*}
+	
+	Duhamel's principle applied to this then provides a solution 
+	\begin{align*}
+		u(x,t) = \int_{0}^{t} (P^{s}f)(x,t)ds
+	\end{align*}
+	where $P^{s}f$ is the solution to the homogeneous equation 
+	\begin{align*}
+		\begin{cases}
+			v_{t} - Lv = 0 & \R^{n} \times (s,\infty) \\ 
+			u(x,s) = f(x,s) 
+		\end{cases}
+	\end{align*} 
+	
+	This explains the intuitive claim above more clearly: the forcing term creates many infinitesimal effects for time before $t$, and integrating across those effects gives the PDE's solution. 
+	
+	
+	
+	
+	
+	
+	\vspace{0.25cm}
+	
+	\subsection{Forcing Terms}
+	
+	We assumed originally that gravity didn't weigh on the string. If it did, we would consider more forces. This adds another term to the equation
+	
+	\begin{align*}
+		\pd_{t}^{2}u - c^2 \pd_{x}^{2}u = f
+	\end{align*}
+	
+	called a \textit{forcing term}. The technique we employ to solve the wave equation in this case came from the work of a French physicist who used it instead for the heat equation (but it works just as well here) called \textit{Duhamel's method}. 
+	
+	To make our formula a bit more slick, let us also introduce the dual concept to Huygen's principle. Recall that Huygen's principle told us that a point $(0,x_0)$ can only affect the function $u(t,x)$ in a cone 
+	\begin{align*}
+		A_{x_0} = \{(t,x): |x-x_0| \leq ct\}
+	\end{align*} 
+	(our information travels at speed $c$). If we instead look backward, considering the same speed of information, the points which affect some fixed $(t,x)$ are all those whose cone of the form $A_{x_0}$ intersect $(t,x)$. Since we want to consider forcing terms that act in positive time as well, we have the \textit{domain of dependence}
+	\begin{align*}
+		D_{t,x} = \{(s,y) : x - c(t-s) \leq y \leq x+c(t-s)\}
+	\end{align*}
+	In other words, $u(t,x)$ depends on the given data in the backwards cone $D_{t,x}$. 
+	
+	\begin{res}
+		For $f \in C^{1}(\R)$, the unique solution of 
+		\begin{align*}
+			\pd_{t}^{2}u - c^2 \pd_{x}^{2}u = f
+		\end{align*}
+		satisfying 
+		\begin{align*}
+			u(0,x) = 0 , \,\,\, \pd_{t} u (0,x) = 0
+		\end{align*}
+		
+		is given by 
+		\begin{align*}
+			u(t,x) = \frac{1}{2c} \int_{D_{t,x}} f(s,y) dyds
+		\end{align*}
+	\end{res}
+	
+	\textbf{Remark:} The non-homogeneous case may then be solved by linearity: in the case 
+	\begin{align*}
+		\begin{cases}
+			\pd_{t}^{2}u - c^2 \pd_{x}^{2}u = f & \{t \geq 0\} \times \R \\
+			(u, \pd_{t}u) |_{t=0} = (g,h)
+		\end{cases}
+	\end{align*}
+	for $g \in C^{2}$,$h \in C^{1}$, and $f \in C^{1}$ may be solved by finding $w_1$ solving
+	\begin{align*}
+		\begin{cases}
+			\pd_{t}^{2}w_1 - c^2 \pd_{x}^{2}w_1 = 0 & \{t \geq 0\} \times \R \\
+			(w_1, \pd_{t}w_1) |_{t=0} = (g,h)
+		\end{cases}
+	\end{align*}
+	and $w_2$ solving 
+	\begin{align*}
+		\begin{cases}
+			\pd_{t}^{2}w_2 - c^2 \pd_{x}^{2}w_2 = f & \{t \geq 0\} \times \R \\
+			(w_2, \pd_{t}w_2) |_{t=0} = (0,0)
+		\end{cases}
+	\end{align*}
+	The sum $u = w_1 + w_2$ then solves the original problem and has the form 
+	\begin{align*}
+		u(t,x) = \frac{1}{2}\left[g(x+ct)+g(x-ct)  \right] + \frac{1}{2c} \int_{x-ct}^{x+ct} h(\tau) d\tau + \frac{1}{2c} \int_{D_{t,x}} f(s,y) dyds
+	\end{align*}
+	
+	
+	\begin{pf}
+		As hinted at earlier, we set up an intermediary PDE with solution $\eta_{s}(t,x)$ starting at time $t=s$ given by 
+		\begin{align*}
+			\begin{cases}
+				\pd_{t}^{2}\eta_{s} - c^2 \pd_{x}^{2}\eta_{s} = 0 & \{t \geq s\} \times \R \\
+				(\eta_s, \pd_{t}\eta_s) |_{t=s} = (0,f(s,x))
+			\end{cases}
+		\end{align*}
+		so 
+		\begin{align*}
+			\eta_{s}(t,x) = \frac{1}{2c} \int_{x-c(t-s)}^{x+c(t-s)} f(s,y) dy
+		\end{align*}
+		by our previous solution. 
+		
+		Duhamel's principle posits that 
+		\begin{align*}
+			u(t,x) = \int_{0}^{t} \eta_{s}(t,x) ds
+		\end{align*}
+		We check the that claim. 
+		
+		First, the initial conditions 
+		\begin{align*}
+			u(0,x) = \int_{0}^{0} \eta_{s}(x,0)dt = 0 \\
+			\pd_{t} u(0,x) = \eta_{0}(0,x) + \int_{0}^{0} \frac{\pd \eta_s}{\pd t}(0,x) ds =0 
+		\end{align*}
+		
+		Next, to check the PDE itself,
+		\begin{align*}
+			\pd_{t}^{2} u(t,x) = \pd_{t}( \eta_{s}(t,x)|_{s=t} + \int_{0}^{t} \pd_{t} \eta_{s} (t,x)ds ) \\
+			= \pd_{t} ( 0+\int_{0}^{t} \pd_{t} \eta_{s} (t,x)ds) \\
+			= \frac{\pd \eta_{s}}{\pd t} (t,x)|_{s=t} + \int_{0}^{t} \frac{\pd^{2} \eta_{s}}{\pd t^{2}}ds \\
+			= f + c^{2} \int_{0}^{t} \frac{d^{2} \eta_{s}}{\pd x^{2}} ds \\
+			= f + c^{2} \frac{\pd^{2} u}{\pd x^{2}}	
+		\end{align*}
+		
+		
+		Lastly, we simplify the solution formula for $u$,
+		\begin{align*}
+			u(t,x) = \int_{0}^{t} \frac{1}{2c} \int_{x-c(t-s)}^{x+c(t-s)} f(s,y) dy ds \\ 
+			= \frac{1}{2c} \int_{D_{t,x}} f dA
+		\end{align*}
+	\end{pf}
+	
+	The backward \textit{wave cone} is called the domain of dependence as we noted above. We often call the forward wave cone from a point $(t_0,x_0)$ the \textit{range of influence}, which is precisely the set of $(t,x)$ where the solution is affected by data at the point $(t_0,x_0)$. 
+	
+	
+	\vspace{0.25 cm}
+	
+	\textbf{Example:} Consider a string of length $l$ with propagation speed $c=1$. Suppose the forcing term is given by 
+	\begin{align*}
+		f(t,x) = \cos(\omega t) \sin(\omega_0 x)
+	\end{align*}
+	where $\omega_0 = \pi /l$ and $\omega > 0$ is the driving frequency. Interpreting this, $f$ is some force on the string whose magnitude oscillates in time, such as exterior sound waves affecting the string. 
+	
+	
+	 A $2\pi$-periodic extension for this forcing term is immediate (at any step in time for Duhamel's principle), so we may apply our previous theorem. Assume the initial conditions are both $0$. Then, the solution is given by 
+	\begin{align*}
+		u(t,x) = \frac{1}{2} \int_{0}^{t} \int_{x-t+s}^{x+t-s} \cos(\omega s) \sin(\omega_0 x')dx'ds \\ 
+		 = \frac{1}{2\omega_0} \int_{0}^{t} \left[ \cos(\omega_0 ( x-t+s)) - \cos(\omega_0(x+t-s)) \right] \cos(\omega s) ds \\
+		 = \frac{\sin(\omega_0 x)}{\omega_0} \int_{0}^{t} \sin(\omega_0(t-s))\cos(\omega s)ds\\
+		 = \frac{\sin(\omega_0 x)}{\omega_{0}^{2} - \omega^{2}} \left[ \cos(\omega t) - \cos(\omega_0 t)\right]
+	\end{align*}
+	using the cosine angle-sum formula.
+	
+	The $x$-dependence of the solution exactly matches the forcing term, and the time dependence affects the solution in two frequencies $(1/\omega$ and $1/\omega_0$). One frequency comes from the forcing term, and the other depends on the length of the string and demonstrates more clearly the reaction of the string to these forces. There is a careful relationship between these frequencies. If $\omega = \omega_0$, the solution 
+	\begin{align*}
+		u(t,x) = \frac{t}{2\omega_0} \sin(\omega_0 x) \sin(\omega_0 t)
+	\end{align*} 
+	
+	has an amplitude which grows linearly in time, so the string accumulates energy added by the forcing term. This is called \textit{resonance}, and is, for example, the means by which a singer may break a wine glass by singing. The \textit{resonant frequency} of an object is exactly what we denoted as $\omega_0$, and is inherent to the object or string being used. 
+	
+	
+	
+	
+	
+	\section{Higher Dimension Wave Equation}
+	
+	\subsection{Model Problem: Sound in the Air}
+	
+	In three dimensions, we will show that sound satisfies the wave equation. As with most of the derivations moving forward, this will rely on some physical laws that may not be commonplace for many readers: we will try to describe what they do, but their form may otherwise be taken at face value. 
+	
+	Recall that sound is a fluctuation of pressure in a medium. You may have seen a ``sound wave'' on a computer visualization that actually looked like a sine wave, which was created by measuring how that pressure change vibrates the membrane of a microphone and maps out that change with respect to time. The space between peak pressures is the wavelength, and the frequency is how many of those wave peaks a fixed point experiences in a unit of time (Hertz is the SI unit, which means cycles per second). We interpret frequency as pitch. 
+	
+	We will denote by $P$ the pressure at a point $x \in \R^{3}$ at a time $t \in [ 0,\infty)$. The velocity field $v$ describes how the changes in pressure propagate, and $\rho$ gives the density of the air or other medium the sound moves through. The relationship between pressure and density is given by the gas law. In the case of very strong perturbations like shockwaves, this law is complex, but for small pressure fluctuations like sound, we may ignore energy transfer through heat and use the simplified \textit{adiabatic gas law}
+	\begin{align*}
+		P = C \rho^{\gamma}
+	\end{align*}
+	for constants $C,\gamma$. 
+	
+	Since we want to measure fluctuations, we normalize our values to $u = P - P_0$ and $\sigma = \rho - \rho_0$, where $P_0$ and $\sigma_0$ are the atmospheric pressure and density. Rewriting the gas law in these term gives
+	
+	\begin{align*}
+		1 + \frac{u}{P_0} = \left( 1 + \frac{\sigma}{\rho_0} \right)^{\gamma}
+	\end{align*}
+	
+	We take another simplifying assumption: we expand the Taylor series of the right-hand side -- 
+	\begin{align*}
+		\left( 1 + \frac{\sigma}{\rho_0} \right)^{\gamma} = 1 + \frac{\gamma}{\rho_0} \sigma + ...
+	\end{align*}
+	and truncate the series as a linear approximation to see
+	\begin{align*}
+		1 + \frac{u}{P_0} = 1 +  \frac{\gamma}{\rho_0} \sigma \\
+		\Leftrightarrow u = \frac{\gamma P_0}{\rho_0} \sigma
+	\end{align*}
+	[Linearization may be justified by $\sigma/\rho_0$ being small]
+	
+	We next need to model how the gas moves via the conservation of mass equation
+	\begin{align*}
+		\frac{\pd \rho}{\pd t} + \nabla \cdot( \rho v) = 0 \\
+		\approx \frac{\pd \sigma}{\pd t} + \rho_0 \nabla \cdot v = 0
+	\end{align*}
+	(where the approximation is claiming $\rho \approx \rho_0$). This is the differential form of a similar conservation law to what we saw previously: a change in mass in a space is the difference of the mass entering and that leaving. Combining this with the above gives
+	\begin{align*}
+		\frac{\pd^{2} u}{\pd t^{2}} =  \frac{\gamma P_0}{\rho_0}\frac{\pd^{2} \sigma}{\pd t^{2}}=  -\gamma P_0 \frac{\pd}{\pd t} (\nabla \cdot v)
+	\end{align*}
+	
+	
+	
+	To treat the velocity term, we use the conservation of momentum equation, \textit{Euler's force equation}
+	\begin{align*}
+		-\nabla P = \rho \left(\frac{\pd}{\pd t} + v \cdot \nabla  \right)v
+	\end{align*}
+	which roughly says that F=MA, where $\nabla P$ stands in for ``force'', $\rho$ for ``mass'', and the Lagrangian derivative of velocity for ``acceleration''. We again simplify, changing to $u$ and $\sigma$
+	\begin{align*}
+		- \nabla u = \rho_0 \left(\frac{\pd}{\pd t} + v \cdot \nabla \right)v
+	\end{align*} 
+	and then discard higher-order terms (linearizing as before) to reduce to 
+	\begin{align*}
+		- \nabla u = \rho_0 \frac{\pd v}{\pd t}
+	\end{align*}
+	
+	This allows us to notice that
+	\begin{align*}
+		\frac{\pd}{\pd t}( \nabla \cdot v) = \nabla \cdot \frac{\pd v}{\pd t} \\
+		= \nabla \cdot ( -\frac{\nabla u}{\rho_0}) = -\frac{1}{\rho_0} \Delta u
+	\end{align*}
+	
+	and hence that 
+	\begin{align*}
+		\frac{\pd^{2} u}{\pd t^{2}} - \frac{\gamma P_0}{\rho_0} \Delta u = 0
+	\end{align*}
+	
+	
+	
+	
+	
+	\subsubsection{Electromagnetic Waves}
+	
+	Electromagentic waves follow the wave equation due to Maxwell's equations: let $E$ be a function of space and time describing an electric field, and $B$ the related function for the magnetic field (magnetic flux density). For constants $\mu_0$ (permeability of free space), $\epsilon_0$ (electric permittivity of free space), and charge volume density $\rho$, 
+	
+	\begin{align*}
+		\nabla \times E = -\frac{\pd B}{\pd t} & \text{ Faraday's Law of Induction }\\
+		\nabla \times B = \mu_0 J + \frac{1}{c^2} \frac{\pd E}{ \pd t}  & \text{ Ampere-Maxwell Law }\\
+		\nabla \cdot E = \frac{\rho}{\epsilon_0}  & \text{ Gauss' Law for Electric Fields } \\
+		\nabla \cdot B = 0 & \text{ Gauss' Law for Magnetic Fields }
+	\end{align*}
+	
+	There is quite a bit of physics going on, but Gauss' electric field law roughly says the electric fields diverges from positive charge and converges on negative charge, while his magnetic field law says that the field is \textit{conserved} (the divergence is 0) i.e. that there are no magnetic monopoles. Faraday's law says a circulating electric field is caused be a magnetic field that changes with time. 
+	
+	For our computations, we note that by a cross-product identity $A \times (B \times C) = B(A \cdot C) - C(A \cdot B)$, 
+	\begin{align*}
+		\Delta E = \nabla \cdot \nabla E = \nabla(\nabla \cdot E) - \nabla \times (\nabla \times E)
+	\end{align*}
+	
+	Then, applying the laws above, 
+	\begin{align*}
+		\Delta E = 0 - \nabla \times ( - \frac{\pd B}{\pd t}) = \frac{\pd}{\pd t} (\nabla \times B)
+	\end{align*}
+	If we assume there are no charge densities/currents (the $J$ term in the Ampere-Maxwell law),
+	\begin{align*}
+		\Delta E = \frac{\pd}{\pd t} ( \frac{1}{c^{2}} \frac{\pd E}{\pd t})
+	\end{align*}
+	which is the wave equation. 
+	
+	
+	\subsection{2,3 Dimensions}
+	
+	We solved the 1D problem relatively easily using characteristics, but how could we approach the 3D equation? Let us try to use the same motivation as the method of characteristics: reducing the dimension. 
+	
+	We may try to understand how to reduce the dimension by first looking at the symmetries of the Laplacian involved in the wave equation. Indeed, the geometric version of the wave equation is 
+	
+	\begin{align*}
+		\tau^{2} - \sum_{i=1}^{n} \xi_{i}^{2} = c
+	\end{align*}
+	
+	And symmetries of this polynomial inform us of symmetries of the wave equation. For example, the spatial part (ignoring $\tau$) is a circle, and is fixed under rotations. Similarly, for $A \in O(n)$ and $f:\R^{n} \to \R$, $\Delta  (f(Ax)) = (\Delta f)(Ax)$. This suggests that we may try to look first at functions which are radial, so $f(x) = g(|x|) = g(r)$. In fact, for such a radial function,
+	
+	\begin{align*}
+		\Delta f = \frac{1}{r^{n-1}} \frac{d}{dr}(r^{n-1} g')
+	\end{align*} 
+	
+	If $u$ is radial in $x$, the wave equation reduces to 
+	\begin{align*}
+		u_{tt} - \frac{n-1}{r^{n-2}} u_{r} + u_{rr} = 0
+	\end{align*}
+	and a change-of-variables relates this back to the original 1D wave equation and the solution method we have. 
+	
+	If our functions are not radial (which they usually aren't), we reduce to 1D by using the modified spherical average of $f \in C^{0}(\R^{3})$ denoted
+	\begin{align*}
+		\tilde{f}(x;\rho) = \frac{1}{4 \pi \rho} \int_{\pd B(x;\rho)} f(w) dS(w)
+	\end{align*}
+	
+	We really don't need continuity for this part of the definition, but we keep it because the true spherical average, $\tilde{f}/\rho$, then satisfies
+	\begin{align*}
+		\lim_{\rho \to 0} \frac{\tilde{f}(x;\rho)}{\rho} = f(x)
+	\end{align*}
+
+	In this case, we need to be careful about computing the Laplacian, and arrive at the following
+	
+	\begin{res}
+		[Darboux's Formula] For $f \in \C^{2}(\R^{3})$, $\frac{\pd^{2}}{\pd \rho^{2}} \tilde{f}(x;\rho) = \Delta_{x} \tilde{f}(x;\rho)$. 
+	\end{res}
+	
+	\begin{pf}
+		First, we center coordinates by setting $w = x + \rho y$, removing the dependence of the integration domain on $x$ and $\rho$, so 
+		\begin{align*}
+			\frac{1}{4 \pi \rho^{2}} \int_{\pd B(x,\rho)} f(w)dS(w) = \frac{1}{4\pi} \int_{\S^{2}} f(x+\rho y) dS(y)
+		\end{align*}
+		
+		Then, we may differentiate under the integral sign (we differentiate $ \tilde{f}/\rho$)
+		\begin{align*}
+			\frac{\pd}{\pd \rho}\left[ \frac{1}{4 \pi \rho^{2}} \int_{\pd B(x,\rho)} f(w) dS(w) \right] \\
+			=  \frac{1}{4\pi} \frac{\pd}{\pd \rho}\int_{S^{2}} f(x+\rho y) dS(y) \\
+			= \frac{1}{4 \pi }\int_{S^{2}} \nabla f (x+ \rho y) \cdot y dS(y) \\
+			=\frac{1}{4 \pi \rho^{2} }\int_{\pd B(x,\rho)} \nabla f (w) \cdot \frac{w-x}{\rho} dS(w) \\
+			= \frac{1}{4 \pi \rho^{2}} \int_{\pd B(x,\rho)} \frac{\pd f}{\pd \nu}(w) dS(w)
+		\end{align*}
+		for $\nu$ the unit normal to $\pd B(x,\rho)$. The divergence theorem then says this is 
+		\begin{align*}
+			\frac{1}{4 \pi \rho^{2}}\int_{B(x,\rho)} \Delta f(w) dw
+		\end{align*}
+		
+		Bringing this back to $\tilde{f}$, we have 
+		\begin{align*}
+			\frac{\pd}{\pd \rho} \tilde{f}(x;\rho) = \rho\left[ \frac{\pd}{\pd \rho}( \tilde{f}/\rho) + \tilde{f}/\rho^{2} \right] \\ 
+			= \frac{1}{4\pi \rho^{2}} \int_{\pd B(x,\rho)} f(w)dS(w) + \frac{1}{4 \pi \rho} \int_{B(x,\rho)} \Delta f(w) dw
+		\end{align*}
+		
+		
+		Repeating this process shows 
+		\begin{align*}
+			\frac{\pd^{2}}{\pd \rho^{2}} \tilde{f}(x;\rho) = \frac{1}{4 \pi \rho} \frac{\pd}{\pd \rho} \int_{B(x,\rho)} \Delta f(w)dw \\
+			= \frac{1}{4 \pi } \frac{\pd}{\pd \rho} \int_{0}^{\rho} \int_{\pd B(x,r)} \Delta f dS dr\\
+			= \frac{1}{4 \pi \rho} \int_{\pd B(x,\rho)} \Delta f(w) dS(w)
+		\end{align*}
+		
+		whereas 
+		\begin{align*}
+			\Delta_{x}\tilde{f} = \frac{1}{4 \pi \rho} \int_{S^{2}} \Delta f(x+\rho y) dS(y)
+		\end{align*}
+		since $f$ is the only term depending on $x$ here. We then have the formula. 
+	\end{pf}
+	
+	
+	
+	We now may prove the 3D solution formula first derived by Gustav Kirchoff in 1883,
+	\begin{res}
+		[Kirchoff's Integral Formula] For $u \in C^{2}([0,\infty) \times \R^{3})$, suppose 
+		\begin{align*}
+			u_{tt} - \Delta u = 0
+		\end{align*}
+		under the initial conditions $(u,u_t)|_{t = 0} = (g,h)$. Then,
+		\begin{align*}
+			u(t,x) = \frac{\pd}{\pd t} \tilde{g}(x;t) + \tilde{h}(x;t)
+		\end{align*}
+	\end{res}
+	
+	
+	\begin{pf}
+		Define
+		\begin{align*}
+			\tilde{u}(t,x;\rho) = \frac{1}{4 \pi \rho} \int_{\pd B(x;\rho)} u(t,w) dS(w)
+		\end{align*}
+		
+		such that 
+		\begin{align*}
+			\tilde{u}_{tt} = \frac{1}{4 \pi \rho} \int_{\pd B(x;\rho)} u_{tt}(t,w) dS(w) \\
+			= \frac{1}{4 \pi \rho} \int_{\pd B(x;\rho)} \Delta u(t,w) dS(w) = \Delta_{x} \tilde{u}(t,x;\rho)
+		\end{align*}
+		
+		By Darboux's formula, $ \tilde{u}_{tt} - \tilde{u}_{\rho \rho} = 0$, while we have initial conditions $(\tilde{u}, \tilde{u}_{t})|_{t = 0} = (\tilde{g}, \tilde{h})$ along with the boundary condition $\tilde{u}(t,x;0) = 0$. 
+		
+		These are only defined for $\rho \geq 0$, so we extend $\tilde{g}$ and $\tilde{h}$ by taking an odd reflection. D'Alembert's formula then implies
+		
+		\begin{align*}
+			\tilde{u}(t,x;\rho) = \frac{1}{2}\left[ \tilde{g}(x;\rho + t) + \tilde{g}(x;\rho - t)\right] + \frac{1}{2} \int_{\rho - t}^{\rho + t} \tilde{h}(x;\tau)d\tau
+		\end{align*}
+		
+		To recover $u$, we set
+		\begin{align*}
+			u(t,x) = \lim_{\rho \to 0} \frac{\tilde{u}(t,x;\rho)}{\rho} \\
+			= \lim_{\rho \to 0}\frac{1}{2 \rho}\left[ \tilde{g}(x;\rho + t) + \tilde{g}(x;\rho - t)\right] + \frac{1}{2 \rho} \int_{\rho - t}^{\rho + t} \tilde{h}(x;\tau)d\tau \\
+			= \frac{1}{2} \left[\tilde{g}_{t}(x;t) + \tilde{h}(x;t) \right]
+		\end{align*}
+		
+		
+	\end{pf}
+
+	
+	Next, using this formula for $\R^{3}$ we may work out another formula for $\R^{2}$ via the \textit{method of descent}. The essence is to view the function $u \in C^{2}([0,\infty)\times \R^{2}])$ with initial conditions $g,h$ on $\R^{2}$ instead as functions on $\R^{3}$ that don't depend on the third variable. If we apply the above formula, we then obtain
+	
+	\begin{res}
+		[Poisson's Integral Formula] For $u \in C^{2}([0,\infty) \times \R^{2}])$, suppose that \begin{align*}
+			u_{tt} - \Delta u = 0
+		\end{align*}
+		under the initial conditions $u|_{t=0} = g, \,\,\, u_{t}|_{t=0} = h$. Then,
+		\begin{align*}
+			u(t,x) = \frac{\pd}{\pd t} \left( \frac{t}{2\pi} \int_{D}\frac{g(x-ty)}{\sqrt{1-|y|^{2}}}\right) + \frac{t}{2\pi} \int_{D} \frac{h(x-ty)}{\sqrt{1-|y|^{2}}} dy
+		\end{align*}
+	\end{res}
+	\begin{pf}
+		If we extend $g,h$ to $\R^{3}$ as mentioned above, 
+		\begin{align*}
+			\tilde{g}(x;\rho) = \frac{\rho}{4\pi} \int_{S^{2}} g(x_1+\rho y, x_2 + \rho y_2) dS(y)
+		\end{align*}
+		for $x \in \R^{2}$. The above formula then comes from a change of coordinates. If we use cylindrical coordinates $y = (r\cos(\theta),r\sin(\theta), \sqrt{1-r^{2}})$, then the change-of-coordinates theorem gives
+		\begin{align*}
+			dS = \frac{r}{\sqrt{1-r^{2}}} drd\theta
+		\end{align*}
+		such that 
+		\begin{align*}
+			\tilde{g}(x;\rho) = \frac{\rho}{2\pi} \int_{0}^{2\pi} \int_{0}^{r} \frac{g(x + \rho y)}{\sqrt{1-r^{2}}} r drd\theta \\
+			= \frac{\rho}{2\pi} \int_{D}\frac{g(x+\rho y)}{\sqrt{1-|y|^{2} }} dy
+		\end{align*}
+		and a similar formula holds for $\tilde{h}$. 
+	\end{pf}
+	
+	
+	
+		Let's revisit Huygen's principle. In two dimensions, it gives us a cone as the domain of dependence, and in a related way it gave that the range of influence was a forward light cone. Let us imagine the world were 2D. Then, this conical range of influence says that in the 2D world, sounds would always have a sustained note. Plosive sounds like the ``p" in ``pop" would sound very weird, missing the sharp, short sound we know in 3D. Kirchoff's formula shows that in 3D, the range of influence is just the boundary of the cone
+	\begin{align*}
+		\Gamma_+(t_0,x_0) = \{ (t,x); t > t_0, |x-x_0| = t-t_0\}
+	\end{align*}
+	
+	allowing us to have sharp sounds! This is also why we may describe a flash of light (or why we sometimes view light waves more easily as photons, related to wave-particle duality). In all dimensions, Huygen's principle does show a \textit{finite propagation speed} for the wave (the speed is the $c$ in the wave equation). This is very important as light having a speed was a huge physical revelation. Readers with some knowledge of physics may also easily show that the wave equation is fixed under \textit{Lorentz boosts}, a type of transformation of spacetime related to relativity. In fact, this invariance may be used to show that \textit{the speed of light is fixed}, a fundamental part of relativity. We will contrast this to other situations like the heat equation later. 
+	
+	
+	
+	
+	
+	
+	\subsubsection{Higher-Dimensional Solution}
+	
+	The method above generalizes with only minor complications: we may solve in $\R^{n}$ for $n>2$ odd, then descend to $\R^{n-1}$ to get solutions in all dimensions. We are going to change notation slightly, and use capital letters to denote true spherical means, while using $r$ as the radius instead of $\rho$.
+	
+	
+	To be precise, let 
+	\begin{align*}
+		u_{tt} - \Delta u = 0 \\
+		(u,u_t)|_{t=0} = (g,h)
+	\end{align*}
+	
+	Then, defining 
+	\begin{align*}
+		U(x;r,t) = \frac{1}{|\pd B(x,r)|} \int_{\pd B(x,r)}u(y,t) dS(y)
+	\end{align*}
+	and similarly define the spherical means $G,H$ for $g,h$. Then, using the same methods that we did in $3$ dimensions,
+	\begin{align*}
+		U_{r}(x;r,t) = \frac{r}{n |B(x,r)|} \int_{B(x,r)} \Delta u(y,t) dy \\
+		U_{rr}(x;r,t) = U + \left(\frac{1}{n} -1 \right)   \frac{1}{|B(x,r)|}\int_{B(x,r)} \Delta u(y,t) dy
+	\end{align*}
+	
+	We notice that 
+	\begin{align*}
+		U_{r} = \frac{r}{n|B(x,r)|} \int_{B(x,r)} u_{tt} dy
+	\end{align*}
+	
+	and, in particular,
+	\begin{align*}
+		\frac{\pd}{\pd r}\left(r^{n-1} U_{r}\right) = \frac{\pd}{\pd r} \left(\frac{1}{n|B(0,1)|} \int_{B(x,r)} u_{tt} dy\right) \\
+		= \frac{1}{n|B(0,1)|} \int_{\pd B(x,r)} u_{tt} dS = r^{n-1} U_{tt}
+	\end{align*}
+	
+	Rewriting this, $U_{tt} = r^{1-n} \frac{\pd}{\pd r}(r^{n-1} U_{r})$ (which is the radial Laplacian!)
+	
+	such that $U$ satisfies the \textit{Euler-Poisson-Darboux Equation}
+	\begin{align*}
+		U_{tt} - U_{rr} - \frac{n-1}{r} U_{r} = 0 \\
+		(U,U_t)|_{t=0} = (G,H)
+	\end{align*}
+	
+	This is a generalization of Darboux's formula. So far, we have not needed that $n$ is odd at all. However, that fact is necessary to solve this new PDE in one spatial dimension. The following may look technically difficult, but it is the accumulation of just a few tricks. First, let $n=2k+1$ and $u \in C^{k+1}$ so $U$ is $C^{k+1}$ as well, and denote
+	\begin{align*}
+		\tilde{U}(r,t) = \left( \frac{1}{r} \frac{\pd}{\pd r}\right)^{k-1}(r^{2k-1}U(x;r,t)) \\
+		\tilde{G}(r) = \left( \frac{1}{r} \frac{\pd}{\pd r}\right)^{k-1}(r^{2k-1}G(x;r)) \\
+		\tilde{H}(r) = \left( \frac{1}{r} \frac{\pd}{\pd r}\right)^{k-1}(r^{2k-1}H(x;r))
+	\end{align*}
+	
+	This transformation turns the Euler-Poisson-Darboux equation into the wave equation. The idea behind the transform is that we are going to repeat the differentiation trick we used in Darboux's formula and Kirchoff's formula, and by doing so we keep only the highest-order derivatives, yielding the following. 
+	
+	\begin{res}
+		We have
+		\begin{align*}
+			\begin{cases}
+				\tilde{U}_{tt} - \tilde{U}_{rr} = 0 & (r,t) \in \R_+ \times (0,\infty)\\
+				(\tilde{U},\tilde{U}_{t})|_{t=0} = (\tilde{G},\tilde{H}) \\
+				\tilde{U}(0,t) = 0 & t>0
+			\end{cases}
+		\end{align*}
+	\end{res}
+	
+	\begin{proof}
+		First, we will note some technical facts that we will not prove here (see HW). Let $\phi: \R \to \R$ be $C^{k+1}$. Then,
+		
+		\begin{align*}
+			(i.) & \left( \frac{d^{2}}{dr^{2}} \right) \left( \frac{1}{r} \frac{d}{dr} \right)^{k-1} (r^{2k-1} \phi(r) ) = \left(\frac{1}{r} \frac{d}{dr}\right)^{k} \left( r^{2k} \frac{d\phi}{dr} \right) \\
+			(ii.) & \left( \frac{1}{r} \frac{d}{dr}\right)^{k-1} \left( r^{2k-1} \phi \right) = \sum_{j=0}^{k-1} \beta_{j}^{k} r^{j+1} \frac{d^{j} \phi}{dr^{j}}(r)
+		\end{align*}
+		for $\beta_{j}^{k}$ some constants independent of $\phi$.
+		
+		
+		Then, if $r>0$, by the first fact we have
+		\begin{align*}
+			\tilde{U}_{rr} = \left( \frac{d^{2}}{dr^{2}} \right) \left( \frac{1}{r} \frac{d}{dr} \right)^{k-1} ( r^{2k-1}U) = \left(\frac{1}{r} \frac{d}{dr}\right)^{k} \left( r^{2k} U_{r} \right) \\
+			= \left(\frac{1}{r} \frac{d}{dr}\right)^{k-1} [ r^{2k-1} U_{rr} + 2kr^{2k-2} U_{r}] \\
+			= \left(\frac{1}{r} \frac{d}{dr}\right)^{k-1}  \left[ r^{2k-1}(U_{rr} + \frac{n-1}{r} U_{r})\right] \\
+			= \left(\frac{1}{r} \frac{d}{dr}\right)^{k-1} (r^{2k-1} U_{tt}) = \tilde{U}_{tt}
+		\end{align*}
+		
+		Whereas, the second fact allows us to conclude $\tilde{U}(0,t) = 0$ since each term in the sum either has a factor of $r$.
+	\end{proof}
+	
+	
+	We also use the fact 
+	\begin{align*}
+		\tilde{U}(r,t) = \left( \frac{1}{r} \frac{d}{dr}\right)^{k-1} \left( r^{2k-1} U(x;r,t) \right) = \sum_{j=0}^{k-1} \beta_{j}^{k} r^{j+1} \frac{d^{j} U}{dr^{j}}(r)
+	\end{align*}
+	
+	to recover 
+	\begin{align*}
+		u(x,t) = \lim_{r \to 0} U(x;r,t) = \lim_{r \to 0} \frac{\tilde{U}}{\beta_{0}^{k} r} 
+	\end{align*}
+	
+	Now, by D'Alembert's formula (with the odd extension of $\tilde{G}$ and $\tilde{H}$),
+	
+	\begin{align*}
+		u(x,t) = \frac{1}{\beta_{0}^{k}} \lim_{r \to 0} \left[ \frac{\tilde{G}(t+r) - \tilde{G}(t-r)}{r} + \frac{1}{2r} \int_{t-r}^{t+r} \tilde{H}(y) dy\right] \\
+		= \frac{1}{\beta_{0}^{k}} \left[\tilde{G}'(t) + \tilde{H}(t) \right] 
+	\end{align*}
+	
+	We conclude with the following, without proof
+	
+	\begin{res}
+		The function
+		\begin{align*}
+			u(x,t) = \frac{1}{\gamma_{n}} \left[ \left( \frac{\pd}{\pd t}\right) \left( \frac{1}{t} \frac{\pd}{\pd t} \right)^{(n-3)/2} \left(\frac{t^{n-2}}{|\pd B(x,t)|} \int_{\pd B(x,t)} g dS \right) + \left( \frac{1}{t} \frac{\pd}{\pd t}\right)^{(n-3)/2}\left(\frac{t^{n-2}}{|\pd B(x,t)|} \int_{\pd B(x,t)} h dS \right) \right]
+		\end{align*}
+		solves the wave equation in $\R^{n}$, for $n$ odd and initial data $g \in C^{m+1}, \,\, h \in C^{m}$ so $(u,u_t)|_{t=0} = (g,h)$, where $\gamma_{n} = 1(3)(5)...(n-2)$. 
+	\end{res}
+	
+	
+	
+	
+	
+	\subsection{Energy Methods}
+	
+	In the above methods, we have seen some argument for uniqueness via a convoluted passage from Picard-Lindel{\"o}f to characteristics to D'Alembert, but we may take a more direct route that is also more easily generalized. It relies on the fact that energy is conserved in our system. For those who haven't seen energy before, energy is the capacity to do work (work is applying a force over a distance). For example, a speeding truck may crash into and push a rock along the road. This is \textit{kinetic energy}, or energy of motion. Due to gravity, we may also convert height (distance from the center of Earth) to motion by, say, dropping an object. The energy stored in this case is one form of \textit{potential energy}, which also accounts for things like chemical potential energy. We now measure the energy of our vibrating string. 
+	
+	To be precise, let us consider only the case of the string of length $l$ with fixed ends (we may use more complicated cases, but this is for exposition). Assume $u \in C^{2}([0,\infty) \times [0,l])$ satisfies the string wave equation with Dirichlet boundary conditions. 
+	
+	Recall that, for simplicity, we discretized the continuous string to a number of point-masses located at $x_j$ of mass $\rho \Delta x$ and velocity $u_{t}(x_j)$. Recall also that kinetic energy is one-half of mass times the square of velocity, so the total kinetic energy along the string is  
+	\begin{align*}
+		\sum_{j=0}^{n} \frac{1}{2} \rho \Delta x \left[ u_{t}(x_j)\right]^2
+	\end{align*}
+	taking the limit as $n \to \infty$, this is a Riemann sum and we are left with the integral 
+	\begin{align*}
+		\mathcal{E}_{k} = \frac{\rho}{2} \int_{0}^{l} u_{t}^{2} dx
+	\end{align*}
+	
+	The potential energy is equal to the energy required to move the string from zero displacement to the position it is in, described by $u(t,\cdot)$. Let us view the displacement as $su(t,\cdot)$ for $s \in [0,1]$. Recall that we denote by $\Delta F(t,x_j)$ the force across the point $x_j$ at time $t$. The work required to shift the segment $x_j$ from $s$ to $s + \Delta s$ is $s \Delta F(t,x_j)u(t,x_j)\Delta s$ (tension force $(su(t,x_j))\Delta F(t,x_j)$ because tension increases proportionally to displacement, times distance $\Delta s$). The potential energy associated with the segment is then
+	\begin{align*}
+		\Delta \mathcal{E}_{p}(t,x_j) = -\int_{0}^{1} s\Delta F(t,x_j) u(t,x_j) ds = -\frac{1}{2} u(t,x_j) \Delta F(t,x_j) \\
+		\approx -\frac{T}{2} u(t,x_j) \frac{\pd^{2} u}{\pd x^{2}} (t,x_j) \Delta x
+	\end{align*}
+	(minus because the tension and force are opposite, and the approximation is one we derived previously). 
+	
+	Again, taking a sum and a limit gives an integral 
+	\begin{align*}
+		\mathcal{E}_{p} = -\frac{T}{2} \int_{0}^{l} u \frac{\pd^{2} u}{\pd x^{2}} dx
+	\end{align*}
+	
+	The total energy is then
+	\begin{align*}
+		\mathcal{E} = -\frac{T}{2} \int_{0}^{l} u \frac{\pd^{2} u}{\pd x^{2}} dx +  \frac{\rho}{2} \int_{0}^{l} u_{t}^{2} dx \\
+		= \frac{1}{2} \int_{0}^{l} T u_{x}^{2}+ \rho u_{t}^{2} dx 
+	\end{align*}
+	
+	In a general situation, the corresponding energy on a domain $\Omega \subset \R^{n}$ is
+	\begin{align*}
+		\mathcal{E}[u](t) = \frac{1}{2} \int_{\Omega} u_{t}^{2} + c^{2} |\nabla u|^{2} dx
+	\end{align*}
+	
+	What do we mean when we say energy is conserved? Energy does not change with time, i.e. we would expect the derivative to be zero. This amounts to applying the Leibniz rule and Green's identity (with some assumptions on $\Omega$) to the integral above
+	
+	\begin{align*}
+		\frac{d}{dt} \mathcal{E} = \int_{\Omega} \left[ u_{t}u_{tt} + c^{2} \nabla u_{t} \nabla u \right] dx \\
+		= \int_{\Omega} \left[u_{t} (u_{tt} - c^{2} \Delta u) \right] dx  + \int_{\pd \Omega} u_{t} \nabla u \cdot \nu dS
+	\end{align*}
+	
+	so that this is 0 as expected for wave solutions with Dirichlet boundary conditions!
+	
+	\begin{res}
+		Suppose $\Omega \subset \R^{n}$ is a bounded domain with piecewise $C^{1}$ boundary. If $u \in C^{2}([0,\infty) \times \cl{\Omega})$ is a wave solution with $u|_{\pd \Omega}$, then the energy $\mathcal{E}[u]$ is independent of time. 
+	\end{res}
+	
+	and, in turn
+	
+	\begin{res}
+		Suppose $\Omega \subset \R^{n}$ is a bounded domain with piecewise $C^{1}$ boundary. If $u \in C^{2}([0,\infty) \times \cl{\Omega})$ satisfies
+		\begin{align*}
+			u_{tt} - c^{2}\Delta u = f, \,\,\, u|_{\pd \Omega} = 0 \\
+			(u,u_t)|_{t=0} = (g,h)
+		\end{align*} 
+		is uniquely determined by the functions $f,g,h$.
+	\end{res}
+	\begin{pf}
+		If $u_1$ an $u_2$ are two solutions to the same $f,g,h$, $w = u_1-u_2$ is a wave solution with homogeneous initial and boundary conditions. Hence, $\mathcal{E}[w](0) = 0$, and so the energy is zero across all time. This implies $w_t$ and $\nabla w$ are $0$ and the $0$ vector, or that $w$ is constant. Given the $0$ boundary conditions, $w$ must be $0$ and $u_1 = u_2$. 
+	\end{pf}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+\end{document}

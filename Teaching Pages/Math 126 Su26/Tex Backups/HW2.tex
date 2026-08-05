@@ -1,0 +1,118 @@
+
+\DocumentMetadata{tagging=on,
+	tagging-setup={math/setup=mathml-SE},
+	pdfstandard=ua-2,
+	lang=en-US
+}
+\documentclass{article}
+
+%Math Libraries
+\usepackage{multirow, longtable, amsmath, amssymb, amsthm}
+\usepackage[mathscr]{euscript}
+
+%Formatting
+\usepackage[margin = 1 in]{geometry}
+\usepackage{indentfirst}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage{tabularx}
+\usepackage{cite}
+
+%Diagram Packages
+\usepackage{tikz}
+\usetikzlibrary{automata,positioning,arrows}
+
+%Standard Commands
+\newcommand{\mm}{\mathscr}
+\newcommand{\B}{{\mathcal{B}}}
+\newcommand{\A}{{\mathcal{A}}}
+\newcommand{\N}{{\mathbb{N}}}
+\newcommand{\R}{{\mathbb{R}}}
+\newcommand{\C}{{\mathbb{C}}}
+\newcommand{\Q}{{\mathbb{Q}}}
+\newcommand{\Z}{{\mathbb{Z}}}
+
+
+\newcommand{\abs}[1]{{|{#1}|}}
+\newcommand{ \norm }[1]{{ || {#1}||}}
+\newcommand{\cl}[1]{{\overline{#1}}}
+\newcommand{\pd}{\partial}
+\newcommand{\ip}[2]{ \langle {#1},{#2}\rangle }
+\newcommand{\ls}{\lesssim}
+\newcommand{\gs}{\gtrsim}
+\newcommand{\supp}{\text{supp}}
+
+%Result Environment
+\newcounter{result}[section]
+\newenvironment{res}[1][]{\refstepcounter{result}\par\medskip
+	\noindent \textbf{[\thesection.\theresult] #1} \rmfamily}{\medskip}
+
+\newenvironment{defn}[1][]{\refstepcounter{result}\par\medskip \noindent \textbf{Definition [\thesection.\theresult] #1} \rmfamily}{\medskip}
+
+%Proof Environment
+\newenvironment{pf}{%
+	\par%
+	\medskip
+	\leftskip=2em\rightskip=2em%
+	\noindent\ignorespaces \textit{Proof:} \newline}{%
+	\,\, \newline \textit{Q.E.D.}\par\medskip}
+
+\title{Math 126 Summer 2026 HW 2}
+\author{Lec 001, Ebbighausen}
+
+
+\begin{document}
+	\pagestyle{fancy}
+	\fancyfoot{} 
+	\fancyfoot[L]{Math 126}
+	
+	\maketitle
+	
+	\textbf{Problem 1:} (Borthwick 4.1, modified) Suppose $u(t,x)$ is a solution to the wave equation 
+	\begin{align*}
+		\pd_{t}^{2}u - c\pd_{x}^{2}u = 0
+	\end{align*}
+	
+	Part A.) Assume $u(0,x)$, $u(t/2,x+ c\frac{t}{2})$ and $u(t/2, x - c\frac{t}{2})$ are known values. Write a formula for $u(t,x)$ given these three values (Hint: Draw a picture, and consider the domain of dependence of each point). 
+	
+	Part B.) Assume that $v(t,x)$ satisfies 
+	\begin{align*}
+		\pd_{t}^{2}v - \pd_{x}^{2}v = 1
+	\end{align*}
+	and $v(0,2) = 1$, $v(1,3) = v(1,1) = 2$. What is $v(2,2)$?
+	
+	\textbf{Problem 2:} Show that if $u(t,x)$ satisfies 
+	\begin{align*}
+		\pd_{t}^{2}u - 2\pd_{t}u - 2 \pd_{x} u - \pd_{x}^{2} u =0
+	\end{align*}
+	then $w(t,x) = e^{x-t}u$ satisfies the wave equation. Find a formula for $u$ give initial conditions $(u,u_{t})|_{t=0} = (g,h)$. 
+	
+	
+	\textbf{Problem 3:} (Borthwick 4.7) Let $u(t,x)$ solve the Schr{\"o}dinger equation 
+	\begin{align*}
+		\begin{cases}
+			\pd_{t} u - i \Delta u = 0 \\
+			u(0,x) = g(x)
+		\end{cases}
+	\end{align*}
+	for $g(x) \in C_{c}^{\infty}(\R)$. 
+	
+	Part A.) Show that $\int_{\R^{n}} |u|^{2} dx = \int_{\R^{n}} |g|^{2} dx$ (assume that both integrals are defined, and that the Leibniz rule and Green's identities are justified).
+	
+	Part B.) Show the solution $u$ is uniquely determined by the initial condition $g$. 
+	
+	
+	\textbf{Problem 4:}
+	
+	Consider the equation 
+	\begin{align*}
+		t \pd_{t} u - (x+1) \pd_{x} u = 0
+	\end{align*}
+	
+	Part A.) Use the method of separation of variables to form a family of solutions.
+	
+	Part B.) Given initial condition $u(1,x) = x$, solve the equation using the method of characteristics. Are the two solutions the same?
+	
+	
+	Part B.) 
+\end{document}

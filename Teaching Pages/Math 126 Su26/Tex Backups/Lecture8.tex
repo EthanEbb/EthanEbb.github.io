@@ -1,0 +1,600 @@
+
+\DocumentMetadata{tagging=on,
+	tagging-setup={math/setup=mathml-SE},
+	pdfstandard=ua-2,
+	lang=en-US
+}
+\documentclass{article}
+
+%Math Libraries
+\usepackage{multirow, longtable, amsmath, amssymb, amsthm}
+\usepackage[mathscr]{euscript}
+
+%Formatting
+\usepackage[margin = 1 in]{geometry}
+\usepackage{indentfirst}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage{tabularx}
+\usepackage{cite}
+
+%Diagram Packages
+\usepackage{tikz}
+\usetikzlibrary{automata,positioning,arrows}
+
+%Standard Commands
+\newcommand{\mm}{\mathscr}
+\newcommand{\B}{{\mathcal{B}}}
+\newcommand{\A}{{\mathcal{A}}}
+\newcommand{\N}{{\mathbb{N}}}
+\newcommand{\R}{{\mathbb{R}}}
+\newcommand{\C}{{\mathbb{C}}}
+\newcommand{\Q}{{\mathbb{Q}}}
+\newcommand{\Z}{{\mathbb{Z}}}
+
+
+\newcommand{\abs}[1]{{|{#1}|}}
+\newcommand{ \norm }[1]{{ || {#1}||}}
+\newcommand{\cl}[1]{{\overline{#1}}}
+\newcommand{\pd}{\partial}
+\newcommand{\ip}[2]{ \langle {#1},{#2}\rangle }
+\newcommand{\ls}{\lesssim}
+\newcommand{\gs}{\gtrsim}
+\newcommand{\supp}{\text{supp}}
+
+%Result Environment
+\newcounter{result}[section]
+\newenvironment{res}[1][]{\refstepcounter{result}\par\medskip
+	\noindent \textbf{[\thesection.\theresult] #1} \rmfamily}{\medskip}
+
+\newenvironment{defn}[1][]{\refstepcounter{result}\par\medskip \noindent \textbf{Definition [\thesection.\theresult] #1} \rmfamily}{\medskip}
+
+%Proof Environment
+\newenvironment{pf}{%
+	\par%
+	\medskip
+	\leftskip=2em\rightskip=2em%
+	\noindent\ignorespaces \textit{Proof:} \newline}{%
+	\,\, \newline \textit{Q.E.D.}\par\medskip}
+
+\title{Lecture 8: Maximum Principles}
+\author{Ethan Ebbighausen}
+\date{}
+
+\begin{document}
+	\pagestyle{fancy}
+	\fancyfoot{} 
+	\fancyfoot[L]{Math 126, Ebbighausen}
+	
+	\maketitle
+	
+	\section{Introduction}
+	
+	In one dimension, the \textit{subsolutions} of the Laplace equation are functions so $-f'' \leq 0$, or that the second derivative is nonnegative. These are exactly functions which are convex, i.e. for $t \in [0,1]$, 
+	\begin{align*}
+		f(xt + (1-t)y) \leq tf(x) + (1-t)f(y)
+	\end{align*}
+	which is to say that if you draw a line between $f(x)$ and $f(y)$ on the graph, the graph of the function sits below the line. One way to describe this property is that, given any interval $[a,b]$, the function is either constant on that interval or the maximum value is at one of the endpoints (if the max were in the middle, we fail to have the ``bowl shape'' of convexity). 
+	
+	Convex functions are quite useful, as we can use them to prove interesting properties, like how we used convexity for the Minkowski inequality. In general, some special properties also come out of the log-convexity of the functions $x^{p}$ (i.e. H{\"o}lder's Inequality). There are also some extremely useful generalizations of convexity. In particular, advanced students may have taken complex analysis already and seen the Maximum Modulus principle, which says that a complex differentiable function (analytic function) on a domain $\Omega \subset \C^n$ either reaches its maximum norm on the boundary of the domain or it is constant. 
+	
+	We can reframe being complex differentiable, i.e. 
+	\begin{align*}
+		\lim_{z \to 0} \frac{f(z+h)-f(z)}{h} = f'(z)
+	\end{align*}
+	as a pair of PDE by moving along the real and complex directions: for $f(x,y) = u(x,y) + iv(x,y)$,
+	\begin{align*}
+		\pd_{x}u = \pd_{y}v \\
+		\pd_{y}u = -\pd_{x}v
+	\end{align*} 
+	These are the Cauchy-Riemann equations, and give when combined that 
+	\begin{align*}
+		\pd_{x}^{2}u + \pd_{y}^{2} u = \pd_{x}\pd_{y} v - \pd_{x}\pd_{y} v = 0
+	\end{align*}
+	so that the real part is a harmonic function. This connection means that we may expect some of the wonders of complex differentiable functions to hold for harmonic functions, namely things like the mean value property and the maximum modulus principle. This lecture shows exactly that, and extends even to some parabolic and general elliptic subsolutions. 
+	
+	
+	\textbf{Learning Objectives:}
+	
+	\begin{itemize}
+		\item Solve the Laplace equation in $B(0,1)$ using the Poisson kernel. 
+		\item Derive the mean value formula, and apply it to understand harmonic functions
+		\item Connect the mean value formula to the maximum principle
+		\item Use the maximum principle to analyze harmonic functions
+		\item Generalize arguments from the Laplace equation to uniformly elliptic operators
+		\item Connect the time evolution of parabolic operators to restricted versions of elliptic operator results
+	\end{itemize}
+	
+	
+	\section{The Laplace Equation}
+	
+	\subsection{Solutions}
+	
+	The introduction already provides ample motivation to investigate the Laplace equation $-\Delta u = 0$, but another motivation comes from finding time-independent solutions of the heat and wave equation. These generally involve Dirichlet boundary conditions $u|_{\pd \Omega} = f$. Another development of the Laplace equation comes from vector fields, since \textit{conservative} vector fields are those which have $\nabla \cdot F = 0$. Thus, $\Delta u =0$ is saying that the gradient of $u$ is conservative. When the vector field of interest is the gradient of a potential function $\phi$, such as in the case of the electric field 
+	\begin{align*}
+		E = -\nabla \phi 
+	\end{align*}
+	where $\phi$ is the electric potential. Gauss' law of electrostatics then shows that this is conservative when there is no charge present.
+	
+	
+	We will consider the case of $B(0,1) \subset \R^{2}$, and solve 
+	\begin{align*}
+		\begin{cases}
+			-\Delta u = 0 \\
+			u|_{\pd B(0,1)} = g 
+		\end{cases}
+	\end{align*}
+	for a continuous $g$. In particular, let us view this as a time-independent solution of the heat equation. In this case, we may try to consider a Fourier series solution. We also have, from the method of separation of variables, a family of harmonic functions 
+	\begin{align*}
+		\phi_{k}(r,\theta) = r^{|k|} e^{ik\theta}
+	\end{align*}
+	so that the Fourier coefficients of $g$, $c_{k}[g]$, are precisely 
+	\begin{align*}
+		\frac{1}{2\pi} \int_{-\pi}^{\pi} g(\theta) \phi_{k}(1,\theta) d\theta
+	\end{align*}
+	
+	and so we take a guess 
+	\begin{align*}
+		u(r,\theta) = \sum_{\Z} c_{k}[g] \phi_{k}(r,\theta) = \sum_{\Z} c_{k}[g] r^{|k|}e^{ik\theta}
+	\end{align*}
+	for the solution, noticing that the series converges absolutely for $r<1$ since the $c_{k}[g]$ are bounded. 
+	
+	To clean up this sum, we may try to use the same kernel method we used for convergence. In particular, we can rewrite this as an integral
+	\begin{align*}
+		u(r,\theta) = \frac{1}{2\pi} \int_{0}^{2\pi}g(\eta) \sum_{\Z} r^{|k|}e^{ik\theta - ik\eta} d\eta \\
+		=\frac{1}{2\pi} \int_{0}^{2\pi} P_{r}(\theta - \eta) g(\eta) d\eta
+	\end{align*}
+	where, by geometric series sums, 
+	\begin{align*}
+		P_{r}(\theta) = \sum_{\Z} r^{|k|}e^{ik\theta} \\
+		= 1 + \frac{re^{i\theta}}{1-re^{i\theta}} + \frac{re^{-i\theta}}{1-re^{-i\theta}} \\
+		= \frac{1-r^{2}}{1-2r\cos(\theta) + r^{2}}
+	\end{align*}
+	
+	Notice that, like $t \to 0$ for the Dirichlet kernel, as $r \to 1$, the Poisson kernel focuses mass at the origin. This leads to the following result.
+	\begin{res}
+		For $g \in C^{0}(\pd B(0,1))$, the Laplace equation admits a classical solution $u \in C^{\infty}(B(0,1)) \cap C^{0}(\cl{B(0,1)})$ given by 
+		\begin{align*}
+			u(r,\theta) = \frac{1}{2\pi} \int_{0}^{2\pi} P_{r}(\theta - \eta) g(\eta) d\eta
+		\end{align*}
+	\end{res}
+	\begin{pf}
+		For $r < 1$, notice that $P_{r}(\theta)$ converges absolutely and, in particular, is also smooth. Notice further that 
+		\begin{align*}
+			\Delta P_{r}(\theta) = \sum_{k} \frac{1}{r} \pd_{r} (r |k|r^{|k|-1} )e^{ik\theta} + \frac{-k^{2}}{r^{2}}r^{|k|}e^{ik\theta} \\
+			= \sum_{k} |k|^{2}r^{|k|-2} e^{ik\theta} - |k|^{2}r^{|k|-2} e^{ik\theta}=0
+		\end{align*}
+		Further, since the Poisson integral is a convolution with a smooth function, the total $u$ is smooth and has $\Delta u =0$ by passing derivatives inside the integral. 
+		
+		We lastly need to check the boundary condition, $\lim_{r \to 1^-} u(r,\theta) = g(\theta)$, which amounts to swapping limits. We use a similar argument to heat cases, where we use the decay of the kernel:
+		
+		\begin{align*}
+			u(r,\theta) -g(\theta) = \frac{1}{2\pi} \int_{-\pi}^{\pi} P_{r}(\eta) [g(\theta - \eta) - g(\theta) ] d\eta
+		\end{align*}
+		
+		Fix $\theta \in D$ and $\epsilon > 0$. First, we use the continuity of $g$ to find $\delta > 0$ so 
+		\begin{align*}
+			|g(\theta - \eta) - g(\theta)| < \epsilon
+		\end{align*}
+		for $|\eta| < \delta$. For $|\eta| \geq \delta$, we notice that 
+		\begin{align*}
+			\max_{\delta \leq | \eta| \leq \pi} P_{r}(\eta) = P_{r}(\delta)
+		\end{align*}
+		by using the form 
+		\begin{align*}
+			P_{r}(\theta) = \frac{1-r^{2}}{1-2r\cos(\theta)+r^{2}}
+		\end{align*}
+		where the denominator is smaller for smaller $\theta$. 
+		
+		We then split the integral at $\delta$, giving 
+		\begin{align*}
+			|u(r,\theta) - g(\theta)| \leq \frac{1}{2\pi} \int_{-\delta}^{\delta} P_{r}(\eta) |g(\theta - \eta) - g(\theta)| d\eta \\ + \frac{1}{2\pi} \int_{\delta < |\eta| < \pi} P_{r}(\eta) |g(\theta - \eta) - g(\theta)| d\eta \\
+			\leq \frac{\epsilon}{2\pi} \int_{-\delta}^{\delta} P_{r}(\eta) d\eta + \frac{P_{r}(\delta)}{2\pi} \int_{\delta < |\eta| < \pi} |g(\theta - \eta) - g(\theta)|d\eta \\
+			\leq \epsilon + \frac{P_{r}(\delta)}{2\pi} 2 \sup |g| \\
+			\leq  \epsilon + M P_{r}(\theta)
+		\end{align*}
+		
+		Since $\lim_{r \to 1^-} P_{r}(\delta) = 0$, we may choose $R$ so $M P_{r}(\delta) \leq \epsilon$ for all $R < r < 1$. This gives that 
+		\begin{align*}
+			\lim_{r \to 1^-} |u(t,\theta) - g(\theta)| = 0
+		\end{align*}
+	\end{pf}
+	
+	
+	
+	
+	\vspace{0.25 cm}
+	\textbf{Example:} For $0 < a < \pi$, suppose 
+	\begin{align*}
+		g(\theta) = \begin{cases}
+			1 - \frac{|\theta|}{a} & |\theta| \leq a \\
+			0 & a < |\theta| \leq \pi
+		\end{cases}
+	\end{align*}
+	
+	which gives a piecewise-linear bump or ``hot spot'' at $0$. The resulting solution is 
+	\begin{align*}
+		u(r,\theta) = \frac{1}{2\pi} + \frac{2}{\pi a} \sum_{k=1}^{\infty} \frac{1 - \cos(ka)}{k^{2}} \cos(k\theta)
+	\end{align*}
+	that gives a spike on the disc near the bump on the boundary. 
+	
+	\vspace{0.25 cm}
+	
+	\subsection{Mean Value Formula}
+	
+	From the introduction, we recall that a harmonic function connects to the real part of a complex analytic function. Such functions obey the mean value formula (Cauchy integral formula)
+	\begin{align*}
+		f(z_0) = \frac{1}{2 \pi i} \oint_{\gamma} \frac{f(z)}{z-z_0} dz
+	\end{align*}
+	that gives a way to determine the value of a function at a point if we know how it acts in a circle around the point. Similarly, if we look at $0$ in the Poisson formula,
+	\begin{align*}
+		u(0) = \frac{1}{2\pi} \int_{0}^{2\pi} g(\theta) d\theta
+	\end{align*}
+	and we see the same type of behavior. We should expect, from the complex case, that this holds at all points $x$ where a solution is defined. In fact, this is the case. We first introduce a family of functions 
+	\begin{align*}
+		G_{R}(x) = \begin{cases} \frac{1}{2\pi} \ln(\frac{|x|}{R}) & n = 2 \\
+		\frac{1}{(n-2)A_{n}} \left[\frac{1}{R^{n-2}} - \frac{1}{|x|^{n-2}} \right] & n \geq 3\end{cases}
+	\end{align*}
+	where $A_{n}$ is the surface area of $S^{n-1}$. The function $G_{R}$ helps describe the behavior of the Poisson kernel in a special way, even in higher dimensions (in fact, it is a version of a fundamental solution, which we will study later). In particular, it satisfies
+	\begin{align*}
+		\frac{\pd G_{R}}{\pd r} = \frac{1}{A_{n}r^{n-1}}, \hspace{1cm} G_{R}|_{r=R} = 0
+	\end{align*}
+	where $A_{n}r{n-1} = |\pd B(0,r)|$. Notice that $G_{R}$ is also integrable despite the singularity, since the radial volume element is $A_{n}r^{n-1}dr$. 
+	
+	\begin{res}
+		[Mean Value Formula] Assume that $u \in C^{2}(\Omega)$ on a domain $\Omega \subset \R^{n}$ with $n \geq 2$. For $R>0$ such that $\cl{B(x_0,r)} \subset \Omega$, 
+		\begin{align*}
+			u(x_0) = \frac{1}{A_{n}R^{n-1}} \int_{\pd B(x_0,R)}u dS + \int_{B(x_0,R)} G_{R}(x-x_0)\Delta u(x) dx
+		\end{align*}
+	\end{res}
+	\textbf{Remark:} If $u$ is a harmonic function, this exactly says that the value at $x_0$ is the average of the values on the edge of the ball around $x_0$. 
+	
+	\begin{pf}
+		Assume $x_0 = 0$. We would truly like to remove the derivatives in the above formula from $u$ and place them on $G_{R}$, since the formula for the radial portion of the Laplacian shows $\Delta G_{R}(x) = 0$ for $x \neq 0$. Then, Green's identity would only produce a boundary condition on the sphere we are interested in. 
+		
+		However, the singularity of $G$ means we must pass around a restricted domain $\{\epsilon < r < R\}$. In this case, apply Green's identity and the above derivative
+		\begin{align*}
+			\int_{\{\epsilon < r < R\}} G_{R} \Delta u + 0 dx = \int_{\{r=R\}} \left(G_{R} \frac{\pd u}{\pd r} - u \frac{\pd G_{R}}{\pd r} \right) dS \\
+			- \int_{\{r = \epsilon\}} \left(G_{R} \frac{\pd u}{\pd r} - u \frac{\pd G_{R}}{\pd r} \right) dS \\
+			= \left(0 - \frac{1}{A_{n}R^{n-1}} \int_{\{r=R\}} u dS \right) \\
+			- \left(G_{R}(\epsilon) \int_{\{r=\epsilon\}} \frac{\pd u}{\pd r} dS - \frac{1}{A_{n} \epsilon^{n-1}} \int_{\{r = \epsilon\}} u dS \right)
+		\end{align*} 
+		
+		or 
+		\begin{align*}
+			\int_{\{\epsilon < r < R\}} G_{R} \Delta u  dx + \frac{1}{|\pd B(0,R)|} \int_{\{r=R\}} u dS \\
+			= - \left(G_{R}(\epsilon) \int_{\{r=\epsilon\}} \frac{\pd u}{\pd r} dS - \frac{1}{A_{n} \epsilon^{n-1}} \int_{\{r = \epsilon\}} u dS \right)
+		\end{align*}
+		
+		
+		It is enough to do this because, since $G_{R}$ is integrable and $\Delta u$ is bounded, 
+		\begin{align*}
+			\lim_{\epsilon \to 0} \int_{\{\epsilon < r < R\}} G_{R}\Delta u dx = \int_{B(0,R)} G_{R} \Delta u dx
+		\end{align*}
+		
+		whereas the right-hand side of the equation reduces nicely as $\epsilon \to 0$. First, since $u \in C^{2}$, 
+		\begin{align*}
+			| \int_{\{r = \epsilon\}} \frac{\pd u}{\pd r} dS| \leq C A_{n} \epsilon^{n-1} 
+		\end{align*}
+		so that 
+		\begin{align*}
+			G_{R}(\epsilon) \int_{\{r=\epsilon\}} \frac{\pd u}{\pd r} dS \to 0
+		\end{align*}
+		as $\epsilon \to 0$
+		Whereas, also by continuity, 
+		\begin{align*}
+			\frac{1}{A_{n} \epsilon^{n-1}} \int_{\{r = \epsilon\}} u dS \to u(0)
+		\end{align*}
+		
+		and so 
+		\begin{align*}
+			u(0) = \frac{1}{A_{n}R^{n-1}} \int_{\pd B(0,R) }udS + \int_{B(0,R)} G_{R}(x)\Delta u(x) dx
+		\end{align*}
+	\end{pf}
+	
+	Since this looks like a spherical shell average for harmonic functions in every shell, we may also expect for it to hold as a mean value property of balls. At the same time, we notice that a function is harmonic precisely when the second integral above disappears, which is also when it satisfies a true mean value property. This is summarized in the following. 
+	
+	\begin{res}
+		[Mean Value Property] Suppose $\Omega \subset \R^{n}$ for $n \geq 2$. For $u \in C^{2}(\Omega)$, the following are equivalent
+		
+		A.) The function $u$ is harmonic on $\Omega$. 
+		
+		B.) For $\cl{B(x_0,R)} \subset \Omega$,
+		\begin{align*}
+			u(x_0) = \frac{1}{A_{n}R^{n-1}} \int_{\pd B(x_0,R)} u dS
+		\end{align*}
+		
+		C.) For $\cl{B(x_0,R)} \subset \Omega$,
+		\begin{align*}
+			u(x_0) = \frac{n}{A_{n} R^{n}} \int_{B(x_0,R)} u dx
+		\end{align*}
+	\end{res}
+	\begin{pf}
+		As we noted, A.)$\rightarrow $B.) follows directly from the above theorem. To derive C.) from B.), notice that 
+		\begin{align*}
+			\int_{B(x_0,r)} u dx = \int_{0}^{r} \int_{\pd B(x_0,t)} u dS dt\\
+			= \int_{0}^{r} A_{n}t^{n-1} u(x_0) dS = u(x_0) \frac{A_{n} r^{n}}{n}
+		\end{align*}
+		
+		which is the formula for C.). We obtain B.) also from C.) by taking the derivative with respect to $r$ of the same equation. Lastly, to obtain A.) from C.), we notice that for $u$ satisfying C.), the mean value formula says
+		
+		\begin{align*}
+			\int_{B(x_0,\delta )} G_{R}(x-x_0)\Delta u(x) dx=0
+		\end{align*}
+		
+		for all $x_0$ given some sufficiently small $\delta$. By contradiction, assume $\Delta u(x_0) \neq 0$, and without a loss of generality, assume it is positive. Then, we may find a small enough $\delta$ on which $\Delta u \geq c>0$ on $B(x_0,\delta)$. Since $G_{R}$ is strictly negative and decreasing as $r \to 0$, 
+		\begin{align*}
+			\int_{B(x_0,\delta)} G_{\delta}(x-x_0)\Delta u(x) dx \leq  \int_{B(x_0,\delta/2)} G_{\delta}(x-x_0)\Delta u(x) dx< c G_{\delta}|_{r = \delta/2} < 0
+		\end{align*}
+		creating our contradiction. 
+	\end{pf}
+	
+	\subsection{Weak and Strong Maximum Principles}
+	
+	The other property we hoped to generalize was the convexity property of functions so $\pd_{x}^{2}u \geq 0$. Since we only need an inequality here, we call $u$ for which $-\Delta u \leq 0$  a \textit{subharmonic} function or a subsolution to the Laplace equation. 
+	
+	There are a pair of maximum principles for subharmonic functions, one ``strong'' principle which then implies the ``weak'' principle. We start by proving the strong principle by our mean value property. This will rely on one of our properties of domains: they are connected. In particular, \textbf{the only nonempty closed and open subset of a connected set is the set itself}. 
+	
+	\begin{res}
+		[Strong Maximum Principle] Let $\Omega \subset \R^{n}$ be a bounded domain. If $u \in C^{2}(\Omega, \R) \cap C^{0}(\cl{\Omega})$ is subharmonic, then the maximum value of $u$ is attained on an interior point if and only if $u$ is constant. 
+	\end{res}
+	
+	\begin{pf}
+		Since $u$ is continuous and $\cl{\Omega}$ is compact, $u$ achieves a global maximum at some point $x_0$. If $x_0 \in \pd \Omega$ for all such $x_0$, then this is clearly true. If not, then $x_0$ is an interior point and there exists some $R > 0$ so $\cl{B(x_0,R)} \subset \Omega$. Let $0<r<R$. Notice that $G_{r} \Delta u \leq 0$ inside the ball, so applying the mean value formula shows
+		\begin{align*}
+			u(x_0) \leq \frac{1}{|\pd B(x_0,r)|} \int_{\pd B(x_0,r)} u(x) dx \leq \frac{1}{|\pd B(x_0,r)|} \int_{\pd B(x_0,r)} u(x_0) dx = u(x_0)
+		\end{align*}
+		In other words, the average is the maximum, so $u(x) = u(x_0)$ for all $x \in \pd B(x_0,r)$ and $0 < r <R$. Combining these two facts,  $u(x) = u(x_0)$ for all $x \in B(x_0,R)$.
+		
+		Now, let $A= \{x \in \Omega \mid u(x) = u(x_0)\}$. By the above argument, $A$ is open. If $y \in \pd A$, then there exists some $\{x_{n}\} \subset A$, $x_{n} \to y$. Hence, $u(x_n) \to u(y)$ shows $u(y) = u(x_0)$ and $y \in A$. Therefore, $A$ is also closed. By the fact we mentioned above, $A = \Omega$. Therefore, $u$ is constant. 
+	\end{pf}
+	
+	The weak maximum principle is then immediate. 
+	
+	\begin{res}
+		[Weak Maximum Principle] Let $\Omega \subset \R^{n}$ be a bounded domain. If $u \in C^{2}(\Omega, \R) \cap C^{0}(\cl{\Omega})$ is subharmonic, then 
+		\begin{align*}
+			\max_{\cl{\Omega}} u = \max_{\pd \Omega} u
+		\end{align*}
+	\end{res}
+	
+	Notice that a \textit{superharmonic} function $u$ where $-\Delta u \geq 0$ has a similar argument for the minimum, so 
+	\begin{align*}
+		\min_{\cl{\Omega}} u = \min_{\pd \Omega} u
+	\end{align*}
+	and a harmonic function satisfies both. This is particularly useful in the realm of uniqueness of solutions, where we make the boundary values disappear. 
+	
+	\begin{res}
+		[Uniqueness of Solutions] Suppose $u_1,u_2 \in C^{2}(\Omega, \R) \cap C^{0}(\cl{\Omega})$ are harmonic functions with 
+		\begin{align*}
+			u_{1}|_{\pd \Omega} = g_1 \\
+			u_{2}|_{\pd \Omega} = g_2
+		\end{align*}
+		for $g_{1},g_{2} \in C^{0}(\Omega)$. Then, 
+		\begin{align*}
+			\max_{\cl{\Omega}} |u_{1}-u_2| \leq \max_{\pd \Omega} |g_{2}-g_1|
+		\end{align*}
+		In particular, if $g_2 = g_1$, $u_2 = u_1$ on $\Omega$. 
+	\end{res}
+	
+	\textbf{Remark:} We could also prove uniqueness directly from energy estimates, but this gives us more quantitative information. 
+	
+	\begin{pf}
+		The function $u_1 - u_2$ is also harmonic with boundary values $g_1 - g_2$. Applying the weak maximum principle gives the claim. 
+	\end{pf}
+	
+	
+	\section{General Second Order Uniformly Elliptic Equations}
+	
+	While the Laplacian is an amazing prototype for properties involved, we may generalize the above maximum principles to many other second-order elliptic operators. We shall focus on the weak maximum principle, but more advanced texts also garner the strong principle in some cases. 
+	
+	 On a domain $\Omega \subset \R^{n}$, let us consider a second-order elliptic operator 
+	\begin{align*}
+		L = -\sum_{i,j =1}^{n} a_{ij}(x) \pd_{i}\pd_{j} + \sum_{j=1}^{n} b_{j}(x) \pd_{j}
+	\end{align*}
+	where the $a_{i,j}$ and $b_{j}$ are continuous functions on $\Omega$. Now, recall that we assume the coefficients $a_{ij}$ are symmetric, since the derivatives are for $C^{2}$ functions. Another way to describe an elliptic operator, comparing it to the Laplacian, is that the eigenvalues of $[a_{i,j}]$ are strictly positive (i.e. the matrix is positive definite) at any value $x$ in the domain (try comparing this to our previous level-set version). 
+	
+	The problem with this property, as it stands, is that the eigenvalues may get very close to 0. To make some technicalities easier, we usually restrict to the case of \textit{uniform ellipticity}, which says that for some $\kappa > 0$
+	\begin{align*}
+		\sum_{i,j = 1}^{n} a_{ij}(x) v_{i}v_{j} \geq \kappa \norm{v}^{2}
+	\end{align*}
+	for all $x \in \Omega$, $v \in \R^{n}$. This also says that the eigenvalues are at least $\kappa$. With this restriction, we may prove the principle
+	
+	\begin{res}
+		[Weak maximum principle for general operators] Suppose $\Omega \subset \R^{n}$ is bounded, and $L$ is a uniformly elliptic operator of the form above. If $u \in C^{2}(\Omega; \R) \cap C^{0}(\cl{\Omega})$ satisfies $Lu \leq 0$ in $\Omega$, then 
+		\begin{align*}
+			\max_{\cl{\Omega}} u = \max_{\pd \Omega} u
+		\end{align*}
+	\end{res}
+	
+	\begin{pf}
+		Consider an arbitrary function $v \in C^{2}(\Omega, \R)$. If we have a local maximum at $x_0 \in \Omega$, the first partial derivatives vanish and 
+		\begin{align*}
+			Lv(x_0) = -\sum A_{ij}(x_0) \pd_{i}\pd_{j}v(x_0)
+		\end{align*}
+		
+		furthermore, the second-derivative test says that the matrix of second partials of $v$ is negative semidefinite at $x_0$, or 
+		\begin{align*}
+			\sum_{i,j=1}^{n} \pd_{i}\pd_{j} v(x_0)v_{i}v_{j} \leq 0
+		\end{align*}
+		for all $v \in \R^{n}$. Another way to see this is to look at $h(t) = u(x_0 + tv)$ and notice $h''(0) \leq 0$. 
+		
+		Next, our goal is to understand the $Lv(x_0)$ sum. Recall that $[a_{ij}]$ is symmetric, and hence is diagonalizable (the spectral theorem). Therefore, we may consider a basis under which $A = [a_{ij}]$ becomes diagonal with eigenvalues $\{\lambda_{j}\}$ in increasing order. Let $B = [ -\pd_{i}\pd_{j} v(x_0)]$, and under this basis for $A$ $B = [b_{ij}]$. Then (using the increasing order)
+		\begin{align*}
+			\sum_{i,j} a_{ij}(-\pd_{i}\pd_{j}v(x_0)) = tr(AB) = \sum_{j=1}^{n} \lambda_{j}b_{jj} \geq \lambda_{1} tr(B) \geq0
+		\end{align*}
+		since $B$ being positive semidefinite means its trace is nonnegative. Therefore, $Lv(x_0) \geq 0$. 
+		
+		
+		Consider a \textit{strict} subsolution $u$. Then, $Lu < 0$, so the above argument shows that it is impossible for $u$ to have an interior maximum and so $u$ satisfies the claim. Next, consider a general subsolution $u$, so $Lu \leq 0$. Our trick is to perturb to the strict case and derive a similar issue. 
+		
+		For $M>0$, let $h(x) = e^{Mx_1}$ such that 
+		\begin{align*}
+			Lh = -a_{11}M^{2}h + b_{1}Mh
+		\end{align*} 
+		
+		Notice that applying $v = e_{1}$ to the ellipticity condition implies $a_{11} \geq \kappa$, so if we pick 
+		\begin{align*}
+			M > \frac{1}{\kappa} \max_{\cl{\Omega}} b_{1}
+		\end{align*}
+		so we can guarantee $Lh < 0$. 
+		
+		If $Lu \leq 0$, then
+		\begin{align*}
+			L(u+\epsilon h) < 0
+		\end{align*}
+		for $\epsilon > 0$. From the strict case, 
+		\begin{align*}
+			\max_{\cl{\Omega}} (u+\epsilon h) = \max_{\pd \Omega} (u+\epsilon h) 
+		\end{align*}
+		
+		since $h \geq 0$, 
+		\begin{align*}
+			\max_{\cl{\Omega}} u \leq \max_{\cl{\Omega}} (u+\epsilon h) =  \max_{\pd \Omega} (u+\epsilon h) 
+		\end{align*}
+		If we can take $\epsilon \to 0$ to get rid of the rightmost term, we can obtain our claim. Since $\Omega$ is bounded, there is $R$ so 
+		\begin{align*}
+			|h| \leq e^{MR}
+		\end{align*}
+		and 
+		\begin{align*}
+			\max_{\cl{\Omega}} u \leq \max_{\pd \Omega} u + \epsilon e^{MR}
+		\end{align*}
+		
+		We may now take $\epsilon \to 0$ to obtain 
+		\begin{align*}
+			\max_{\cl{\Omega}} u \leq \max_{\pd \Omega} u 
+		\end{align*}
+	\end{pf}
+	
+	\textbf{Remark:}  This extends directly to 
+	
+	\begin{align*}
+		L = -\sum_{i,j =1}^{n} a_{ij}(x) \pd_{i}\pd_{j} + \sum_{j=1}^{n} b_{j}(x) \pd_{j} + c(x)
+	\end{align*}
+	in the case that $c(x) \geq 0$ and $\max_{\cl{\Omega}} u \geq 0$ or $c(x) \leq 0$ and $\max_{\cl{\Omega}} u \leq 0$. There are other versions of the statement involving this extra term, but they are always slightly awkward to make the same principles work. 
+	
+	
+	\textbf{Remark:} There is also a strong maximum principle for this situation. It relies on some extra computations called \textit{Hopf's lemma} that describe what the normal derivatives of a function look like at the maximum of a function on the boundary of a ball. We will not prove this, but it is informative to have. 
+	
+	\begin{res}
+		Assume $u \in C^{2}(\Omega) \times C^{0}( \cl{\Omega})$ for a bounded domain $\Omega$. If $L$ is a uniformly elliptic operator (with $c=0$ as discussed in the theorem above), and $Lu \leq 0$ in $\Omega$, then $u$ attains a maximum at an interior point of $\Omega$ if and only if $u$ is constant. 
+	\end{res}
+	
+	\section{Parabolic Equations}
+	
+	Parabolic equations mimic some, but not all, of the properties of the Laplace equation. For example, we may observe that heat tends to flow away from a maximum, so a local maximum of $u(t,x)$ should be impossible at time $t>0$ or on the interior of the domain. There is also a mean value principle for the heat equation, which is useful though more difficult than the Laplace version (see, for example, Evans Chapter 2). In any case, we look at the generalizations of the above properties to the parabolic cases. 
+	
+	First, let us define the \textit{heat boundary}
+	
+	\begin{align*}
+		\Gamma(T,\Omega) = \{\{0\} \times \cl{\Omega}\} \cup [0,T] \times \pd \Omega
+	\end{align*}
+	
+	and the collection of functions 
+	\begin{align*}
+		C_{h}(\Omega) = \{ u \in C^{0}([0,\infty) \times \cl{\Omega}) \mid u(\cdot, x) \in C^{1}((0,\infty)), u(t,\cdot) \in C^{2}(\Omega)\}
+	\end{align*}
+	
+	
+	This allows us to establish the weak maximum principle for the heat equation on a bounded domain
+	
+	\begin{res}
+		Suppose $\Omega \subset \R^{n}$ is a bounded domain and $u \in C_{h}(\Omega)$ satisfies 
+		\begin{align*}
+			\pd_{t} u - \Delta u \leq 0
+		\end{align*}
+		on $(0,T) \times \Omega$. Then, the maximum value of $u$ in $[0,T] \times \cl{\Omega}$ occurs on $\Gamma(T,\Omega)$. 
+	\end{res}
+	
+	\begin{pf}
+		Suppose that $u$ attains a maximum at $(t_0,x_0) \subset (0,T) \times \Omega$. Then, by using calculus, 
+		\begin{align*}
+			\pd_{t}u (t_0,x_0) = 0 \\
+			\pd_{j} u(t_0,x_0) = 0 \\
+			\pd_{j}^{2} u(t_0,x_0) \leq 0
+		\end{align*}
+		
+		so that 
+		\begin{align*}
+			(\pd_{t} - \Delta) u(t_0,x_0) \geq 0
+		\end{align*}
+		
+		If this inequality were strict, we would have a contradiction, so we try to force this. For $\epsilon > 0$, set 
+		\begin{align*}
+			u_{\epsilon} = u + \epsilon |x|^{2}
+		\end{align*}
+		since 
+		\begin{align*}
+			\Delta |x|^{2} = 2n
+		\end{align*}
+		
+		we have 
+		\begin{align*}
+			[\pd_{t} - \Delta] (u+\epsilon |x|^{2})(t_0,x_0) \leq 0 - 2n\epsilon < 0
+		\end{align*}
+		
+		On the other hand, our above argument still holds on $u_{\epsilon}$, so we have a contradiction and local maxima of this function must occur on the boundary. Label the global maximum of $u_{\epsilon}$ as $(t_{\epsilon},x_{\epsilon})$. We have either $t_{\epsilon} = 0$ or $T$, or $x_{\epsilon} \in \pd \Omega$. 
+		
+		In the case $t_{\epsilon} = T$ and $x_{\epsilon} \in \Omega$, $u_{\epsilon}(t,x_{\epsilon}) \leq u_{\epsilon}(t_{\epsilon},x_{\epsilon})$ implies 
+		\begin{align*}
+			\pd_{t} u_{\epsilon}(T,x_\epsilon) \geq 0
+		\end{align*}
+		however, then $\pd_{t} u_{\epsilon} - \Delta u_{\epsilon} < 0$ implies $\Delta u_{\epsilon} > 0$, which contradicts the local maximum part. Therefore, the maximum must be on the heat boundary. 
+		
+		Next, we bring the property back to $u$. Let $R$ be large enough so $\Omega \subset B(0,R)$ so 
+		\begin{align*}
+			u \leq u_{\epsilon} \leq u + \epsilon R^{2}
+		\end{align*}
+		such that 
+		\begin{align*}
+			\max_{[0,T] \times \cl{\Omega}} u \leq \max_{\Gamma(T,\Omega)} u_{\epsilon} \leq \max_{\Gamma(T,\Omega)} u + \epsilon R^{2}
+		\end{align*}
+		taking $\epsilon \to 0$ finishes the argument. 
+	\end{pf}
+	
+	We employ this type of trick one final time, to consider unbounded domains. 
+	\begin{res}
+		Suppose $u$ is a classical solution of the heat equation on $(0,\infty) \times \R^{n}$ with $u|_{t=0} = g$, and that on $[0,T] \times \R^{n}$, $u$ is bounded. Then,
+		\begin{align*}
+			\max_{[0,\infty) \times \R^{n}} u \leq \max_{\R^{n}} g
+		\end{align*}
+	\end{res}
+	\begin{pf}
+		Let $u(t,x) \leq M$ on $[0,T] \times \R^{n}$. For $y \in \R^{n}$ and $\epsilon > 0$, we set 
+		\begin{align*}
+			v(t,x) = u(t,x) - \epsilon(T-t)^{-n/2}e^{\frac{|x-y|^{2}}{4(T-t)}}
+		\end{align*}
+		(notice the exponent is positive, unlike the heat kernel).
+		
+		Via direct differentiation, this satisfies the heat equation and, considering the domain $(0,T) \times B(y,R)$, we apply the previous maximum principle to notice 
+		\begin{align*}
+			\max_{[0,T] \times B(y,R)} v \leq \max_{\Gamma(T,B(y,R))} v 
+		\end{align*}
+		Next, we break down the parts of the heat boundary. We have $v(0,x) \leq u(0,x) =  g(x)$ for $x \in  B(y,R)$. On $\pd B(y,R)$,
+		\begin{align*}
+			v(t,x) \leq M - \epsilon(T-t)^{-n/2}e^{R^{2}/(4T-4t)}\leq M - \epsilon T^{-n/2}e^{R^{2}/4T}
+		\end{align*}
+		for a large choice of $R$, we then have $v(t,x) \leq \max_{ B(y,R)} g(x)$. This is to say we are bounded above by $g$ on the heat boundary, and so 
+		
+		\begin{align*}
+			\max_{[0,T] \times B(y,R)} v \leq \max_{ B(y,R)} g 
+		\end{align*}
+		In particular, 
+		\begin{align*}
+			v(t,y) = u(t,y) - \epsilon (T-t)^{-n/2} \leq \max_{ B(y,R)} g\leq \max_{\R^{n}}g
+		\end{align*}
+		
+		taking $\epsilon \to 0$ shows 
+		\begin{align*}
+			u(t,y) \leq \max_{ \R^{n} } g 
+		\end{align*}
+		and this now holds for all $y$. Finally, taking $T \to \infty$ yields the claim. 
+	\end{pf}
+	
+	\textbf{Remark:}
+	
+	If $L$ is uniformly elliptic, $\pd_{t} - L$ is called a uniformly parabolic operator. The same methods as the previous section apply to show that we may obtain a weak maximum principle for bounded domains. We may also obtain a strong maximum principle using Harnack's inequality. 
+	
+	
+\end{document}

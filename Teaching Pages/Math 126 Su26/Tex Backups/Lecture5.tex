@@ -1,0 +1,493 @@
+
+\DocumentMetadata{tagging=on,
+	tagging-setup={math/setup=mathml-SE},
+	pdfstandard=ua-2,
+	lang=en-US
+}
+\documentclass{article}
+
+%Math Libraries
+\usepackage{multirow, longtable, amsmath, amssymb, amsthm}
+\usepackage[mathscr]{euscript}
+
+%Formatting
+\usepackage[margin = 1 in]{geometry}
+\usepackage{indentfirst}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage{tabularx}
+\usepackage{cite}
+
+%Diagram Packages
+\usepackage{tikz}
+\usetikzlibrary{automata,positioning,arrows}
+
+%Standard Commands
+\newcommand{\mm}{\mathscr}
+\newcommand{\B}{{\mathcal{B}}}
+\newcommand{\A}{{\mathcal{A}}}
+\newcommand{\N}{{\mathbb{N}}}
+\newcommand{\R}{{\mathbb{R}}}
+\newcommand{\C}{{\mathbb{C}}}
+\newcommand{\Q}{{\mathbb{Q}}}
+\newcommand{\Z}{{\mathbb{Z}}}
+
+
+\newcommand{\abs}[1]{{|{#1}|}}
+\newcommand{ \norm }[1]{{ || {#1}||}}
+\newcommand{\cl}[1]{{\overline{#1}}}
+\newcommand{\pd}{\partial}
+\newcommand{\ip}[2]{ \langle {#1},{#2}\rangle }
+\newcommand{\ls}{\lesssim}
+\newcommand{\gs}{\gtrsim}
+\newcommand{\supp}{\text{supp}}
+
+%Result Environment
+\newcounter{result}[section]
+\newenvironment{res}[1][]{\refstepcounter{result}\par\medskip
+	\noindent \textbf{[\thesection.\theresult] #1} \rmfamily}{\medskip}
+
+\newenvironment{defn}[1][]{\refstepcounter{result}\par\medskip \noindent \textbf{Definition [\thesection.\theresult] #1} \rmfamily}{\medskip}
+
+%Proof Environment
+\newenvironment{pf}{%
+	\par%
+	\medskip
+	\leftskip=2em\rightskip=2em%
+	\noindent\ignorespaces \textit{Proof:} \newline}{%
+	\,\, \newline \textit{Q.E.D.}\par\medskip}
+
+\title{Lecture 5}
+\author{Ethan Ebbighausen}
+\date{June 19th, 2026}
+
+\begin{document}
+	\pagestyle{fancy}
+	\fancyfoot{} 
+	\fancyfoot[L]{Topics Document, Ethan Ebbighausen}
+	
+	\maketitle
+	
+	\section{Introduction: The Heat Equation}
+	
+	Heat is the measurement of the average kinetic energy of the molecules of a substance. For example, fluids like water or air have particles that are moving constantly all over the place, so that motion carries energy. Heat transfers between objects as these particles collide with each other (conduction), transfer from the collective motion of particles (convection), or as collisions cause subatomic processes to emit radiation such as light or infrared radiation (think of a heat lamp like in a reptile tank). 
+	
+	Because this is a very complicated system, it is much easier to describe the flow of energy via differential equations rather than physical states. A simple version of this is \textit{Newton's Law of Cooling}, a separable ODE that describes simple heat flow between a medium of constant temperature $M$ and an object of temperature $T$ in this medium. The rate of change of the temperature of the object is proportional to the difference in temperature, where the constant of proprtionality depends on the conductivity of the object and medium. Writing this symbolically gives
+	\begin{align*}
+		\frac{dT}{dt} = k(M-T)
+	\end{align*}
+	This is a very simple model, as the heat of the medium usually changes (especially nearby the object), like with ice in a glass of water. This is most suitable for a system with no state changes, a medium with a large thermal mass and either very high conductivity or currents to maintain the constant temperature, and no phase changes. 
+	
+	Joseph Fourier resolved many of these limitations by developing the \textit{heat equation} in the early 19th century. While it is simplified compared to most situations (just asks anyone who has taken thermodynamics), it describes basic systems well 
+	
+	\section{Model: Heat Flow in a Metal Plate}
+	Let the temperature at time $t \in [0,\infty)$ and position $x \in $ be $u(t,x)$.
+	
+	We require two physical facts about heat. The first is that temperature is proportional to internal energy of a material, where the constant of proportionality is called the \textit{specific heat} c. The thermal energy along a domain is then
+	\begin{align*}
+		U = c \int_{D} \rho u dx
+	\end{align*}
+	where $\rho$ is the density of the material, which we will assume to be constant. Next, Fourier's law of heat conduction describes how heat moves from hotter to colder regions. Hotter regions have more particle movement, so more collisions. At a barrier between two regions of different temperature, the hotter side will have more incoming collisions, thus transferring energy to the colder region. In math, this may be written as ``temperature flux at a point is proportional to the thermal difference'', or 
+	\begin{align*}
+		q = -k \nabla u
+	\end{align*}
+	for $k>0$ the \textit{thermal conductivity} of the material. Notice that this resembles Newton's law of cooling above, but in higher dimensions. 
+	
+	We assume that the rod is isolated, so no energy is gained from or lost to the environment. This allows is to use conservation of energy to say that the  rate of change of thermal energy in a domain $D$ is
+	\begin{align*}
+		\frac{d U}{dt}(t) = -\int_{\pd D} \nu \cdot q dS\\
+		\Leftrightarrow \\
+		\int_{D} \left(c\rho \pd_{t} u + \nabla\cdot q\right) dx=0 \\
+			\Leftrightarrow \\
+		\int_{D} \left(c\rho \pd_{t} u - k\Delta u\right) dx=0
+	\end{align*}
+	
+	Using our standard trick, since this holds for every region, we must have 
+	\begin{align*}
+		c\rho \pd_{t} u - k\Delta u = 0 \\
+		 \pd_{t} u - C\Delta u = 0
+	\end{align*}
+	the heat equation. 
+	
+	In a rod of finite length (domain $(0,l)$), we could have several boundary conditions. For example, Dirichlet conditions like $u(t,0) = T_0$ could amount to a heating element on one side of the rod. If both ends are held at temperature $T_0$, then we notice that this temperature spreads across the rode and we wind up with a stead-state solution (time-independent, or long-term behavior) of just $T_0$. If We have $u(t,l) = T_1$, we instead see a time-independent solution 
+	\begin{align*}
+		u(x) = T_0(1-\frac{x}{l}) + T_1 \frac{x}{l}
+	\end{align*}
+	If, instead, the ends are insulated, we have Neumann conditions $\pd_{x}u(t,0) = \pd_{x}u(t,l) = 0$. 
+	
+	\vspace{0.25 cm}
+	
+	\textbf{Example:} Assume we have a rod of length $\pi$, Dirichlet BC $u(t,0) = u(t,\pi) = 0$. Using separation of variables, we obtain equations
+	
+	\begin{align*}
+		h'(t) = -K h\\
+		\phi''(x) = -K\phi(x) 
+	\end{align*}
+	
+	giving solutions
+	
+	\begin{align*}
+		u(t,x) = e^{-n^{2}t} \sin(nx)
+	\end{align*}
+	
+	which all lose energy to the endpoints and decay to $0$ as time approaches infinity. In the insulated endpoint case, we would instead of 
+	\begin{align*}
+		u(t,x) = e^{-n^{2}t} \cos(nx)
+	\end{align*}
+	where $n=0$ provides the constant, or steady-state solution. 
+	
+	
+	
+	\subsection{Alternate Derivation: Einstein and Brownian Motion}
+	
+	\textit{Brownian motion} is a stochastic process originally developed by botanist Robert Brown in attempts to predict the motion of pollen particles in water. It was then developed more mathematically by Louis Bachelier, before being picked up by Einstein who used the bolstered theory to describe the motion of individual atoms in 1905 (this actually provided some of the evidence to support the existence of atoms, since they had not yet been experimentally confirmed). 
+	
+	His argument went as follows. Suppose there are a total of $n$ particles distributed along the real line. Over time, we expect the position of the particles to change by some random amount, $\phi$, which is to say that in the time interval $\tau$, the number of particles experiencing a displacement between $\sigma$ and $\sigma + \delta\sigma$ is 
+	\begin{align*}
+		\int_{\sigma}^{\sigma + \delta \sigma} n \phi d\sigma \approx n \phi(\sigma) \delta \sigma
+	\end{align*}
+	where the approximation is more accurate for smaller $\delta \sigma$. We usually write this as $n\phi(\sigma) d\sigma$ to represent the probability distribution or measure. Since $\phi$ is a probability distribution, $\int \phi d\sigma = 1$. 
+	
+	We also assume that the displacements are symmetric (equally likely to move left or right), so $\phi(\sigma) = \phi(-\sigma)$. Suppose the distribution of particles at time $t$ is given by a density function $\rho(t,x)$, so we relate $\rho(t,x)$ to $\rho(t+\tau,x)$ by 
+	\begin{align*}
+		\rho(t+\tau,x) = `` \sum \rho(t,x-\sigma)\phi(\sigma)\delta\sigma) '' = \int_{-\infty}^{\infty} \rho(t,x-\sigma)\phi(\sigma)d\sigma
+	\end{align*}
+	by the previous argument ($\rho$ takes the place of $n$). We wish to simplify this, so we expand using Talyor series
+	\begin{align*}
+		\rho(t+\tau,x) = \rho(t,x) + \pd_{t}\rho (t,x)\tau + ... \\
+		\rho(t,x-\sigma) = \rho(t,x) - \pd_{x}\rho(t,x)\sigma + \frac{1}{2} \pd_{x}^{2} \rho(t,x) \sigma^{2} + ...
+	\end{align*}
+	such that putting both in the integral gives 
+	\begin{align*}
+		\rho(t,x) +\pd_{t}\rho (t,x)\tau + ... = \int \phi \left[ \rho(t,x) - \pd_{x}\rho(t,x)\sigma + \frac{1}{2} \pd_{x}^{2} \rho(t,x) \sigma^{2} + ... \right] d\sigma \\
+		\pd_{t}\rho (t,x)\tau + ... = \int \phi \left[ - \pd_{x}\rho(t,x)\sigma + \frac{1}{2} \pd_{x}^{2} \rho(t,x) \sigma^{2} + ... \right] d\sigma
+	\end{align*}
+	
+	since $\phi$ is even, we lose the linear term as well when we integrate
+	
+	\begin{align*}
+	\pd_{t}\rho (t,x)\tau + ... = \frac{1}{2} \pd_{x}^{2} \rho(t,x) \int \sigma^{2} \phi d\sigma + ...
+	\end{align*}
+	
+	Einstein assumes that the term $\int \sigma^{2} \phi d\sigma$, the second moment of $\phi$, is constant. He also assumes that higher even moments are negligible (so we need only the leading term on the right side), so that for a very short time period $\tau$ we may keep only the leading term on the left side and obtain 
+	
+	\begin{align*}
+		\pd_{t} \rho = C \pd_{t}^{2} \rho
+	\end{align*}
+	
+	Thus, the heat equation appears here to describe the movement of particles instead of the movement of energy. For this reason, it is also called the diffusion equation in some situations, and may be used to model anything from disease spread to stock market changes. 
+	
+	
+	\section{Solution by Scale Invariance}
+	
+	We were able to solve the higher-dimensional wave equation by noting the rotation invariance of the Laplacian. Here, we notice that the heat equation in 1D
+	
+	\begin{align*}
+		\pd_{t}u - \pd_{x}^{2} u = 0
+	\end{align*}
+	
+	relates to the polynomial $\tau - \xi^{2} = c$, i.e. a parabola. This shape is invariant under the rescaling $(t,x) \mapsto (\lambda^{2}t,\lambda x)$ for nonzero $\lambda$, which suggests a solution may tie to the scale-invariant ratio $y = \frac{x}{\sqrt{t}}$. We aim for a solution of the form $u(t,x) = q(y)$. This has the goal of reducing to a single variable to obtain an ODE. By the chain rule,
+	\begin{align*}
+		\pd_{t} u = -\frac{y}{2t} q' \\
+		\pd_{x}^{2} u = \frac{1}{t} q''
+	\end{align*}
+	so the PDE is 
+	\begin{align*}
+		q'' = -\frac{y}{2} q'
+	\end{align*}
+	which may be solved by separation of variables to obtain
+	\begin{align*}
+		q'(y) = q'(0) e^{-y^{2}/4} \\
+		q(y) = q'(0) \int_{0}^{y} e^{-z^{2}/4}dz + q(0)
+	\end{align*}
+	or 
+	\begin{align*}
+		u(t,x) = C_{1} \int_{0}^{x/\sqrt{t}} e^{-y^{2}/4}dy + C_{1}
+	\end{align*}
+	
+	Recall that $\int_{0}^{\infty} e^{-y^{2}/4}dy = \sqrt{\pi}$ (the Gaussian integral), so 
+	\begin{align*}
+		\lim_{t \to 0} u(t,x) = \begin{cases} C_{1}\sqrt{\pi} + C_{2} & x> 0 \\ 0 & x=0 \\ -C_{1}\sqrt{\pi} + C_{2} & x< 0 \end{cases}
+	\end{align*}
+	
+	Because of this, we often normalize to 
+	\begin{align*}
+		U(t,x) = \frac{1}{\sqrt{4\pi}} \int_{0}^{\frac{x}{\sqrt{t}}} e^{-y^{2}/4}dy + \frac{1}{2}
+	\end{align*}
+	
+	because these constants form the step behavior as $t\to0$ above into a the \textit{Heaviside step function} $H$, which is $0$ for $x<0$ and $1$ for $x>0$. In fact, this step behavior can be used to derive a more general formula. Suppose we have initial condition $u(0,x) = \phi(x) \in C_{c}^{\infty}$. We notive that by the Fundamental Theorem of Calculus,
+	\begin{align*}
+		\int_{-\infty}^{\infty} \phi'(z)H(x-z) dz = \int_{-\infty}^{x} \phi'(z) dz = \phi(x)
+	\end{align*}
+	
+	which suggests that 
+	\begin{align*}
+		u(t,x) = \int_{-\infty}^{\infty} \phi'(z) U(t,x-z)dz
+	\end{align*}
+	solves the heat equation with this initial condition. To simplify this, when $t>0$ we integrate by parts to obtain
+	\begin{align*}
+		u(t,x) = \frac{1}{\sqrt{4\pi t}} \int \phi(z) e^{-(x-z)^{2}/4t }dz
+	\end{align*}
+	
+	where the function 
+	\begin{align*}
+		H_{t}(x) = \frac{1}{\sqrt{4\pi t}} e^{-x^{2}/4t}
+	\end{align*}
+	is called the heat kernel, and this is the convolution $u = H_{t} * \phi$. Let us introduce another special function called the \textit{dirac delta function}. It isn't truly a function, but is instead something else called a distribution. We won't worry about the theory of distributions here, but we think of $\delta_{0}$ as being $0$ when $x \neq 0$ and $\infty$ when $x=0$, in particular so 
+	\begin{align*}
+		\int \delta_{0}(x) \phi(x) dx = \phi(0)
+	\end{align*}
+	This is often called a ``point charge" in electrical physics, or a ``point mass'' in measure theory. The fact we have used above is that, in some sense, as $t \to 0$, ``$H_{t} \to \delta_{0}$'' where we haven't defined this convergence rigorously. \textbf{This is a very important idea that lead to the creation of Fourier series and Fourier transforms, as well as the concept of weak solutions in PDEs.} 
+	
+	\subsection{Integral Formula}
+	
+	Next, we consider the higher-dimensional heat equation on $\R^{n}$, $\pd_{t}u - \Delta u = 0$, with initial condition $u(0,x) = g(x)$. From our previous 1D case, we take the guess that the heat kernel 
+	\begin{align*}
+		H_{t}(x) = (4\pi t)^{-n/2} e^{-|x|^{2}/4t}
+	\end{align*}
+	will allow a solution by convolution. Indeed, $H_{t}(x)$ itself is a solution of the heat equation, and the convolution should give us the initial conditions. This is the case. 
+	
+	\begin{res}
+		For a bounded function $g \in C^{0}(\R^{n})$, the heat equation 
+		\begin{align*}
+			\left(\pd_{t} - \Delta \right) u = 0 \\
+			u|_{t=0} = g
+		\end{align*}
+		admits a classical solution given by $u(t,x) = H_{t} * g(x)$. 
+	\end{res}
+	
+	\begin{pf}
+		First, we need to check that $H_{t} * g$ solves the heat equation for $t>0$. Since
+		\begin{align*}
+			u(t,x) = \int_{\R^{n}} H_{t}(x-y)g(y) dy
+		\end{align*}
+		we should expect that 
+		\begin{align*}
+			(\pd_{t} - \Delta) u = \int_{\R^{n}} g(y)(\pd_{t} - \Delta )H_{t}(x-y) dy = 0
+		\end{align*}
+		since $H_{t}$ is a head solution. However, since the domain is unbounded, we cannot directly apply the Leibniz rule to conclude this. 
+		
+		
+		Let us first treat the partial derivative in $t$. Notice, 
+		\begin{align*}
+			\pd_{t}( H_{t}*g) = \lim_{h \to 0} [\frac{H_{t+h}-H_{t}}{h}] * g
+		\end{align*}
+		
+		Then, for small $h$ we may apply Taylor's theorem to notice 
+		\begin{align*}
+			H_{t+h} - H_{t} = h \pd_{t} H_{t}(x) + \pd_{t}^{2}H_{t+ \xi}(x)h^{2}/2
+		\end{align*}
+		
+		for $\xi$ between $0$ and $h$. The main insight here is that, for small $h$ and fixed $t$, we have that 
+		\begin{align*}
+			|\pd_{t}^{2}H_{t+ \xi}(x)h^{2}/2| \leq h^{2} C_{t} e^{-|x|^{2}/2t}
+		\end{align*}
+		
+		Hence, 
+		\begin{align*}
+			|[\frac{H_{t+h}-H_{t}}{h} - \pd_{t}H_{t}] * g| \leq hC_{t} | e^{-|x|^{2}/2t} * g|
+		\end{align*}
+		and as $h \to 0$, the limit above converges to $\pd_{t}H_{t} * g$. A similar argument works for $\Delta$. 
+		
+		
+		
+		
+		Next, we check the initial conditions. This is done by a change-of-variables to stabilize $H_{t}$. Let $w = \frac{y-x}{\sqrt{t}}$ so $dy = t^{n/2} dy$. Then,
+		\begin{align*}
+			u(t,x) = (4\pi)^{-n/2} \int e^{-|w|^{2}} g(x+t^{1/2}w)dw \\
+			= \int H_{1}(w) g(x+t^{1/2}w)dw
+		\end{align*}
+		Since we also have $g(x) = \int H_{1}(w)g(x)dw$,
+		\begin{align*}
+			u(t,x) - g(x) = \int H_{1}(w)\left[g(x+t^{1/2}w - g(x)) \right]dw
+		\end{align*}
+		
+		We separate this integral into two parts to show it is small. Pick $\epsilon > 0$ First, when $w$ is large, $H_{1}(w)$ is very small. In particular, for large $w$ we have $\int_{|w|\geq R} H_{1}(w)dw \leq \epsilon$. For $|g| \leq M$,
+		\begin{align*}
+			\int_{|w| \geq R} H_{1}(w)\left[g(x+t^{1/2}w - g(x)) \right]dw \leq 2M\epsilon
+		\end{align*}
+		Next, for small $w$, we use the continuity of $g$. Pick $\delta > 0$ such that if $|y| < \delta$, $|g(x-y) - g(x)| < \epsilon$. Then, if we take $t < \frac{\delta^{2}}{R^{2}}$, we have $t^{1/2}w < \delta$ and 
+		\begin{align*}
+			\int_{|w| \leq R}  H_{1}(w)\left[g(x+t^{1/2}w - g(x)) \right]dw \leq \int H_{1}(w) \epsilon dw \leq \epsilon
+		\end{align*}
+		
+		Finally, 
+		\begin{align*}
+			|u(t,x) - g(x)| \leq (2M+1)\epsilon
+		\end{align*}
+		whenever $t < \frac{\delta^{2}}{R^{2}}$. We conclude that 
+		\begin{align*}
+			\lim_{t \to 0} u(t,x) = g(x)
+		\end{align*}
+	\end{pf}
+	
+	We do not yet have the tools to prove uniqueness results about this solution, but we will later when we investigate maximum principles. We are missing one important thing shown by the proof above. Because of the properties of $H_{t}$, we were able to take partial derivatives of $H_{t} * g$ by just applying the derivative to $H_{t}$, which is smooth. Hence, we have the following
+	
+	\begin{res}
+		Suppose $u$ is a bounded solution of the heat equation for a bounded initial condition $g \in C^{0}(\R^{n})$. Then, $u \in C^{\infty}((0,\infty) \times \R^{n})$. 
+	\end{res}
+	
+	We will discuss further smoothness results when we talk about Fourier series. 
+	
+	
+	\vspace{0.25 cm}
+	
+	\textbf{Example: Infinite Propagation Speed}
+	
+	Consider the 1D heat equation with initial data $u(0,x) = \psi(x)$ for $\psi(x)$ a smooth bump supported in $(-1,1)$, where $\psi \geq 0$. Consider the solution 
+	\begin{align*}
+		u(t,x) = \frac{1}{\sqrt{4 \pi t}} \int e^{-(x-y)^{2}/4t} \psi(y) dy
+	\end{align*}
+	
+	For any $x \in \R$ and any $t > 0$, observe that $e^{-(x-y)^{2}/4t}$ is strictly positive near $y=0$ (though it may be small). Therefore, $u(t,x) > 0$ for any $t>0$. In other words, the initial energy contained in $(-1,1)$ diffused instantaneously. Contrast this to the wave equation, which had finite speed. 
+	
+	\subsection{Inhomogeneous Problem}
+	
+	We now consider the problem 
+	\begin{align*}
+		\pd_{t} u - \Delta u = f \\
+		u(0,x) = 0
+	\end{align*}
+	in positive time. This is what Duhamel's method was originally applied to. Since we have seen this method once, we don't motivate it. Recall that the method begins by setting up the alternate PDE
+	\begin{align*}
+		\begin{cases}
+			(\eta_{s})_{t} - \Delta \eta_{s} = 0 & t > s \\
+			\eta_{s}(t,x)|_{t=s} = f(s,x) &
+		\end{cases}
+	\end{align*}
+	
+	and posits that the solution is $u(t,x) = \int_{0}^{t} \eta_{s}(t,x) ds$. We simply must check this formula carefully. 
+
+	\begin{res} 
+		Assume that $f \in C^{2}([0,\infty) \times \R^{n})$ and is compactly supported. Then,
+		\begin{align*}
+			u(t,x) = \int_{0}^{t} \int_{\R^{n}} H_{t-s}(x-y)f(s,y) dyds
+		\end{align*} 
+		gives a solution to the inhomogeneous heat equation. 
+	\end{res}
+	\begin{pf}
+		First, we note that $u$ is at least $C^{2}$ by changing variables and analyzing the integral
+		\begin{align*}
+			u(t,x) = \int_{0}^{t} \int_{\R^{n}} H_{s}(y) f(t-s,x-y) dyds
+		\end{align*}
+		
+		Since $H_{s}(y)$ is smooth in $s>0$ and since $f$ is compactly supported, differentiating under the integral is okay (we may change the integration bounds to a bounded domain). Then,
+		\begin{align*}
+			\pd_{t}u(t,x) = \int_{0}^{t} \int_{\R^{n}} H_{s}(y) \pd_{t} f(t-s,x-y) dyds \\
+			+ \int_{\R^{n}} H_{t}(y) f (0,x-y) dy
+		\end{align*}
+		
+		(where the Leibniz rule doesn't give a boundary term at $0$ because it is constant) and 
+		\begin{align*}
+			\Delta u(t,x) = \int_{0}^{t} \int_{\R^{n}} H_{S}(y) \Delta_{x} f(t-s,x-y) dyds
+		\end{align*}
+		
+		
+		Our goal here is to have the derivatives on $H_{t}(x)$ since it satisfies the heat equation. Ideally, we would differentiate directly under the integral instead of doing this variable swap, but the singularity of $H_{t}$ at $t=0$ prevents us from using the Leibniz rule in that case, or from integrating by parts. To treat this singularity, we remove a small part of the integral around $t=0$, and show that this piece is negligible. Pick $\epsilon > 0$. Then,
+		
+		\begin{align*}
+			\int_{\epsilon}^{t} \int_{\R^{n}} H_{s}(y) \pd_{t}f(t-s,x-y) dyds \\
+			= -\int_{\epsilon}^{t} \int_{\R^{n}} H_{s}(y) \pd_{s}f(t-s,x-y) dyds \\
+			= \int_{\epsilon}^{t} \int_{\R^{n}} \pd_{s}H_{s}(y) f(t-s,x-y) dyds \\
+			- \int_{\R^{n}} H_{t}(y)f(0,x-y) dy + \int_{\R^{n}} H_{\epsilon}(y) f(t-\epsilon,x-y)dy
+		\end{align*}
+		where the last term will cancel with our previously created boundary term. For $x$,
+		
+		\begin{align*}
+			\int_{\epsilon}^{t} \int_{\R^{n}} H_{s}(y) \Delta_{x}f(t-s,x-y) dyds \\
+			= \int_{\epsilon}^{t} \int_{\R^{n}} \Delta_{y} H_{s}(y) f(t-s,x-y) dyds
+		\end{align*}
+		
+		since we have no boundary on $\R^{n}$ due to $f$ being compactly supported. Thus, 
+		\begin{align*}
+			(\pd_{t} - \Delta )u = \int_{0}^{\epsilon} \int_{\R^{n}} H_{s}(y) (\pd_{t} - \Delta_{x})f(t-s,x-y)dyds + 0 \\
+			+ \int_{\R^{n}} H_{\epsilon}(y)f(t-\epsilon,x-y)dy - \int_{\R^{n}} H_{t}(y)f(0,x-y) dy \\  + \int_{\R^{n}} H_{t}(y) f (0,x-y) dy 
+		\end{align*}
+		
+		Since $f$ is $C^{2}$ and compactly supported, we may take $|(\pd_{t} - \Delta_{x})f(t-s,x-y)| \leq C$ such that 
+		\begin{align*}
+			|\int_{0}^{\epsilon} \int_{\R^{n}} H_{s}(y) (\pd_{t} - \Delta_{x})f(t-s,x-y)dyds| \\
+			\leq C \int_{0}^{\epsilon} \int_{\R^{n}} H_{s}(y) dyds \leq C \epsilon
+		\end{align*}
+		
+		Therefore, taking $\epsilon \to 0$ shows 
+		\begin{align*}
+			(\pd_{t} - \Delta)u(t,x) = \lim_{\epsilon \to 0} \int_{\R^{n}} H_{\epsilon}(y)f(t-\epsilon,x-y)dy = f(t,x)
+		\end{align*}
+		using our argument on $H_{t}(x)$ from earlier. 
+	\end{pf}
+	
+	
+	
+	
+	
+	\section{Schr{\"o}dinger's Equation}
+	
+	The Schr{\"o}dinger equation is another important PDE in physics, particularly in quantum mechanics, that has a form very similar to the heat equation. It has many other mathematical implications, as the solution operator relates to the convergence of Fourier series, and so it has been studied by many notable mathematicians (including my advisor). We give a brief overview of the equation here.
+	
+	\subsection{``Derivation"}
+	
+	Unlike the other equations so far, there isn't a strict derivation of the Schr{\"o}dinger equation as much as a series of heuristics that lead to it. The equation describes motion for a nonrelativistic particle. In 1924, De Broglie postulated that matter also followed the Planck-Einstein relations that describe waves. We shall apply these to a particle of mass $p$ and momentum $m$. 
+	
+	Recall that the energy of the particle is the sum of kinetic and potential energy, which we write as 
+	\begin{align*}
+		E = \frac{p^{2}}{2m} + V(x,t)
+	\end{align*}
+	for potential energy $V$. The Planck-Einstein relations tie the wavenumber $k$ ($2\pi$ divided by wavelength) and the angular frequency $\omega$ ($2\pi$ times frequency) to the energy and momentum of a wave 
+	\begin{align*}
+		E = \bar{h} \omega, \,\,\, p = \bar{h}k
+	\end{align*}
+	where $\bar{h}$ is Planck's constant $h$ divided by $2\pi$. Rewriting the energy equation with these gives
+	\begin{align*}
+		\frac{\bar{h}^{2}}{2m} k^{2} + V = \bar{h}\omega
+	\end{align*}
+	
+	Since we are trying to view this particle as a wave, we define a wavefunction $\Psi$ to describe its oscillation as a wave. The reason we need this function is that the frequency and wavelength may be obtained from the wavefunction, and we would like to eliminate them from the equation above since they are difficult to understand for a particle. To write a free wave in 1D, we may use a complex function 
+	\begin{align*}
+		\Psi = C e^{i(kx - \omega t)}
+	\end{align*}
+	
+	(from the wave equation). Now, $k^{2} = - \frac{\pd^{2}}{\pd x^{2}} \Psi$, and $\omega = i \pd_{t} \Psi$. For ease of use, we also view the potential energy as an operator on the wave function. Thus, we have 
+	\begin{align*}
+		-\frac{\bar{h}^{2}}{2m} \pd_{x}^{2} \Psi + V(x,t)\Psi = i \bar{h} \pd_{t} \Psi
+	\end{align*}
+	
+	The \textit{free} Schr{\"o}dinger equation sets $V=0$, so, using units to remove constants, we wind up with the equation 
+	\begin{align*}
+		(i \pd_{t} - \pd_{x}^{2}) \Psi = 0
+	\end{align*}
+	In higher dimensions, we simply define the wavenumber and angular frequency using similar operators on the wave function, which gives the PDE
+	\begin{align*}
+		(i \pd_{t} - \Delta ) \Psi = 0
+	\end{align*}
+	
+	(what you will commonly see called the Schr\{"o\}dinger equation in PDEs). 
+	
+	
+	
+	\subsection{Solution: Mimic the Heat Case}
+	
+	The only difference between the heat and Schr{\"o}dinger equations is the presence of $i$. In some situations, this means big differences in how solutions act. However, in other ways, the solutions are still very similar. Consider that the Schrodinger equation is also invariant under the rescaling $(t,x) \mapsto (\lambda^{2}t,\lambda x)$. If we apply the same scale-invariant ratio argument, setting $q(y) = u(t,x)$ for $y = x/\sqrt{t}$, we see that 
+	
+	\begin{align*}
+		q'' = - \frac{y}{2i} q'
+	\end{align*}
+	
+	and so we see solution 
+	\begin{align*}
+		q(y) = q'(0) \int_{0}^{y} e^{-z^{2}/4i} dz + q(0)
+	\end{align*}
+	or 
+	\begin{align*}
+		u(t,x) = C_{1} \int_{0}^{x/\sqrt{t}} e^{-y^{2}/4i} dy + C_{2}
+	\end{align*}
+	
+	as before, to solve for general initial conditions, we take the convolution and integrate by parts, obtaining a Schr{\"o}dinger kernel
+	\begin{align*}
+		S_{t}(x) = (4\pi i t)^{-n/2} e^{-|x|^{2}/4it}
+	\end{align*}
+	
+	(this may also be obtained by transforming $t$ in the PDE). Hence, the solution with initial data $u(0,x) = \phi(x)$ is $S_{t}(x) * \phi$, following the heat equation proofs almost to a ``t". Duhamel's method also follows suit to solve the inhomogeneous case. 
+	
+	
+\end{document}

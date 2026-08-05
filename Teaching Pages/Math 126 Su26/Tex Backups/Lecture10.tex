@@ -1,0 +1,744 @@
+
+\DocumentMetadata{tagging=on,
+	tagging-setup={math/setup=mathml-SE},
+	pdfstandard=ua-2,
+	lang=en-US
+}
+\documentclass{article}
+
+%Math Libraries
+\usepackage{multirow, longtable, amsmath, amssymb, amsthm}
+\usepackage[mathscr]{euscript}
+
+%Formatting
+\usepackage[margin = 1 in]{geometry}
+\usepackage{indentfirst}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage{tabularx}
+\usepackage{cite}
+
+%Diagram Packages
+\usepackage{tikz}
+\usetikzlibrary{automata,positioning,arrows}
+
+%Standard Commands
+\newcommand{\mm}{\mathscr}
+\newcommand{\B}{{\mathcal{B}}}
+\newcommand{\A}{{\mathcal{A}}}
+\newcommand{\N}{{\mathbb{N}}}
+\newcommand{\R}{{\mathbb{R}}}
+\newcommand{\C}{{\mathbb{C}}}
+\newcommand{\Q}{{\mathbb{Q}}}
+\newcommand{\Z}{{\mathbb{Z}}}
+
+
+\newcommand{\abs}[1]{{|{#1}|}}
+\newcommand{ \norm }[1]{{ || {#1}||}}
+\newcommand{\cl}[1]{{\overline{#1}}}
+\newcommand{\pd}{\partial}
+\newcommand{\ip}[2]{ \langle {#1},{#2}\rangle }
+\newcommand{\ls}{\lesssim}
+\newcommand{\gs}{\gtrsim}
+\newcommand{\supp}{\text{supp}}
+
+%Result Environment
+\newcounter{result}[section]
+\newenvironment{res}[1][]{\refstepcounter{result}\par\medskip
+	\noindent \textbf{[\thesection.\theresult] #1} \rmfamily}{\medskip}
+
+\newenvironment{defn}[1][]{\refstepcounter{result}\par\medskip \noindent \textbf{Definition [\thesection.\theresult] #1} \rmfamily}{\medskip}
+
+%Proof Environment
+\newenvironment{pf}{%
+	\par%
+	\medskip
+	\leftskip=2em\rightskip=2em%
+	\noindent\ignorespaces \textit{Proof:} \newline}{%
+	\,\, \newline \textit{Q.E.D.}\par\medskip}
+
+\title{Lecture 10: Distributions}
+\author{Ethan Ebbighausen}
+\date{July 22nd, 2026}
+
+\begin{document}
+	\pagestyle{fancy}
+	\fancyfoot{} 
+	\fancyfoot[L]{Topics Document, Ethan Ebbighausen}
+	
+	\maketitle
+	
+	\section{Introduction}
+	
+	How far can we push weak solutions? We have defined a weak derivative, which may go well beyond just Sobolev spaces, and we have also observed that there are some interesting objects that behave like measures. Our case-in-point is the heat kernel $H_{t}(x)$, which converged pointwise as $t \to 0$ to 
+	\begin{align*}
+		\begin{cases}
+			\infty & x = 0\\ 0 & \text{else}
+		\end{cases}
+	\end{align*}
+	but when we measured it via integration, $\lim_{t \to 0} \int H_{t}(y)f(x-y)dy = f(x)$, so this limit acts like the probability distribution assigning probability 1 to $0$ and probability $0$ to everything else. We noticed before that $H_{t}$ looked like a derivative of a smoothed-out step function, so we are saying that this ``point density'' looks like the derivative of the step function (which is not differentiable, so we may try using weak definitions). 
+	
+	Surely, the weird pointwise behavior isn't enough to describe this, because we can generate other functions with the same pointwise behavior where this fails. We can see this behavior arise in another way physically, in electrostatics, through Coulomb's law. 
+	
+	
+	\subsection{Model: Coulomb's Law}
+	
+	Charles-Augustin de Coulomb published an empirical observation of electristatics in the 18th century, describing that a particle with electric charges $q_0$ located at the origin generates an electric field given by 
+	\begin{align*}
+		E(x) = \frac{kq_0x}{|x|^{3}}
+	\end{align*}
+	for a constant $k$. Recall that Gauss' law also told us $\nabla \cdot E = 4 \pi k \rho$. The weird part about this condition is that, except at $x=0$, 
+	\begin{align*}
+		\nabla \cdot \frac{x}{|x|^{3}} = \frac{\nabla \cdot x}{|x|^{3}} - \frac{3x}{|x|^{4}} \nabla |x| = 0
+	\end{align*}
+	
+	so the behavior on a null set must somehow cause Gauss' law. We rectify this by using the weak form of Gauss' law,
+	
+	\begin{align*}
+		\int_{\R^{3}} E \cdot \nabla \psi dx = - 4\pi k \int_{\R^{3}} \rho \psi dx
+	\end{align*}
+	
+	for all test functions $\psi$. As long as we exclude the origin, we can integrate by parts, so we write 
+	\begin{align*}
+		\int_{\R^{3}} E \cdot \nabla \psi dx = \lim_{\epsilon \to 0} \int_{|x| \geq \epsilon} E \cdot \nabla \psi dx \\
+		=\lim_{\epsilon \to 0} \int_{|x| = \epsilon} \nu \cdot E \psi dS = -\int_{|x| = \epsilon} \frac{k q_0}{\epsilon^{2}} \psi dS\\
+		= -4 \pi k q_0 \psi(0)
+	\end{align*}
+	
+	so this requires
+	
+	\begin{align*}
+		\int_{\R^{3}} \rho \psi dx = q_0 \psi(0)
+	\end{align*}
+	
+	another instance of a point density. 
+	
+	
+	\vspace{1 cm}
+	\textbf{Learning Objectives:}
+	
+	\begin{itemize}
+		\item Define a distribution and compute distributional derivatives and limits. 
+		\item Define fundamental solutions, use them to solve PDEs.
+		\item Compute Green's functions on some domains. 
+	\end{itemize}
+	
+	\section{Definitions, Convergence, Derivatives}
+	
+	The theory of distributions was developed independently in the mid-20th century by Sergei Sobolev and Laurent Schwartz, as the concept of the dual to the test functions.
+	
+	A \textit{distribution} on a domain $\Omega \subset \R^{n}$ is a linear function $C_{c}^{\infty}(\Omega) \to \C$ that is continuous. We write the function as $u$, and write evaluations as pairings $(u,\psi)$. 
+	
+	By continuity here, we mean that if $\{\psi_{n}\} \to \psi$ in $C_{c}^{\infty}$, then $ (u,\psi_{n}) \to (u,\psi)$, where converging in $C_{c}^{\infty}(\Omega)$ means that there exists some compact $K$ so all the $\psi_{n}$ are supported in $K$ and all of their partial derivatives converge uniformly to those of $\psi$ on $K$. 
+	
+	We denote the space of distributions by $D'(\Omega)$ (the prime signifying dual). Notice that $L_{loc}^{1}(\Omega) \subset D'(\Omega)$ via 
+	\begin{align*}
+		(f,\psi) = \int_{\Omega} f \psi dx
+	\end{align*}
+	and we have also seen the Dirac delta $(\delta_{x},\psi) = \psi(x)$. 
+	
+	We may place the \textit{weak topology} on $D'(\Omega)$, by stating $u_{k} \to u$ in $D'(\Omega)$ if 
+	\begin{align*}
+		\lim_{k \to \infty} (u_k,\psi) = (u,\psi)
+	\end{align*}
+	for all $\psi \in C_{c}^{\infty}$. We may finally formalize the idea behind the heat kernel:
+	
+	
+	\begin{res}
+		Given $f \in L^{1}(\R^{n})$ satisfying $\int_{\R^{n}} f dx = 1$, define $f_{a}(x) = a^{n}f(ax)$. Then,
+		\begin{align*}
+			\lim_{a \to \infty} f_{a} = \delta_0
+		\end{align*}
+		as a distributional limit.
+	\end{res}
+	\begin{proof}
+		For $\psi \in C_{c}^{\infty}(\R^{n})$, 
+		\begin{align*}
+			(f_a,\psi) = \int_{\R^{n}} a^{n}f(ax)\psi dx = \int_{\R^{n}} f(x) \psi(x/a)dx
+		\end{align*}
+		so 
+		\begin{align*}
+			|(f_{a},\psi) - \psi(0)| \leq \int_{\R^{n}} |f(x) (\psi(x/a)-\psi(0))|dx
+		\end{align*}
+		
+		We now use the decay of $f$ and the continuity of $\psi$. Pick $\epsilon > 0$. Assume $|\psi| \leq M$. Then, we may find $R$ so 
+		\begin{align*}
+			\int_{|x| > R} |f| dx \leq \frac{\epsilon}{2M}
+		\end{align*}
+		and $\delta > 0 $ so $|\psi(y) - \psi(0)| < \epsilon/2$ for $|y| < \delta$. Setting $a \geq R/\delta$, 
+		\begin{align*}
+			\int_{\R^{n}} |f(x) (\psi(x/a)-\psi(0))|dx \leq \int_{|x| >R} |f| (2M) dx + \int_{|x|\leq R} | f| \epsilon /2dx < \epsilon
+		\end{align*}
+		so $(f_a,\psi) \to \psi(0)$ as desired. 
+	\end{proof}
+	
+	\textbf{Remark:} This is a version of mollification, a process introduced by Kurt Otto Friedrichs in 1944. 
+	
+	
+	
+	We may also extend many operations to $D'$. Because the idea of the integral pairing is so central to the construction of the distributions, we define many operations by mimicking that case. For example, when $f \in C^{\infty}(\Omega)$, we define $uf$ to be the distribution so 
+	\begin{align*}
+		(uf,\psi) = (u,f\psi)
+	\end{align*}
+	for all $\psi$. Similarly, we define the \textit{distributional derivative} $\pd^{\alpha} u$ to be the distribution 
+	\begin{align*}
+		(\pd^{\alpha}u,\psi) = (u, (-1)^{|\alpha|}\pd^{\alpha} \psi )
+	\end{align*}
+	
+	\vspace{0.25 cm}
+	\textbf{Example:}
+	Notice that 
+	\begin{align*}
+		\int_{\R} -1_{[0,\infty)} \psi' dx = \int_{0}^{\infty} -\psi'(x) dx = \psi(0)
+	\end{align*}
+	so that 
+	\begin{align*}
+		\frac{d}{dx} (-1_{[0,\infty)}) = \delta_{0}
+	\end{align*}
+	as distributions. We may compute further derivatives by noticing 
+	\begin{align*}
+		(\pd^{\alpha} \delta_{0}, \psi) = (-1)^{|\alpha|} \pd^{\alpha} \psi ( 0)
+	\end{align*}
+	
+	
+	
+	\vspace{0.25 cm}
+	\textbf{Example:}
+	
+	The function $\ln|x|$ is locally integrable and so it defines a distribution on $\R$. We may expect the distributional derivative to be $\frac{1}{x}$ for $x \neq 0$, but this is not locally integrable. To understand this, we go back to the integral pairing:
+	
+	\begin{align*}
+		\int_{\R} - \psi' \ln|x|dx := \lim_{\epsilon \to 0} -\int_{|x| \geq \epsilon} \psi' \ln|x| dx \\
+		= \lim_{\epsilon \to 0} \int_{|x| \geq \epsilon} \frac{\psi(x)}{x} dx + [\psi(\epsilon) - \psi(-\epsilon)]\ln(\epsilon) \\
+		 = \lim_{\epsilon \to 0} \int_{|x| \geq \epsilon} \frac{\psi(x)}{x} dx 
+	\end{align*}
+	since 
+	\begin{align*}
+		\lim_{\epsilon \to 0 } [\psi(\epsilon) - \psi(-\epsilon)]\ln(\epsilon) = \psi'(0) \lim_{\epsilon \to 0} 2\epsilon \ln|\epsilon| = 0
+	\end{align*}
+	
+	The limit definition of the integral is given a special name, the principal value distribution $PV[x^{-1}]$, and only converges because it is taken symmetrically. 
+	
+	
+	\vspace{0.25 cm}
+	\textbf{Example:}
+	
+	Gauss' law from the introduction, combined with Coulomb's law, may be rewritten as 
+	\begin{align*}
+		\nabla \cdot  \frac{x}{|x|^{3}} = 4 \pi \delta 
+	\end{align*}
+	
+	
+	\section{Fundamental Solutions}
+	
+	Imagine we have a matrix $L$, and vectors $f_i$ so $L f_i = e_i$. How do we solve $Lf = v$? We superimpose solutions $f = \sum v_{i}f_{i}$ so $Lf = \sum v_{i}e_{i} = v$. 
+	
+	Now, if instead we have a differential operator $L$ and solutions $\Phi_{x}$ so $L \Phi = \delta_0$, we can solve $Lu = f$ by superimposing solutions 
+	\begin{align*}
+		u(x) = \int \Phi_x(y) f(y)dy
+	\end{align*}
+	
+	Then, as long as we are justified in swapping the integral and derivatives, 
+	\begin{align*}
+		Lu = \int L\Phi_x(y) f(y) dy = f(x)
+	\end{align*}
+	as desired. We therefore call the solution $\Phi_{x}$ the \textit{fundamental solution} at $x$. With linear operator $L$, we only need to compute $\Phi_0$ and notice $\Phi_{x}(y) = \Phi_{0}(x-y)$ (so we have a convolution above). 
+	
+	We're treating the fundamental solution like a function here, but that may not always be so. To justify these actions, we need to consider convolutions with distributions and how distributional derivatives work with convolutions. 
+	
+	In the first case, when $f,g \in L^{1}_{loc}(\R^{n})$ and $\psi \in C_{c}^{\infty}(\Omega)$, 
+	\begin{align*}
+		(f*g,\psi) = \int \int f(y)g(x-y)\psi(x)dydx = \int f(y) \int g(y-x)\psi(x)dxdy
+	\end{align*}
+	so that we may move the convolution off $f$ and onto $\psi$ by taking $g^-(x) = g(-x)$. Then, 
+	\begin{align*}
+		(f*g,\psi) = (f,g^- * \psi)
+	\end{align*}
+	
+	Using the right hand side, we may define the convolution of $u \in D'(\R^{n})$ and a test function $\phi \in C_{c}^{\infty}(\R^{n})$ by 
+	\begin{align*}
+		(u*\phi,\psi) = (f,\phi^- * \psi)
+	\end{align*}
+	for all $\psi \in C_{c}^{\infty}(\R^{n})$. In particular, the $\delta_0$ distribution gives 
+	\begin{align*}
+		(\delta_0 * \phi, \psi) = \phi^{-}*\psi(0) = (\phi, \psi)
+	\end{align*}
+	so $\delta_0 * \phi = \phi$. 
+	
+	For the second complication, we have the following
+	
+	\begin{res}
+		For $w \in D'(\R^{n})$ and $\psi \in C_{c}^{\infty}(\R^{n})$, 
+		\begin{align*}
+			D^{\alpha}(w * \psi) = (D^{\alpha} w) * \psi = w * (D^{\alpha}\psi)
+		\end{align*}
+	\end{res}
+	\begin{pf}
+		For $\phi,\psi$ both test functions,
+		\begin{align*}
+			D^{\alpha}( \phi * \psi) = D^{\alpha}\int_{\R^{n}} \phi(x-y)\psi(y) dy \\
+			= \int_{\R^{n}} D^{\alpha} \phi(x-y) \psi(y)dy = (D^{\alpha}\phi)*\psi
+		\end{align*}
+		as desired. Next, for $w \in D'(\R^{n})$ and $\phi,\psi \in C_{c}^{\infty}(\R^{n})$, 
+		\begin{align*}
+			(D^{\alpha}(w * \phi), \psi) = (-1)^{|\alpha|}(w* \phi, D^{\alpha}\psi) = (-1)^{\alpha}(u, \phi^- * D^{\alpha} \psi) = (-1)^{\alpha}(u, D^{\alpha}(\phi^- *  \psi) ) \\
+			= ((D^{\alpha} u),\phi^- * \psi ) = ((D^{\alpha} u)*\phi, \psi ) 
+		\end{align*}
+		or 
+		\begin{align*}
+			 (-1)^{\alpha}(u, D^{\alpha}(\phi^- *  \psi) ) = (u,D^{\alpha} \phi^- * \psi) = (u*D^{\alpha} \phi, \psi)
+		\end{align*}
+		as desired. 
+	\end{pf}
+	
+	
+	\begin{res}
+		For $\phi \in C_{c}^{\infty}(\R^{n})$, $u \in \mathcal{D}'(\R^{n})$, $u*\phi \in C^{\infty}(\R^{n})$.
+	\end{res}
+	\begin{pf}
+		We claim that 
+		\begin{align*}
+			u*\phi = \langle u, \phi(x - \cdot ) \rangle 
+		\end{align*}
+		so it is a function. Then, the above result shows it is smooth. To prove this is a function, notice that for $\psi \in C_{c}^{\infty}$, we have 
+		\begin{align*}
+			\lim_{m \to \infty} \sum_{x \in \frac{1}{m} \Z^{n}} \frac{1}{m} \psi(x) \phi(x - \cdot) = \int_{\R^{n}} \psi)x_\phi(x-\cdot)dx
+		\end{align*}
+		where the limit converges in $C_{c}^{\infty}$. Then, 
+		\begin{align*}
+			\langle \langle u,\phi(x-\cdot)\rangle ,\psi\rangle = \int \langle u,\phi(x-\cdot)\rangle\psi(x)dx = \langle u, \int \phi(x-\cdot)\psi(x)dx \rangle \\
+			 = \langle u, \phi^- * \psi \rangle = \langle u*\phi, \psi \rangle 
+		\end{align*}
+		as desired. 
+	\end{pf}
+	
+	We now formally state our heuristic
+	
+	\begin{res}
+		If $L$ is a constant coefficient operator on $\R^{n}$ with fundamental solution $\Phi \in D'(\R^{n})$ satisfying $L\Phi = \delta_0$, then for $f \in C_{c}^{\infty}(\R^{n})$, 
+		\begin{align*}
+			Lu = f
+		\end{align*}
+		is solved by 
+		\begin{align*}
+			u = \Phi * f
+		\end{align*}
+	\end{res}
+	\begin{pf}
+		Let 
+		\begin{align*}
+		Lf = \sum_{|\alpha| \leq m} a_{\alpha} D^{\alpha}f
+		\end{align*}
+		
+		Then,
+		\begin{align*}
+			L(\Phi * f) = \sum_{|\alpha| \leq m} a_{\alpha} D^{\alpha}(\Phi * f) = (L\Phi) * f = \delta_0 * f = f
+		\end{align*}
+	\end{pf}
+	
+	
+	\subsection{Laplace Solution}
+	
+	To motivate our fundamental solution, we recall that the Laplacian is rotationally invariant. It may then make sense to try to reduce to an ODE in $r$, in which case we have 
+	\begin{align*}
+		r^{1-n} \pd_{r}(r^{n-1} \pd_{r} \rho) = \pd_{r}^{2} \rho + \frac{n-1}{r} \pd_{r} \rho=\delta_0
+	\end{align*}
+	
+	From Coulomb's law in the introduction, we saw that $\frac{1}{Cr}$ gives a solution in 3D for the right constant. We then may try a general monomial $r^{l}$, in which case
+	\begin{align*}
+		(l)(l-1)r^{-l-2} + (n-1)(l)r^{-l-2}
+	\end{align*}
+	is only zero for $r \neq 0$ if $l = 2-n$. We then must check at $r=0$:
+	
+	\begin{res}
+		On $\R^{n}$, the operator $-\Delta$ has the fundamental solution 
+		\begin{align*}
+			\Phi(x) = \begin{cases} -\frac{1}{2\pi} \ln(r) & n=2 \\ \frac{1}{(n-2)A_{n}r^{n-2}} & n \geq 3 \end{cases}
+		\end{align*}
+		for $A_{n} = \text{vol}(B(0,1))$ in $\R^{n}$. 
+	\end{res}
+	\begin{pf}
+		We wish to show 
+		\begin{align*}
+			(-\Delta \Phi, \psi) = \psi(0)
+		\end{align*}
+		for all test functions $\psi \in C_{c}^{\infty}(\R^{n})$. 
+		
+		First, we notice that 
+		\begin{align*}
+			\nabla \Phi(x) = -\frac{x}{A_{n}r^{n}}
+		\end{align*}
+		Assume momentarily that $\Phi$ were smooth. Then, we may use Green's identity
+		\begin{align*}
+			\int_{\R^{n}} \Delta\Phi  \psi dx = - \int_{\R^{n}} \nabla \Phi \cdot \nabla \psi dx \\
+			= \frac{1}{A_{n}} \int_{\R^{n}} \frac{x}{r^{n}} \cdot \nabla \psi dx \\
+			= \frac{1}{A_{n}} \int_{\R^{n}} \frac{1}{r^{n-1}} \pd_{r} \psi dx \\
+			= \frac{1}{A_{n}} \int_{S^{n-1}} \int_{0}^{\infty} \pd_{r} \psi drdS = - \psi(0)
+		\end{align*}
+		as desired. 
+		
+		However, since we have a singularity, we instead use a pair of tricks to unravel this more nicely. First, $(-\Delta \Phi, \psi) = (\Phi, - \Delta \psi)$ by the definition of distributional derivatives. Then, 
+		\begin{align*}
+			\int_{\R^{n} \backslash B(0,\epsilon)} \Phi \Delta \psi dx = - \int_{\R^{n}\backslash B(0,\epsilon)} \nabla \Phi \cdot \nabla \psi dx - \int_{\pd B(0,\epsilon)} \Phi \eta \cdot \nabla \psi dS
+		\end{align*}
+		
+		On the left-hand side, we notice that 
+		\begin{align*}
+			\lim_{\epsilon \to 0}\int_{\R^{n} \backslash B(0,\epsilon)} \Phi \Delta \psi dx  = \int_{\R^{n}} \Phi \Delta \psi dx 
+		\end{align*}
+		since $\Phi \Delta \psi$ is locally integrable. On the right-hand side, $\Phi(\epsilon)= C\epsilon^{2-n}$ and $\pd B(0,\epsilon) $ is proportional to $\epsilon^{n-1}$, so 
+		\begin{align*}
+			\int_{\pd B(0,\epsilon)} \Phi \eta \cdot \nabla \psi dS \leq C \epsilon
+		\end{align*}
+		
+		and this term disappears as $\epsilon \to 0$. Lastly, 
+		\begin{align*}
+			-\int_{\R^{n} \backslash B(0,\epsilon)} \nabla \Phi \cdot \nabla \psi dx = \frac{1}{A_{n}} \int_{\S^{n-1}} \int_{\epsilon}^{\infty} \pd_{r} \psi drdS = - \psi(\epsilon)
+		\end{align*}
+		exactly as in the above calculation. As $\epsilon \to 0$, this approaches $\psi(0)$ by continuity. Putting these together, 
+		\begin{align*}
+			(-\Delta \Phi, \psi) = -\int_{\R^{n}} \Phi \Delta \psi dx = \psi(0)
+		\end{align*}
+		as desired. 
+	\end{pf}
+	
+	When the domain is not $\R^{n}$, it becomes a bit harder to use this symmetry to our advantage. George Green developed a method for doing so in 1828, by connecting fundamental solutions to boundary value problems through an integral formula. 
+	
+	Let $\Phi$ be the fundamental solution of the Laplacian on $\R^{n}$ given above. Let $\Phi_{y}(x) = \Phi(x-y)$.
+	
+	\begin{res}
+		[Green's Representation Formula] Suppose that $\Omega \subset \R^{n}$ is a bounded domain with piecewise $C^{1}$ boundary. For $u \in C^{2}(\cl{\Omega})$, 
+		\begin{align*}
+			u(y) = - \int_{\Omega} \Phi_{y}\Delta u dx + \int_{\pd \Omega} \left[\Phi_{y}\pd_{\eta} u - u \pd_{\eta} \Phi_{y} \right] dS
+		\end{align*}
+		for $y \in \Omega$. 
+	\end{res}
+	
+	\begin{pf}
+		Because the point $y$ is fixed, we assume $y=0$. Pick some $\epsilon > 0$ small enough so $\cl{B(0,\epsilon)} \subset \Omega$. Then, on $\cl{\Omega} - B(0,\epsilon)$, $\Phi$ is smooth and has $\Delta \Phi = 0$. We then have
+		\begin{align*}
+			\int_{\Omega-\cl{B(0,\epsilon)}} \Phi \Delta u dx = \int_{\pd \Omega} \left(\Phi \pd_{\eta} u - u \pd_{\eta} \Phi \right) dS + \\ \int_{\pd B(0,\epsilon)}  \left(\Phi \pd_{\eta} u - u \pd_{\eta} \Phi \right) dS 
+		\end{align*}
+		
+		Because $\Delta u$ is continuous and $\Phi$ is locally integrable,
+		\begin{align*}
+			\lim_{\epsilon \to 0} \int_{\Omega-\cl{B(0,\epsilon)}} \Phi \Delta u dx  = \int_{\Omega} \Phi \Delta u dx
+		\end{align*}
+		
+		so to prove the representation formula, we need to show 
+		\begin{align*}
+			\lim_{\epsilon \to 0} \int_{\pd B(0,\epsilon)}  \left(\Phi \pd_{\eta} u - u \pd_{\eta} \Phi \right) dS  = u(0)
+		\end{align*}
+		
+		We treat the two terms separately. First, $\nabla u$ is bounded on $\cl{\Omega}$, so we take 
+		\begin{align*}
+			|\pd_{\eta} u| \leq | \nabla u | \leq M 
+		\end{align*}
+		so 
+		\begin{align*}
+			\lvert \int_{\pd B(0,\epsilon)} \Phi \pd_{\eta} u dS\rvert \leq \frac{M}{n-1} \epsilon 
+		\end{align*}
+		
+		(or $M \epsilon \ln(\epsilon)$ if $n=1$), which disappears as $\epsilon \to 0$. 
+		
+		However, $\pd_{\eta} \Phi = \pd_{r} \Phi = -\frac{1}{A_{n}r^{n-1}}$ implies 
+		\begin{align*}
+			- \int_{\pd B(0,\epsilon)} u \pd_{r} \Phi dS = \frac{1}{|\pd B(0,\epsilon)|} \int_{\pd B(0,\epsilon)} u dS
+		\end{align*}
+		which converges to $u(0)$ as $\epsilon \to 0$ by continuity. 
+	\end{pf}
+	
+	The original goal of this representation formula was to solve the Poisson problem with inhomogeneous Dirichlet boundary condition. Suppose there exists a family of functions $H_{y} \in C^{2}(\cl{\Omega})$ for $y \in \Omega$ such that 
+	\begin{align*}
+		\Delta H_{y} = 0 \\
+		H_{y} |_{\pd \Omega} = \Phi_{y} |_{\pd \Omega}
+	\end{align*}
+	Then, $G_{y} = \Phi_{y} - H_{y}$ has homogeneous boundary conditions and has $\Delta G_{y} = \delta_{y}$ in $\Omega$. This is called the Green's function for $\Omega$. The following formula connects this form to the Poisson solution
+	
+	
+	\begin{res}
+		Suppose $\Omega \subset \R^{n}$ is a bounded domain with piecewise $C^{1}$ boundary condition that admits Green's function $G_{y}$. For $f \in C^{0}(\Omega)$ and $g \in C^{0}(\pd \Omega)$, 
+		\begin{align*}
+			-\Delta u = f \\ u|_{\pd \Omega} = g
+		\end{align*}
+		Let $u$ be a $C^{2}$ solution. Then, we have that 
+		\begin{align*}
+			u(y) = - \int_{\Omega} f G_{y} dx - \int_{\pd \Omega} g \pd_{\eta} G_{y} dS
+		\end{align*}
+	\end{res} 
+	\begin{pf}
+		By Green's second identity,
+		\begin{align*}
+			\int_{\Omega} H_{y} \Delta u - u \Delta H_{y} dy = \int_{\pd \Omega} H_{y} \pd_{\eta}  dS
+		\end{align*} 
+		
+		Using the representation formula, 
+		
+		\begin{align*}
+			u(y) =- \int_{\Omega} \Phi_{y}\Delta u dx + \int_{\pd \Omega} \left[\Phi_{y}\pd_{\eta} u - u \pd_{\eta} \Phi_{y} \right] dS  \\
+			= - \int_{\Omega} \Phi_{y}\Delta u dx + \int_{\pd \Omega}  - u \pd_{\eta} \Phi_{y}  dS + \int_{\Omega} H_{y} \Delta u dy + \int_{\pd \Omega} u \pd_{\eta}H_{y} dS 
+		\end{align*}
+		
+		which, combining terms, is the formula above. 
+	\end{pf}
+	
+	\textbf{Remark:} In the case that we don't know we have a solution, this gives us a candidate solution. Assume, for $f$ and $g$ given, that $u$ is given by the formula above. In many situations, this will give a solution. We shall demonstrate two cases below where this formula aligns with our previous solution formulas. 
+	
+	The \textit{method of images} is a trick to help compute the Green's function. It involves trying to place charges outside of the working domain to cancel the boundary terms of the normal fundamental solution. In general, we try to construct $G_{y}(x)$ by starting with $\Phi(x-y)$ (a charge at $y$), then finding locations $\{\bar{y}_{j}\}$ outside of $\Omega$ and magnitudes (charges) $q_{j}$ so 
+	\begin{align*}
+		\sum_{j} q_{j} \Phi(x-\bar{y}_{j})
+	\end{align*}
+	exactly equals $\Phi(x-y)$ for $x \in \pd \Omega$.
+	
+	Therefore, 
+	\begin{align*}
+		G_{y}(x) = \Phi(x-y) - \sum_{j} q_{j} \Phi(x-\bar{y}_{j})
+	\end{align*}
+	disappears on the boundary. Further, since $\bar{y}_{j} \notin \Omega$,  $\sum_{j} q_{j} \Phi(x-\bar{y}_{j})$ is harmonic and $C^{2}$ on $\Omega$. This is precisely $H_{y}(x)$ as we described above. 
+	
+	The problem then reduces to finding $q_{j}$ and $\bar{y}_{j}$ as above. In the following two examples, we shall take advantage of the fact that $\Phi$ is radial and pick $\bar{y}$ so that the relationship between $|x-y|$ and $|x-\bar{y}|$ is simple when $x \in \pd \Omega$. 
+	
+	\vspace{1 cm}
+	\textbf{Example:} The Half-Plane \\
+	
+	If we consider $\Omega = \R^{n}_{+} = \{x \in \R^{n} \mid x^{n} > 0\}$, then the boundary has $x^{n} = 0$. Hence, 
+	\begin{align*}
+		\Phi(y-x) = \Phi(y - \bar{x})
+	\end{align*}
+	for $y \in \pd \R^{n}_{+}$ and $\bar{x} = (x^1,...,x^{n-1},-x^{n})$ the reflection across the boundary. Therefore, we set
+	\begin{align*}
+		G_{y}(x) = \Phi(y-x) - \Phi(y-\bar{x})
+	\end{align*}
+	to remove boundary conditions. Notice that since $\bar{x}$ is outside of the domain, $\Phi(y-\bar{x})$ is harmonic and we satisfy the differential condition as well. 
+	
+	To use this definition in the representation formula, we only need to compute 
+	\begin{align*}
+		\pd_{y^{d}}G_{y}(x) = -\frac{1}{n A_{n}} \frac{y^{n}-x^{n}}{|y-x|^{n}}  + \frac{1}{n A_{n}} \frac{x^{n}+y^{n}}{|y - \bar{x}|^{n}}
+	\end{align*}
+	so that for $y = (y',0)$ and $x = (x',x^n)$,
+	\begin{align*}
+		\eta(y) \cdot D_{y}G_{y}(x) = \frac{2x^{n}}{nA_{n}} \frac{1}{(|y'-x'|^{2} + (x^{n})^{2})^{n/2}}
+	\end{align*}
+	
+	For example, a harmonic function $u$  with boundary condition $g$ on the upper half plane has, for continuous bounded $g$, 
+	\begin{align*}
+		u(x) = \frac{2x^{n}}{n A_{n}} \int_{\R^{n-1}} \frac{g(y')}{(|y'-x'|^{2} + (x^{n})^{2})^{n/2}} dy'
+	\end{align*}
+	
+	
+	\vspace{1 cm}
+	\textbf{Example:} The Unit Ball in $\R^{2}$ \\
+	
+	A similar reflection argument gives the Green's function on $B(0,1)$, where the reflection instead must be taken across the circle. For $x \in B(0,1)$, this reflection is 
+	\begin{align*}
+		\tilde{x} = \frac{x}{|x|^{2}}
+	\end{align*}
+	
+	Then, for $y \in \pd B(0,1)$, 
+	\begin{align*}
+		|\tilde{x}-y|^{2} = |\frac{x}{|x|^{2}} - y|^{2} = | \frac{x-|x|^2 y}{|x|^{2}}|^{2} = \frac{1}{|x|^{4}}(|x|^{4}-2x \cdot y|x|^{2} +|x|^2)
+	\end{align*}
+	but 
+	\begin{align*}
+		|x-y|^{2} = |x|^{2} -2 x \cdot y +1
+	\end{align*}
+	
+	then implies
+	\begin{align*}
+		|y-x| = |x| | y-\tilde{x}|
+	\end{align*}
+	
+	Since $\Phi(x) = -\frac{1}{2\pi} \ln |x|$, taking $\Phi(y-x) - \Phi(y - \tilde{x})$ gives
+	
+	\begin{align*}
+		G_{y}(x) = \begin{cases}
+			-\frac{1}{2\pi} \ln \left( \frac{|y-x|}{|x||y-\tilde{x}|}\right) & x \neq 0 \\
+			=\frac{1}{2\pi} \ln|y| & x=0
+		\end{cases}
+	\end{align*}
+	
+	In this version, the outward normal is simply $y$, so we compute (for $r = |y|$)
+	\begin{align*}
+		\pd_{r} \ln(|y-x|) = y \cdot \nabla \ln|y-x| = y \cdot \frac{y-x}{|y-x|^{2}} = \frac{1-x\cdot y}{|y-x|^{2}}
+	\end{align*}
+	
+	and so, subtracting a similar term, 
+	
+	\begin{align*}
+		\pd_{r} G_{y}(x) = -\frac{1-|x|^{2}}{2\pi|y-x|}
+	\end{align*}
+	
+	The formula for a harmonic $u$ with boundary value $g$ is then
+	\begin{align*}
+		u(x) = \frac{1}{2\pi} \int_{\pd B(0,1)} \frac{1-|x|^{2}}{|x-y|^{2}}g(x)dS(x)
+	\end{align*}
+	
+	(In polar coordinates, this is the Poisson formula we derived in lecture 8).
+	
+	\section{Time-Dependent Fundamental Solutions}
+	
+	We adapt to the time dependence by considering families of distributions, indexed by time. In other words, we have a map $\R \to D'(\R^{n})$ by $t \mapsto w_{t}$. This map is differentiable with respect to time if there is a family $\pd_{t} w_{t} \in D'(\R^{n})$ so 
+	\begin{align*}
+		\frac{d}{dt} (w_{t},\psi) = (\pd_{t}w_{t},\psi)
+	\end{align*}
+	for all $\psi \in C_{c}^{\infty}(\R^{n})$. 
+	
+	\subsection{Forward Fundamental Solutions}
+	
+	%Physical problems in time evolution usually tend to look at a set of initial conditions, then want to predict how a system will develop in time. For this reason, we often focus on time-dependent equations without forcing terms. While this is conventional, we also know in many situations that the equation with a forcing term may be solved using the non-forcing term solution via using Duhamel's principle, or the idea of a forward-in-time solution. Therefore, we look at \textit{Forward Fundamental Solutions}. 
+	
+	Assume for a moment that we want to define a general fundamental solution as we did above for the ODE $\pd_{t} u(t) + A(t) u(t) = f$. This may look like a function or distribution $F_{s}(t)$ so 
+	
+	\begin{align*}
+		\frac{d}{dt} F_{s}(t) + A(t)F_{s}(t) = \delta_{s} & t \in \R \\
+	\end{align*}
+	
+	In linear cases, $F_{s}(t) = F(t-s)$, which greatly reduces our solving load. 
+	
+	
+	Now, presume we want to add spatial variables and we want to restrict to looking forward in time. This poses a bit of an issue. What happens if $t<s$? This function would no longer be defined and so we can only have the solution be forward-in-time, i.e. the fundamental solution $F_{s}(t)$ is only defined for $s>t$. We can solve this by enforcing $F_{s}(t) = 0$ for $t<s$ (a forward-in-time support property). In other words, we would solve for the \textit{forward fundamental solution}
+	
+	\begin{align*}
+		\begin{cases}
+			\frac{d}{dt} F_{s}(t) + A(t) F_{s}(t) = \delta_{s} & t \in \R\\
+			F_{s}(t) = 0 & t<s
+		\end{cases}
+	\end{align*}
+	
+	How do we create a solution from this? We relate it back to the solution in all time, and use the forward support property to create a jump at time $t=s$ that we can exploit to make a $\delta_0$ show up. More precisely, let $G_{s}(t)$ have
+	\begin{align*}
+		\pd_{t} G_{s}(t) + A(t)G_{s}(t) = 0 & t \in \R \\
+		G_{s}(s) = 1 
+	\end{align*}
+	Define 
+	\begin{align*}
+		F_{s}(t) = \begin{cases}
+			0 & t<s \\
+			G_{s}(t) & t \geq s
+		\end{cases}
+	\end{align*}
+	
+	Then, 
+	\begin{align*}
+		\langle (\pd_{t} + A(t))F_{s},\psi\rangle =  \langle F_{s},(-\pd_{t} + A(t))\psi\rangle \\
+		= \int_{s}^{\infty} G_{s}(t) (-\pd_{t} + A(t))\psi(t)dt = \psi(s) - \int_{s}^{\infty} 0 dt = \psi(s)
+	\end{align*}
+	as desired. Notice that, in computations, we use $G_{s}(t)$.
+	
+	When we're looking for a fundamental solution of a forward-in-time PDE, we often define our fundamental solutions using this ODE for $G_{s}(t)$, where we replace the $1$ with a $\delta_0$ to account for the fact that we have spatial variables. This is enough for our solution formulas. 
+	
+	We now call $W_{t}$ a fundamental solution of $\pd_{t} + L$ if
+	\begin{align*}
+		\pd_{t}W_{t} + LW_{t} = 0 \\
+		W_{t} |_{t=0} = \delta_0
+	\end{align*}
+ 	As above, considering 
+ 	\begin{align*}
+ 		F_{s} = \begin{cases}
+ 			0 & t< s \\
+ 			W_{t-s} & t>s
+ 		\end{cases}
+ 	\end{align*}
+ 	would give the forward fundamental solution discussed above. 
+	
+	
+	
+	or a solution to 
+	\begin{align*}
+		\pd_{t}^{2}+L
+	\end{align*}
+	if
+	\begin{align*}
+		\pd_{t}^{2}W_{t} + LW_{t} = 0 \\
+		W_{t} |_{t=0} = 0 \\
+		\pd_{t} W_{t}|_{t=0} = \delta
+	\end{align*}
+	
+	
+	\subsection{Heat Equation}
+	
+	The heat equation fundamental solution is simple for us because we already found a convolution solution formula 
+	\begin{align*}
+		u(t,x) = \int_{\R^{n}} H_{t}(x-y) h(y)dy
+	\end{align*}
+	
+	Therefore, we would guess that $H_{t}(x)$ is the fundamental solution. We have proven with some effort in the past  that 
+	\begin{align*}
+		\lim_{t \to 0} \int H_{t}(x)g(x) = g(0)
+	\end{align*}
+	when $g$ is continuous, so this certainly holds for test functions, which implies
+	\begin{align*}
+		\lim_{t \to 0} H_{t}(x) = \delta_0
+	\end{align*}
+	
+	as distributions. We also constructed $H_{t}(x)$ to be a solution to the heat equation. A more historically accurate presentation of the material would have waited to define $H_{t}(x)$ until this point, and only solved the heat equation with separation of variables until now. 
+	
+	
+	To match the forward fundamental solution even further, recall that with a forcing term 
+	\begin{align*}
+		(\pd_{t} - \Delta) u(t,x) = f \\ u|_{t = 0} = 0
+	\end{align*}
+	
+	we solve with 
+	\begin{align*}
+		u(t,x) = \int_{0}^{t} \int_{\R^{n}} H_{t-s}(x-y)f(s,y)dyds = [H^{+}_{s}(y) *_{s,y} f(s,y)](t,x)
+	\end{align*}
+	
+	for $H^{+}$ the forward fundamental solution generated from $H_{t}(x)$. 
+	
+	
+	\subsection{Wave Equation (1D)}
+	
+	Recall D'Alembert's formula 
+	\begin{align*}
+		u(t,x) = \frac{1}{2} \left[ g(x+t) + g(x-t)\right] + \frac{1}{2} \int_{x-t}^{x+t} h(\tau) d\tau \\
+		= \frac{1}{2} \left[ g(x+t) + g(x-t)\right] + \frac{1}{2} 1_{[-t,t]} * h(x)
+	\end{align*}
+	where we have converted the integral to a convolution. Further, notice that 
+	\begin{align*}
+		\pd_{t} 1_{[-t,t]}(x) = \delta_{t} + \delta_{-t}
+	\end{align*}
+	
+	since 
+	\begin{align*}
+		\frac{d}{dt}(1_{[-t,t]},\psi) = \frac{d}{dt} \int_{-t}^{t} \psi(x)dx = \psi(t)-\psi(-t)
+	\end{align*}
+	
+	Then, 
+	\begin{align*}
+		u(t,x) = \frac{1}{2} g * \pd_{t} 1_{[-t,t]} + \frac{1}{2} 1_{[-t,t]}*h
+	\end{align*}
+	this motivates us to guess that $W_{t} = \frac{1}{2} 1_{[-t,t]}$.
+	
+	Before we make more computations, notice that 
+	\begin{align*}
+		\pd_{t}(\delta_t,\psi) = \pd_{t} \psi(t) = \psi'(t) = (-\delta_{t}',\psi)
+	\end{align*}
+	
+	Using this for a test function $\psi$,
+	\begin{align*}
+		(\pd_{t}^{2}W_{t},\psi) = \frac{1}{2}(\delta_{-t}' - \delta_{t}',\psi) = \frac{1}{2}[\psi'(t) - \psi'(-t)]
+	\end{align*}
+	
+	while 
+	\begin{align*}
+		(\pd_{x}^{2}W_{t},\psi) = (W_{t},\pd_{x}^{2}\psi) = \frac{1}{2} \int_{-t}^{t}\psi '' dx = \frac{1}{2}[-\psi'(t) + \psi'(-t)]
+	\end{align*}
+	
+	by the Fundamental Theorem of Calculus. Therefore, 
+	\begin{align*}
+		\pd_{t}^{2}W_{t} - \pd_{x}^{2} W_{t} = 0 \\
+		W_{t}|_{t=0} = 0 \\
+		\pd_{t} W_{t}|_{t=0} = \delta_0
+	\end{align*}
+	as desired.  
+	
+	Fundamental solutions to higher-dimensional wave equations are known, but take an awkward form that arises from studying homogeneous distributions, so we will not display the general case here. For example, in 3D the solution is 
+	\begin{align*}
+		E_{t}(x) = -\frac{1}{2\pi}1_{(0,\infty)}(t) \delta_{0}(t^{2}-|x|^{2})
+	\end{align*}
+	
+	
+	
+	
+\end{document}

@@ -1,0 +1,496 @@
+
+\DocumentMetadata{tagging=on,
+	tagging-setup={math/setup=mathml-SE},
+	pdfstandard=ua-2,
+	lang=en-US
+}
+\documentclass{article}
+
+%Math Libraries
+\usepackage{multirow, longtable, amsmath, amssymb, amsthm}
+\usepackage[mathscr]{euscript}
+
+%Formatting
+\usepackage[margin = 1 in]{geometry}
+\usepackage{indentfirst}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage{tabularx}
+\usepackage{cite}
+
+%Diagram Packages
+\usepackage{tikz}
+\usetikzlibrary{automata,positioning,arrows}
+
+%Standard Commands
+\newcommand{\mm}{\mathscr}
+\newcommand{\B}{{\mathcal{B}}}
+\newcommand{\A}{{\mathcal{A}}}
+\newcommand{\N}{{\mathbb{N}}}
+\newcommand{\R}{{\mathbb{R}}}
+\newcommand{\C}{{\mathbb{C}}}
+\newcommand{\Q}{{\mathbb{Q}}}
+\newcommand{\Z}{{\mathbb{Z}}}
+
+
+\newcommand{\abs}[1]{{|{#1}|}}
+\newcommand{ \norm }[1]{{ || {#1}||}}
+\newcommand{\cl}[1]{{\overline{#1}}}
+\newcommand{\pd}{\partial}
+\newcommand{\ip}[2]{ \langle {#1},{#2}\rangle }
+\newcommand{\ls}{\lesssim}
+\newcommand{\gs}{\gtrsim}
+\newcommand{\supp}{\text{supp}}
+
+%Result Environment
+\newcounter{result}[section]
+\newenvironment{res}[1][]{\refstepcounter{result}\par\medskip
+	\noindent \textbf{[\thesection.\theresult] #1} \rmfamily}{\medskip}
+
+\newenvironment{defn}[1][]{\refstepcounter{result}\par\medskip \noindent \textbf{Definition [\thesection.\theresult] #1} \rmfamily}{\medskip}
+
+%Proof Environment
+\newenvironment{pf}{%
+	\par%
+	\medskip
+	\leftskip=2em\rightskip=2em%
+	\noindent\ignorespaces \textit{Proof:} \newline}{%
+	\,\, \newline \textit{Q.E.D.}\par\medskip}
+
+\title{Lecture 6: Basic Functional Analysis}
+\author{Ebbighausen}
+
+\begin{document}
+	\pagestyle{fancy}
+	\fancyfoot{} 
+	\fancyfoot[L]{Topics Document, Ethan Ebbighausen}
+	
+	\maketitle
+	
+	\section{Introduction}
+	
+	
+	Up to this point, our main solution method has been to use some inherent symmetry or behavior to reduce the PDE to an ODE. If we want to start to push beyond these cases, what we need to study is the partial differential operator itself. If we view a PDE as $Lu = f$, whether we can solve the PDE amounts to whether we can invert $L$ for $u = L^{-1}f$. The solution only exists when $f$ is in the image of $L$, and it is only unique when $L$ is injective. Whether the solution is continuous on the data has to do with whether $L^{-1}$ is continuous and some other caveats. 
+	
+	
+	During the development of many of the solutions we have looked at, there was significant development in a field called functional analysis that studied operators like $L$ in great detail. The goal of functional analysis was to understand infinite-dimensional linear algebra, by way of operators on spaces like $C^{m}(\R)$ and $L^{2}([0,1])$. We are studying a special type of operator on spaces of continuous functions, so we reduce well-posedness to studying the operator $L$ such that we can use these powerful tools. 
+	
+	
+	\vspace{0.25 cm}
+	
+	\textbf{Learning Objectives:}
+	
+	\begin{itemize}
+		\item Give examples of infinite-dimensional vector spaces. 
+		\item Describe a norm and an inner product by definition; prove that a function is either a norm or an inner product
+		\item Define and differentiate $L^p$ spaces. 
+		\item Describe the convergence of sequences of functions.
+		\item Describe the properties of a basis and tools to check that it is a basis.
+		\item Construct a basis given a space.
+		\item Connect a eigenvectors of a self-adjoint operator to a basis. 
+	\end{itemize}
+	
+	
+	\section{Function Spaces}
+	
+	We will consider a vector space $V$, usually over $\C$ or $\R$. Our goal here is to look at generalizing linear algebra, so we first need to see some more general spaces. While there are many types of spaces to which our theory will apply, the spaces studied historically were those of continuous or integrable functions. We display why the continuous functions are interesting. 
+	
+	
+	Recall that on such a space, a norm is a function $V \to \C$ such that \\
+	1.) Positive Definiteness: $\norm{u} \geq 0$ with equality iff. $u=0$ \\
+	2.) Homogeneity: $\norm{\lambda u } = |\lambda \norm{u}$ for $\lambda \in \C$ \\
+	3.) Triangle Inequality: $\norm{u+v} \leq \norm{u} + \norm{v}$
+	
+	\vspace{0.25 cm}
+	
+	\textbf{Example:} $C^{0}(\R)$ is infinite-dimensional
+	
+	In linear algebra, we had quite a few theorems that relied on the space being finite-dimensional, such as the rank-nullity theorem. However, many of the spaces we care about are not finite-dimensional. To see that $C^{0}(\R)$ is not finite dimensional, consider the "sup norm" $\norm{f} = \sup_{\Omega} |f(x)|$. Let $\psi$ be a nonzero smooth bump supported in $[0,1]$. Then, the set $\{\psi(x-n)\}_{n \in \N}$ is linearly independent. 
+	
+	\vspace{0.25 cm}
+	
+	\textbf{Example:}
+	
+	We may place another norm on $C^{0}_{c}((0,1))$ by creating an \textit{inner product} (which we focus on more later)
+	\begin{align*}
+		\langle f,g \rangle = \int_{0}^{1} fg dx
+	\end{align*}
+	
+	and one interesting facet of this is inner product is that 
+	\begin{align*}
+		\langle \Delta f, g \rangle  = \langle f, \Delta g \rangle 
+	\end{align*}
+	
+	which makes treating PDEs very easy. 
+	
+	\vspace{ 0.25 cm}
+	
+	Our next goal is to investigate more spaces like this to get an idea of the right choice of space to set our operators on. We often run into integrals, especially of weird functions, when doing PDEs. It turns out that the main tool we need to find the right spaces and right theory is to strengthen these integrals first (we strengthen derivatives later, for weak solutions). In particular, we investigate Lebesgue integration. 
+	
+	
+	\subsection{Integration and Measures}
+	
+	Bernhard Riemann introduced the classical Riemann integral in 1854 (though you probably learned Darboux's integral in analysis because it is slightly better-posed). In the late 1800s, Caratheodory, Hausdorff, and some other figures were developing the idea of \textit{measures}, which allowed for the study of the size of sets and for the reconstruction of probability theory with rigorous mathematics. Henri Lebesgue used these measures in the early 20th century to construct an integral that worked on functions that were not Riemann integrable. For example, the function 
+	\begin{align*}
+		f(x) = \begin{cases}
+			1 & x \in \Q \\
+			0 & x \notin \Q
+		\end{cases}
+	\end{align*}
+	is not Riemann integrable, but its Lebesgue integral is defined (and is 0). This integral also has amazing properties when it comes to sequences of functions (Fatou's lemma, Dominated Convergence Theorem). Furthermore, when a function is Riemann integrable, the two integrals agree, so it is truly a generalization of classical integrals. For these reasons, we will need the stronger integration techniques to solve higher PDEs. Now, we could easily spend an entire course (or actually several) focused on simply measures and integration theory, but we will just quickly take some highlights for our purposes. 
+	
+	
+	In the most basic sense, a measure is a way to generalize the notion of length or volume. We will only be talking about the \textit{Lebesgue measure}, though there are many, many types of measures that are important even in Euclidean spaces. As a generalization of volume, it agrees with volume on basic sets. For example, an interval $[0,5] \subset \R$ has measure $\mu([0,5]) = 5$. In $\R^{n}$, a rectangle $R = \prod [a_i,b_i]$ has measure $\mu(R) = \prod (b_{i}-a_i)$, the formula you know from elementary school. When we encounter other sets, we measure them by covering them with rectangles. For example, consider $B(0,1) \subset \R^{2}$. We can place it inside a rectangle of side-length $2$, so $\mu(B(0,1)) \leq 4$. If you do the same thing with rectangles of side-length $1/5$, it is possible to cover the circle with $88$ of them, giving an upper bound of 3.52. It gets tricky to count, but using a tool like Desmos, you may plot the circle and notice that the area approximated decreases to exactly $\pi$, the expected area. In general, we use this type of process to measure weird sets, defining a function $\mu: P(\R^{n}) \to [0,\infty]$ by 
+	\begin{align*}
+		\mu(A) = \inf \{ \sum_{j=1}^{\infty} vol(R_{j}) \mid A \subset \bigcup_{j=1}^{\infty} R_{j}\}
+	\end{align*} 
+	[You will not be asked to use this definition]. Technically, this is called an \textit{outer measure}, but we will not care about the distinction here because we will not worry much about the details of measurable sets. We will add the assumption that sets and functions are measurable onto our theorems because some wacky fringe cases.
+	
+	The \textit{characteristic function } of a set $A$ is 
+	\begin{align*}
+		1_{A}(x) = \begin{cases} 1 & x \in A \\ 0 & x \notin A \end{cases}
+	\end{align*}
+	
+	And such a set allows us to define basic integrals, provided $A$ is measurable, as
+	\begin{align*}
+		\int_{\R^{n}} 1_{A} d\mu = \mu(A)
+	\end{align*}
+	to agree with the normal definition of volume. To get to an integral of a function $f$, we first extend by linearity
+	
+	\begin{align*}
+		\int \sum_{A \in \mathcal{A}} c_{A} 1_{A} d\mu = \sum c_{A} \mu (A)
+	\end{align*}
+	
+	then, we use linear combinations like this to approximate functions (again, only measurable functions). 
+	
+	For example, consider $\sin(x)$ for $x \in [0,\pi]$. Since $\sin(x) \in [-1,1]$, let $A_{k} = \sin^{-1}([\frac{k-1}{n}, \frac{k}{n}])$. Then,
+	\begin{align*}
+		\psi_{n}(x) = \sum \frac{k}{n} 1_{A_{k}}
+	\end{align*}
+	sits just under the sine curve, like a stack of coins. As $n \to \infty$, $\int_{0}^{\pi} \psi_{n}(x) d\mu = \sum \frac{k}{n} \mu(A_n)$ gives $\int_{0}^{\pi} \sin(x)dx$. 
+	
+	Beyond this concept, we ask the reader to accept without justification some facts following from the definition. First, changing a function on a set of measure 0 doesn't change the integral, so when working with integration, we actually work with equivalnce classes where $f \equiv g$ iff. $f=g$ except on a set of measure $0$. This is precisely the same as saying 
+	\begin{align*}
+		\int_{\Omega} |f-g| d\mu = 0
+	\end{align*}
+	This does occasionally cause issues, since a continuous function may be equivalent to a non-continuous one. For this purpose, we say $f $ is $C^{m}$ if it is equivalent to a $C^{m}$ function, and we always assume we are working with such a representative of the equivalence class. 
+	
+	Second, this integral agrees with the Riemann integral on functions which are Riemann integrable, so we swap $d\mu$ for $dx$. 
+	
+	Then, we say a function $f: \Omega \to \C$ is \textit{integrable} if 
+	\begin{align*}
+		\int_{\Omega} |f|dx < \infty
+	\end{align*}
+	
+	For $p \geq 1$, we define the space of $p$-integrable functions by 
+	\begin{align*}
+		L^{p}(\Omega) = \{ f: \Omega \to \C; \int_{\Omega} |f|^{p} dx < \infty\}
+	\end{align*}
+	(the spaces with $p \leq 1$ are studied, but have very different properties). These are the vector spaces we are going to care most about. To show that it is truly a vector space, notice that it is closed under scalar multiplication. Then, since $x \mapsto |x|^{p}$ is convex when $p \geq 1$,
+	
+	\begin{align*}
+		|\frac{f+g}{2}|^{p} \leq \frac{|f|^{p} + |g|^{p}}{2}
+	\end{align*}
+	
+	so we are closed under addition. The other axioms may be checked easily due to the linearity of the integral. We define the $L^p$ norm
+	\begin{align*}
+		\norm{f}_{p} = \left( \int_{\Omega} |f|^{p} dx\right)^{1/p}
+	\end{align*} 
+	
+	where this is truly a norm due to the \textit{Minkowski Inequality}
+	\begin{align*}
+		\norm{f+g}_{p} \leq \norm{f}_{p} + \norm{g}_{p}
+	\end{align*}
+	(we omit the proof). In the case $p=1$, this follows from the triangle inequality for absolute value, and in the case $p=2$, the norm arises from an inner product
+	\begin{align*}
+		\langle f,g \rangle = \int_{\Omega} f \cl{g} dx
+	\end{align*}
+	and the Cauchy-Schwartz inequality gives the triangle inequality (see the next section). 
+	
+	
+	What happens when we change $p$? If we look at the basic case of $f = k1_{A}$, $\norm{k1_{A}}_{p} = k\mu(A)^{1/p}$. As $p \to \infty$, this approaches $k$ as long as $A$ has nonzero, finite measure. Thus, we are instead measuring the height of the function, much like a supremum. This leads us to define the \textit{essential supremum} of a set $A \subset \R$ and the \textit{infinity norm} for a function $f: \Omega \to \C$ by 
+	\begin{align*}
+		\text{ess-sup}(A) = \int \{a \in \R \mid \mu(A \cap [a,\infty) = 0)\}
+		\norm{f}_{\infty} = \inf \{ a \in \R \mid \{|f| > a\} \text{ has measure 0 }\}
+	\end{align*}
+	
+	\textbf{Question:} What is the infinity norm of $\sin(x)$, $\frac{1}{x}$, and of $1_{\Q}$?
+	
+	We also define $L^{\infty}(\Omega)$ to be the set of functions with finite infinity norm. 
+	
+	\subsection{Convergence, Completeness}
+	
+	Convergence in a normed vector space $V$ means $\{v_{n}\} \to v$ when
+	\begin{align*}
+		\lim_{n \to \infty} \norm{v_{n} - v} = 0
+	\end{align*}
+	
+	Recall from early in the class that, when a limit may not be known, we also talk about a sequence being \textit{Cauchy}, which is to say that given any $\epsilon > 0$, there is some $N$ so for $k,m \geq N$, 
+	\begin{align*}
+		\norm{v_{k}-v_{m}} < \epsilon
+	\end{align*}
+	
+	and that a \textit{complete} space is one in which every Cauchy sequence converges. 
+	
+	We will take as given two facts about $L^{p}$ spaces. 
+	
+	\begin{res}
+		1.) Assume $1 \leq p < \infty$. For any $f \in L^{p}(\Omega)$, there exists some $\{\psi_{k}\} \subset C_{c}^{\infty}(\Omega)$ so $\psi_{k} \to f$. 
+		
+		2.) Assume $1 \leq p \leq \infty$ and $\Omega$ is a domain. Then, $L^{p}(\Omega)$ is complete.
+	\end{res}
+	
+	\textbf{Question:} A subspace $W \subset V$ is closed if it contains the limit of every sequence in $W$ that converges in $V$. Show that a closed subspace of a complete space is complete. 
+	
+	\vspace{0.25cm}
+	
+	\textbf{Example 1:} 
+	The sequence in $C^{0}([-1,1])$ given by
+	
+	\begin{align*}
+		f_{n}(x) = \begin{cases}
+			-1 & x < -\frac{1}{n}\\
+			nx & -\frac{1}{n} \leq x \leq \frac{1}{n} \\
+			1 & x >  \frac{1}{n}
+		\end{cases}
+	\end{align*}
+	
+	is Cauchy since (using the area of two triangles)
+	\begin{align*}
+		\norm{f_{k} - f_{m}}_{1} = |\frac{1}{k} - \frac{1}{m}|
+	\end{align*}
+	
+	and so there is a limit in $L^{1}$, which is precisely $f(x) = 1_{[0,1]} - 1_{[-1,0]}$. Notice that we fail to converge in the space of continuous functions. 
+	
+	\vspace{0.25 cm}
+	
+	\textbf{Example 2:}
+	
+	We may also define $l^{p}(\C)$ to be the space of sequences $\{a_i\}$ such that 
+	\begin{align*}
+		\norm{a}_{l^{p}} = \left[ \sum_{j=1}^{\infty} |a_{j}|^{p}\right]^{1/p} < \infty
+	\end{align*}
+	
+	For example, $\{\frac{1}{n^{2}}\}$ is in $l^1$, but $\{\frac{1}{n}\}$ is not (though it is in $l^{2}$). This space is often used to come up with examples in the more difficult $L^{p}$ spaces. From the previous sequence, we notice 
+	\begin{align*}
+		f(x) = \sum \frac{1}{n} 1_{[n,n+1)}
+	\end{align*}
+	is in $L^{2}$ but not $L^{1}$, whereas
+	\begin{align*}
+		g(x) = \sum n 1_{[n,n + \frac{1}{n^{3}}]}
+	\end{align*}
+	is in $L^{1}$ but not $L^{2}$. 
+	
+	
+	
+	\section{Linear Algebra Recap: Inner Products}
+	
+	Recall that on a vector space $V$ over $\C$, an \textit{inner product} is a function $u,v \mapsto \langle u,v \rangle \in \C$ such that \\
+	1.) $\langle v,v \rangle \geq 0$, with $\langle u,v \rangle = 0$ if and only if $v = 0$ \\
+	2.) $\langle u,v\rangle  = \overline{\langle v,u\rangle }$ \\
+	3.) For $c_{1},c_{2} \in \C$ and $v_{1},v_{2},w \in V$,
+	\begin{align*}
+		\langle c_{1}v_{1} + c_{2}v_{2},w\rangle  = c_{1}\langle v_1,w\rangle  + c_{2}\langle v_{2},w\rangle 
+	\end{align*}
+	
+	\vspace{0.25 cm}
+	
+	The inner product measures the angle between the two vectors, so we call $u,v$ \textit{orthogonal} if $\langle u,v\rangle  = 0$. This generalizes the fact that, for $u,v \in \R^{n}$, $u \cdot v = |u||v| \cos(\theta)$ where $\theta$ is precisely that angle between $u$ and $v$. 
+	
+	On an inner product space, we define $\norm{v} = \sqrt{\langle v,v\rangle }$. Our most commonly seen inner product space is $\R^{n}$. In general, a norm $\norm{\cdot}$ need not arise from an inner product. 
+	
+	\vspace{0.25 cm}
+	\textbf{Example:} 
+	The space $C^{m}(\Omega)$ is a vector space for $\Omega \subset \R^{n}$. The standard norm on $C^{m}(\Omega)$ is 
+	\begin{align*}
+		\norm{f} = \sum_{i=0}^{m} \sup_{\Omega} |f^{(m)}(x)|
+	\end{align*}
+	This norm does not arise from an inner product (we'll show this on the HW). 
+	
+	Similarly, $C_{c}^{m}(\Omega)$ is an inner product space with standard inner product 
+	\begin{align*}
+		\langle f,g\rangle = \int_{\Omega} f \overline{g} dx
+	\end{align*}
+	
+	\vspace{0.25 cm}
+	
+	In the norm case, the triangle inequality is extremely useful. In the inner product case, we gain a further inequality
+	\begin{res}
+		(Cauchy-Schwartz Inequality) For an inner product space $V$ with $\norm{\cdot}$ defined by the inner product, 
+		\begin{align*}
+			|\langle v,w\rangle | \leq \norm{v} \norm{w}
+		\end{align*}
+		for all $v,w \in V$. 
+	\end{res}
+	
+	
+	\textbf{Note:} In the Euclidean case, this is very easy to see because $|\cos(\theta)| \leq 1$, but it can also be derived directly from sum properties.
+	
+	\begin{pf}
+		For $t \in \R$, consider 
+		\begin{align*}
+			q(t) = \norm{v+t\langle v,w\rangle w}^{2}
+		\end{align*}
+		if $w=0$, the inequality is immediate, and in the case $w \neq 0$, 
+		\begin{align*}
+			q(t) = \langle v+t\langle v,w\rangle w,v+t\langle v,w\rangle w\rangle  \\
+			= \norm{v}^{2} + 2t \norm{\langle v,w\rangle }^{2} + t^{2} |\langle v,w\rangle |^{2} \norm{w}^{2}
+		\end{align*}
+		which is a quadratic in $t$. We use calculus to say that the minimum is at $t_{0} = - \norm{w}^{-2}$, and 
+		\begin{align*}
+			0 \leq q(t_0) = \norm{v}^{2} - \frac{|\langle v,w\rangle |}{\norm{w}^{2}} 
+		\end{align*}
+		which is the desired inequality. 
+	\end{pf}
+	
+	\vspace{0.25 cm}
+	
+	\textbf{Remark:} The Cauchy-Schwartz inequality also implies the triangle inequality by 
+	\begin{align*}
+		\norm{u+v}^{2} = \langle u+v,u+v\rangle \\
+		= \norm{u}^{2} + 2 Re\langle u,v\rangle +\norm{v}^{2} \\
+		\leq \norm{u}^{2} + 2|\langle u,v\rangle|+\norm{v}^{2} \\
+		\leq \norm{u}^{2} + 2 \norm{v}\norm{u} +\norm{v}^{2} = \norm{u+v}^{2}
+	\end{align*}
+	
+	
+	
+	
+	\subsection{Hilbert Spaces, Orthonormal Bases}
+	
+	A \textit{Hilbert Space} is a complete inner-product space (such as $\R^{n}$). We will consider an infinite-dimensional complex Hilbert space (such as $L^{2}([0,1])$). A sequence of vectors $\{e_{n}\}$ in this space is orthonormal if the vectors are pairwise orthonormal, or $\langle e_n, e_m \rangle  = 0$ if $n \neq m$ and each vector has norm $1$. 
+	
+	An \textit{orthonormal basis} for $H$ is a an orthonormal sequence so each $v \in H$ admits a unique representation as a convergent series 
+	\begin{align*}
+		v = \sum_{j=1}^{\infty} c_{j} e_{j}
+	\end{align*}
+	
+	Notice that convergence here means absolute convergences of the sum $\sum |c_{j}|$. This allows us to compute $c_{k}$, since 
+	\begin{align*}
+		\langle \sum_{j=1}^{n} c_{j}e_{j}, e_{k} \rangle =c_k
+	\end{align*}
+	for $n \geq k$ and since Cauchy-Schwartz implies the inner product is continuous in each entry, taking the limit gives $c_{k} = \langle v,e_k \rangle $. Therefore, we often write $c_{j}[v] = \langle v,e_j \rangle $ and also sometimes talk about sums 
+	\begin{align*}
+		S_{n}[v] = \sum_{j=1}^{n} c_{j}[v] e_{j}
+	\end{align*}
+	
+	
+	Therefore, $S_{n}[v] \to v$ for every $v$ if and only if $\{e_{j}\}$ is a basis. 
+	
+	
+	We tend to think of a basis as a way to break down a vector into its components. Then, each component should be smaller than the original, the following result clarifies just this in our case. 
+	
+	\begin{res}
+		[Bessel's Inequality] Assume that $\{e_{j}\}$ is an orthonormal sequence in Hilbert space $H$. For $v \in H$, the series 
+		\begin{align*}
+			\sum |c_{j}[v]|^{2}
+		\end{align*}
+		converges, and 
+		\begin{align*}
+			\sum_{j=1}^{\infty} |c_{j}[v]|^{2} \leq \norm{v}^{2}
+		\end{align*}
+		with equality iff. $S_{n}[v] \to v$ in $H$.
+	\end{res}
+	
+	\textbf{Note:} From Bessel's inequality, we know that $S_{n}[v]$ always converges to some vector, but if $\{e_{j}\}$ is not a basis, this vector becomes the projection of $v$ onto the span of this sequence. 
+	
+	\begin{pf}
+		
+	First,
+	\begin{align*}
+		\norm{v - S_{n}[v]}^{2} = \langle v,v \rangle - 2 Re(\langle v,S_{n}[v] \rangle ) + \langle S_{n}[v], S_{n}[v] \rangle \\
+	\end{align*}
+	
+	Since the $e_{j}$ are orthonormal, $\langle v,S_{n}[v] \rangle =\langle S_{n}[v], S_{n}[v] \rangle = \sum_{j=1}^{n} |c_{j}|^{2}$. Therefore, 
+	\begin{align*}
+		\norm{v-S_{n}[v]}^{2} = \norm{v}^{2} - \sum_{j=1}^{n} |c_{j}|^{2}
+	\end{align*}
+	
+	Since the left hand side is nonnegative, we have established the inequality 
+	\begin{align*}
+		\sum_{j=1}^{n} |c_{j}|^{2} \leq \norm{v}^{2}
+	\end{align*}
+	
+	where the infinite sum reaches equality precisely when $\norm{v-S_{n}[v]}^{2} \to 0$. 
+	\end{pf}
+	
+	
+	We end with a characterization of a basis that will be useful in our search to compute bases. 
+	
+	\begin{res}
+		Suppose $H$ is an infinite-dimensional Hilbert space. An orthonormal sequence in $H$ forms a basis iff. $0$ is the only element orthogonal to every vector in the sequence. 
+	\end{res}
+	
+	\begin{pf}
+		If $\{e_{j}\}$ forms a basis, a vector $v$ being orthogonal to every term means $c_{j}[v] = 0$ for all $j$. Since this is a basis, $\sum 0$ converges to $v$, so $v=0$. 
+		
+		Next, let $\{e_{j}\}$ simply be orthonormal and assume that $0$ is the only vector orthogonal to every $e_j$. Let $S_{n}[v] \to \tilde{v}$ and notice that 
+		\begin{align*}
+			\langle v - S_{n}[v],e_{j} \rangle =0
+		\end{align*}
+		for all $n \geq j$. Taking the limit on $n$, $\langle v - \tilde{v},e_{j} \rangle  = 0$ for all $j$, so that $v = \tilde{v}$ by assumption. We then have a basis. 
+	\end{pf}
+	
+	\subsection{Self-Adjoint Operators}
+	
+	When we investigated the separation of variables, a key computation was to find the eigenvalues of the Laplacian. This motivates us to understand how we may simplify operators like the Laplacian in similar ways to what we do with matrices when we diagonalize, in particular for orthogonal diagonalization. Recall that a matrix may be orthogonally diagonalized when it is symmetric. This meant that $Ax \cdot y = x \cdot Ay$. If we generalize to 
+	\begin{align*}
+		\langle Av,w \rangle  = \langle v,Aw\rangle 
+	\end{align*}
+	for all $u,v\in H$ a Hilbert space, this property is called being self-adjoint (the adoint of $A$ is the operator so $\langle Av,w \rangle  = \langle v, A^* w \rangle $). In particular, this property leads to a much more technical version of the Spectral theorem that we will not use. When we look at $L^{2}$, the Laplacian is a self-adjoint operator with some technicalities to work out non-differentiable functions. To avoid those technicalities, we reduce to $C^{2}$:
+	
+	\begin{res}
+		Suppose that $\Omega \in \R^{n}$ is a bounded domain with $C^{1}$ boundary. If $u,v \in C^{2}(\Omega)$ both satisfy either Dirichlet or Neumann boundary conditions then 
+		\begin{align*}
+			\langle \Delta u, v \rangle  = \langle u \Delta v \rangle 
+		\end{align*}
+	\end{res}
+	\begin{pf}
+		\begin{align*}
+			\int_{\Omega} u \cl{\Delta v} - \cl{v} \Delta u  dx = \int_{\pd \Omega} u \pd_{\nu}\cl{v} - \cl{v} \pd_{\nu} u dS =0
+		\end{align*}
+		by the boundary conditions. 
+	\end{pf}
+	
+	We call boundary conditions where the above property holds \textit{self-adjoint boundary conditions}. 
+	
+	\vspace{0.25 cm}
+	\textbf{Example:} On $[0,\pi]$, recall that the eigenvalue equation with Dirichlet boundary conditions is 
+	\begin{align*}
+		\phi '' = - \lambda \phi \\
+		\phi(0) = \phi(\pi) = 0
+	\end{align*}
+	
+	and has eigenvalue solutions $\lambda = n^{2}$ for $n \in \N$ with eigenfunctions $\sin(nx)$. Notice, in particular, that 
+	\begin{align*}
+		\int_{0}^{\pi} \sin(nx) \sin(mx) dx = \int_{0}^{\pi}\cos((m+n)x) - \cos((m-n)x) dx= 0
+	\end{align*}
+	so that this sequence is orthogonal. If we allow Neumann boundary conditions, we instead of eigenfunctions $\{\cos(nx)\}$, which are also orthogonal. Furthermore, we can form convergent Fourier series for any $C^{2}$ functions on $[0,\pi]$ using these eigenfunctions, so they are a basis in some sense (in fact a basis for $L^{2}$). 
+	
+	\vspace{0.25 cm}
+	
+	\begin{res}
+		Suppose $\{\lambda_{j} \}$ is a sequence of eigenvalues of $-\Delta$ on a bounded domain $\Omega \subset \R^{n}$ with eigenvectors in $C^{2}(\cl{\Omega})$ subject to self-adjoint boundary conditions. Then, $\lambda_{j} \in \R$ and, after some possible rearrangement, the eigenvectors form an orthonormal sequence in $L^{2}(\Omega)$. Furtheremore, $\lambda_{j} > 0$ for Dirichlet conditions and $\lambda_{j} \geq 0$ for Neumann boundary conditions.  
+	\end{res}
+	
+	\begin{pf}
+		Suppose we have a sequence of eigenvectors $\{\phi_{j}\}$ corresponding to eigenvalues $\{\lambda_{j}\}$. The self-adjoint condition implies 
+		\begin{align*}
+			-\lambda_{j} \langle \phi_{j}, \phi_{k} \rangle = \langle \Delta \phi_{j}, \phi_{k} \rangle  = \langle \phi_{j}, \Delta \phi_{k} \rangle  = -\cl{\lambda_{k}} \langle \phi_{j}, \phi_{k} \rangle 
+		\end{align*}
+		In the case $j=k$, the inner product is nonzero and $\lambda_{j} = \cl{\lambda_{j}}$ implies the eigenvalues are real. If $\lambda_{j}\neq \cl{\lambda_{k}}$, the functions must be orthogonal.
+		
+		If there are multiple eigenfunctions for one eigenvalue, we may apply Gram-schmidt to create an orthogonal sequence of eigenfunctions for that eigenvalue. Further, for all eigenfunctions, we may divide by their magnitude to make an orthonormal sequence. 
+		
+		Lastly, given an orthonormal sequence
+		\begin{align*}
+			\lambda_{j} = \langle -\Delta \phi_{j},\phi_{j} \rangle  = \int_{\Omega} |\nabla \phi_{j} |^{2} dx - \int_{\pd \Omega} \cl{\phi_{j}} \pd_{\nu} \phi_{i} dS
+		\end{align*}
+		so that, in the case of Dirichlet and Neumann boundary conditions, we have $\lambda_{j}\geq 0$. 
+		
+		If $\lambda_{j} = 0$, this also shows the eigenfunction is constant, so that in the Dirichlet case the only such solution is $0$ and $\lambda_{j} > 0$. 
+	\end{pf}
+
+
+	
+\end{document}

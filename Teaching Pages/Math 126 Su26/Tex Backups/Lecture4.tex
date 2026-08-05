@@ -1,0 +1,477 @@
+
+\DocumentMetadata{tagging=on,
+	tagging-setup={math/setup=mathml-SE},
+	pdfstandard=ua-2,
+	lang=en-US
+}
+\documentclass{article}
+
+%Math Libraries
+\usepackage{multirow, longtable, amsmath, amssymb, amsthm}
+\usepackage[mathscr]{euscript}
+
+%Formatting
+\usepackage[margin = 1 in]{geometry}
+\usepackage{indentfirst}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage{tabularx}
+\usepackage{cite}
+
+%Diagram Packages
+\usepackage{tikz}
+\usetikzlibrary{automata,positioning,arrows}
+
+%Standard Commands
+\newcommand{\mm}{\mathscr}
+\newcommand{\B}{{\mathcal{B}}}
+\newcommand{\A}{{\mathcal{A}}}
+\newcommand{\N}{{\mathbb{N}}}
+\newcommand{\R}{{\mathbb{R}}}
+\newcommand{\C}{{\mathbb{C}}}
+\newcommand{\Q}{{\mathbb{Q}}}
+\newcommand{\Z}{{\mathbb{Z}}}
+
+
+\newcommand{\abs}[1]{{|{#1}|}}
+\newcommand{ \norm }[1]{{ || {#1}||}}
+\newcommand{\cl}[1]{{\overline{#1}}}
+\newcommand{\pd}{\partial}
+\newcommand{\ip}[2]{ \langle {#1},{#2}\rangle }
+\newcommand{\ls}{\lesssim}
+\newcommand{\gs}{\gtrsim}
+\newcommand{\supp}{\text{supp}}
+
+%Result Environment
+\newcounter{result}[section]
+\newenvironment{res}[1][]{\refstepcounter{result}\par\medskip
+	\noindent \textbf{[\thesection.\theresult] #1} \rmfamily}{\medskip}
+
+\newenvironment{defn}[1][]{\refstepcounter{result}\par\medskip \noindent \textbf{Definition [\thesection.\theresult] #1} \rmfamily}{\medskip}
+
+%Proof Environment
+\newenvironment{pf}{%
+	\par%
+	\medskip
+	\leftskip=2em\rightskip=2em%
+	\noindent\ignorespaces \textit{Proof:} \newline}{%
+	\,\, \newline \textit{Q.E.D.}\par\medskip}
+
+\title{Lecture 4}
+\author{Ethan Ebbighausen}
+
+\begin{document}
+	\pagestyle{fancy}
+	\fancyfoot{} 
+	\fancyfoot[L]{Topics Document, Ethan Ebbighausen}
+	
+	\maketitle
+	
+	\section{Introduction: Separating influences simplifies equations.}
+	
+	What makes $y' = 2ty$ a relatively easy-to solve ODE? We can separate the variable $y$ from that of $t$, 
+	\begin{align*}
+		\frac{y'}{y} = 2t
+	\end{align*}
+	then integrate both parts separately in their respective variables
+	\begin{align*}
+		\ln(y) = t^{2} + C
+	\end{align*}
+	and solve for $y = K e^{t^2}$. What if we tried to do the same thing to a PDE like the wave equation $u_{tt} - \Delta u = 0$? We can certainly separate the influences:
+	\begin{align*}
+		u_{tt} = \Delta u
+	\end{align*}
+	
+	Since integration isn't immediate here, instead we use an \textit{ansatz} (basically an informed guess. The word is German for ``approach") that the solution also has separate variables, like $u(t,x) = v(t)\phi(x)$. Plugging this into the above equation
+	
+	\begin{align*}
+		\frac{v''(t)}{v(t)} = \frac{\Delta \phi(x)}{\phi(x)} 
+	\end{align*}
+	
+	and so both sides of the equation must be constant. We can then solve a pair of ODEs instead of a PDE. Because the form of the above equation is common, this is one example of why it is important to study \textit{eigenfunctions} and \textit{eigenvalues} of differential operators, such as for the case $\Delta \phi(x) = C \phi(x)$. 
+	
+	
+	\textbf{Learning Objectives:}
+	
+	\begin{itemize}
+		\item Apply the method of separation of variables to 1-dimensional PDEs.
+		\item Interpret the eigenfunctions generated from the Helmholtz equation. 
+		\item Apply the Frobenius method to solve ODEs.
+		\item Analyze asymptotic behavior to inform ODE solutions. 
+		\item Use rotational symmetry to simplify higher-dimensional PDEs.
+	\end{itemize}
+	
+	
+	\section{One-Dimensional Analysis: Hemlholtz Equation}
+	
+	\subsection{Model: Overtones}
+	
+	Look up a video playing a 440 Hz note. That is your standard (American standard) A. However, if you've every played an instrument like a violin, you know the standard A coming from the instrument sounds much richer than the video sound. The difference is not that the technology is bad, but in fact that the video plays a pure note and the instrument plays a ``muddy" one. 
+	
+	If you've taken physics, you've already seen this in action. If we have a string of length $l$ with fixed ends, the fundamental mode (or first harmonic) creates a wave with wavelength $2l$, which is our standard wave solution. However, we also see the effect of other pitches. The \textit{first overtone} (or second harmonic) has wavelength $l$, and the second overtone has wavelength $\frac{2l}{3}$, going on and on. When the string is plucked, these overtones play and add the richness we hear. Due to the relationship between frequency and wavelength, these overtones are integer multiples of the fundamental frequency. This observation was first published by Mersenne in 1636, who did not yet have a mathematical model of it. We will derive that model shortly. 
+	
+	
+	\subsection{Helmholtz Equation}
+	
+	We have studied the wave equation of the form $u_{tt} - \Delta u = 0$. Later, we will study the heat equation of the form $u_{t} - \Delta u=0$, and the Schrodinger equation $-iu_{t} - \Delta u =0$. For the moment, we generalize to an equation of the form
+	
+	\begin{align*}
+		P_{t} u -\Delta u = 0
+	\end{align*}
+	where $P_{t}$ is an differential operator only in time. 
+	
+	\begin{res}
+		If $u$ is a classical solution of the above PDE of the form $u(t,x) = v(t)\phi(x)$ for $t \in \R$ and $x \in \Omega \subset \R^{n}$, then in any region where $u$ is nonzero, there is a constant $\kappa$ such that 
+		\begin{align*}
+			P_{t} v = \kappa v, \,\,\,\, \Delta \phi = \kappa \phi
+		\end{align*}
+	\end{res}
+	\begin{pf}
+		Substituting this form of $u$ into the PDE gives 
+		\begin{align*}
+			\frac{P_{t} v}{v} = \frac{\Delta \phi}{\phi}
+		\end{align*}
+		since the left side has no dependence on $x$, the right side must be constant as we vary $x$. Similarly, the left must be constant as we vary $t$, and we name the constant $\kappa$. 
+	\end{pf}
+	
+	Therefore, the PDE reduces to solving two \textit{eigenfunction} equations, with the more difficult being the \textit{Helmholtz equation} $-\Delta \phi = \lambda \phi$. We have added a negative sign here so that the \textit{eigenvalues} $\lambda$ are non-negative. The Helmholtz equation can be a bit tricky and require advanced techniques in weird domains, but in some simple domains we can use symmetry to solve. Let us begin with 1 spatial dimension
+	
+	\begin{res}
+		For $\phi \in C^{2}([0,l])$, the equation 
+		\begin{align*}
+			-\phi''(x) = \lambda \phi \\
+			\phi(0) = \phi(l) = 0
+		\end{align*}
+		has nonzero solutions only if 
+		\begin{align*}
+			\lambda_{n} = \frac{\pi^{2}n^{2}}{l^{2}}
+		\end{align*}
+		for $n \in \N$. The corresponding eignefunctions (up to multiplying by a constant) are 
+		\begin{align*}
+			\phi_{n}(x) = \sin(x \sqrt{\lambda_{n}})
+		\end{align*}
+	\end{res}
+	
+	\begin{pf}
+		If we integrate the ODE, then integrate by parts
+		\begin{align*}
+			\lambda \int_{0}^{l} |\phi|^{2} = - \int_{0}^{l} \phi'' \bar{\phi} dx = \int_{0}^{l} |\phi ' |^{2} dx
+		\end{align*}
+		so that if $\phi$ is anywhere nonzero, $\lambda \geq 0$. In the case $\lambda = 0$, the right integral is $0$ and so the derivative is everywhere $0$, hence by the boundary conditions, $\phi = 0$. 
+		
+		When $\lambda > 0$, this is a second-order linear ODE with characteristic equation $y^{2}- \lambda=0$, which yields a general solution of the form 
+		\begin{align*}
+			\phi(x) = c_1 \sin(x\sqrt{\lambda}) + c_{2} \cos(x\sqrt{\lambda})
+		\end{align*} 
+		Next, checking $\phi(0) = c_2 = 0$ shows we need only the first term of the sum, and $\phi(l) = c_{1}\sin(l\sqrt{\lambda}) = 0$ shows $l\sqrt{\lambda} = \pi n$ for some integer $n$. This finishes the proposed family of solutions. 
+	\end{pf}
+	
+	If we recall the model problem of overtones, we see wave solutions with wavelengths $\frac{2l}{k}$ for integers $k$, which look similar to the eigenfunctions of wavelengths $\frac{2l}{\sqrt{\lambda_k}}$. Indeed, if we apply separation of variables to 
+	\begin{align*}
+		u_{tt} - u_{xx} = 0 \\
+		u(t,0) = u(t,l) = 0
+	\end{align*}
+	we see the above family of solutions to the Helmholtz equation, and the time equation is 
+	\begin{align*}
+		-v''(t) = \lambda_{n} v
+	\end{align*}
+	without initial conditions. Combining the general solutions, we have a form
+	\begin{align*}
+		u_{n}(t,x) = \left[ a_{n} e^{it \sqrt{\lambda_{n}}} + b_{n} e^{-it\sqrt{\lambda_n}}\right] \sin(x\sqrt{\lambda_{n}})
+	\end{align*}
+	This ``pure tone" solution (called such for modeling a single frequency) can model any of the overtones independently. Overlaying these tones gives the sound we hear in the real world. To find these frequencies in Hertz, we divide by $2 \pi$ (and reintroduce the speed of the wave $\sqrt{T/\rho}$) to obtain \textit{Mersenne's law}
+	
+	\begin{align*}
+		\frac{\omega_{n}}{2\pi} = \frac{n}{2l} \sqrt{\frac{T}{\rho}}
+	\end{align*}
+	where $\omega_{n} = \sqrt{\lambda_{n}}$ is the frequency. 
+	
+	Each higher waveform solution introduces new points where the string is stationary, which we call \textit{nodes}. Let $x_0 \in [0,l]$ be a node for frequency $\omega_{n} = n \omega_{1}$, so $x_0 = \frac{2l k}{n}$ for some integer $k < n$. Imagine you set your finger on this node $x_0$. What tones would be heard now? 
+	
+	Only those tones with wavelengths $\frac{2x_0}{m} = \frac{4lk}{nm}$ for integers $m$ would remain. For example, if $x_0 = \frac{21}{3}$, then only the frequencies $\omega_{3 m }$ would remain and be heard. This produces a new, pure-ring sound that string players call a \textit{harmonic}. 
+	
+	A similar study of these eignevalues was done on the light emission of certain atoms, and the frequency $\sqrt{\lambda_{n}}$ we see corresponds in that case to the color. This earned the family of frequencies the name \textit{spectrum}, and as time moved on, this came to refer to the set of generalized eigenvalues $\lambda$ so  $P - \lambda I$, for any operator $P$ and identity $I$, is either not injective or not surjective (the same way we think about eigenvalues of a matrix). 
+	
+	\vspace{0.25 cm}
+	
+	\textbf{Example:} We've focused quite a bit on strings. For those people who play wind instruments (brass or woodwind), we can use a different common physical model, that of a half-open pipe. In particular, consider a clarinet, where $u(t,x)$ models the pressure fluctuation in the instrument of length $l$ relative to the atmospheric background. We model this in 1D, assuming the pressure does not vary much in each disk-shaped cross-section of the pipe. 
+	
+	At the mouthpiece, we see the greatest pressure. This is a local maximum and a critical point, so we have boundary condition $u_{x}(t,0) = 0$. At the open end of the instrument, pressure remains at atmospheric levels and $u(t,l) = 0$. 
+	
+	Using separation of variables on the wave equation, we must solve 
+	\begin{align*}
+		\begin{cases}
+			-\phi '' (x) = \lambda \phi(x), \,\,\,\phi'(0) = 0, \,\,\, \phi(l)=0 \\
+			-v''(t) = \lambda v, 
+		\end{cases}
+	\end{align*}
+	
+	The Helmholtz equation with these boundary conditions yeilds solutions $\phi_{n}(x) = \cos(x\sqrt{\lambda_{n}})$ where $\lambda_{n} = \frac{\pi^{2}}{l^{2}}(n - 1/2)^{2}$. Draw out some of these solutions and compare to our previous case with the string. 
+	
+	
+	
+	\section{Higher-Dimensions: Symmetry}
+	
+	Next, we will consider the special higher-dimension case of the disc $B(0,1)$. Because this domain is radially symmetric, we write the Laplacian in the form 
+	\begin{align*}
+		\Delta = \frac{1}{r} \pd_{r} \left(r \pd_{r} \right) + \frac{1}{r^{2}} \pd_{\theta}^{2}
+	\end{align*}
+	
+	we can use this to separate the Helmholtz equation into ODEs, but at the cost of having a tricky ODE called the Bessel Equation involved. 
+	
+	\subsection{Aside: Bessel's Equation, Bessel Functions}
+	
+	German astronomer Friedrich Bessel systematically studied wave and heat motion in circularly symmetric and cylindrically symmetric domains, and published a treatise on them in 1824. His analytic solutions were called Bessel functions, best described as being solutions to the ODE
+	
+	\begin{align*}
+		x^{2} y''(x) + xy'(x) + (x^{2} - \alpha^{2}) y = 0
+	\end{align*}
+	
+	where $\alpha$ is simply a number. When $\alpha$ is a half-integer, these functions are often called \textit{spherical Bessel functions} because they correspond to our spherical Helmholtz equation above.
+	
+	To solve this ODE, we use the method of Frobenius. This method starts with the idea that we will try to plug in an analytic solution 
+	\begin{align*}
+		y = \sum_{k=0}^{\infty} a_{k} x^{k}
+	\end{align*}
+	
+	This leads to equations 
+	\begin{align*}
+		-\alpha^{2} a_0 + x(a_1 - \alpha^{2}a_1)+\sum_{k=2}^{\infty} \left(a_{k}k(k-1) + a_{k}k + a_{k-2} - \alpha^{2}a_{k} \right) x^{k} = 0 \\
+	\end{align*}
+	
+	so that we see only the trivial solution $a_k = 0$. Frobenius' method poses that we try $y = x^{r} \sum a_{k}x^{k}$ for some $r>0$. This gives
+	\begin{align*}
+		0 = (a_0(r)(r-1)+a_0 r -\alpha^{2} a_0)x^{r} + (a_{1}(1+r)(r)+a_{1}(1+r) - \alpha^{2} a_1)x+\sum_{k=2}^{\infty} \left(a_{k}(k+r)(k+r-1) + a_{k}(k+r) + a_{k-2} - \alpha^{2}a_{k} \right) x^{k+r}
+	\end{align*}
+	
+	To find a nontrivial solution, we must have $((r)(r-1)+ r -\alpha^{2}) = 0$, or $r = \pm \alpha$ (and we will then have two generalized solutions). In the case $r = \alpha$, and $\alpha > 0$ is some integer, the equations in the sum above reduce to 
+	\begin{align*}
+		[(\alpha+k)^{2} -\alpha^{2}]a_{k} = - a_{k-2} \\
+		\Leftrightarrow \\
+		a_{k} = \frac{-1}{k(k+2\alpha)} a_{k-2}
+	\end{align*}
+	
+	so that iterating the relationship gives
+	
+	\begin{align*}
+		a_{2k} =  \left( -\frac{1}{4} \right) \frac{1}{k(k+\alpha)} a_{2k-2} = ... = \left( -\frac{1}{4} \right)^{k} \frac{\alpha!}{k!(k+\alpha)!} a_{0}
+	\end{align*}
+	
+	we technically have the freedom to choose $a_0$ by the linearity of the equation, but the standard choice is $a_0 = \frac{1}{\alpha! 2^{\alpha}}$ to normalize constants and find
+	\begin{align*}
+		J_{\alpha}(x) = \left(\frac{x}{2}\right)^{\alpha}\sum_{k=0}^{\infty} \frac{(-1)^{k}}{k!(k+\alpha)!} \left( \frac{x}{2}\right)^{2k} 
+	\end{align*}
+	
+	Using the same process on $r = -\alpha$ gives a solution with a much more complicated formula, $Y_{n}(x)$. The main properties we will use to distinguish these solutions is that as $z \to 0$, $J_{k}(z) \sim c_{k} z^{|k|}$ but $Y_{k}(z) \sim c_{k} z^{-|k|}$ for any integer $k$. 
+	
+	Sometimes, the modified or hyperbolic Bessel equation
+	\begin{align*}
+		x^{2} y''(x) + xy'(x) + (x^{2} + \nu^{2}) y = 0
+	\end{align*}
+	is used, for example if we were to consider imaginary $\alpha$ in the original equation. A similar analysis produces solutions $I_k$ and $K_k$ with the same asymptotics as $J_k,Y_k$ respectively. In fact, $I_{\alpha}(x) = i^{-\alpha} J_{\alpha}(ix)$.  
+	
+	
+	\subsection{Circular Symmetry}
+	
+	The Helmholtz equation was solved for many basic shapes in the 1800s, starting with the rectangle (by Poisson) and the equilateral triangle n 1852 (by Lam{\'e}). The following was found by Alfred Clebsch in 1862
+	
+	\begin{res}
+		Suppose $\phi \in C^{2}(\R^{2})$ is a solution of $-\Delta \phi = \lambda \phi$ that factors as a product $h(r)w(\theta)$. Then, up to a multiplicative constant, $\phi$ has the form
+		\begin{align*}
+			\phi_{\lambda,k}(r,\theta) = h_{k}(r)e^{ik\theta}
+		\end{align*}
+		for some $k \in \Z$ with 
+		\begin{align*}
+			h_{k}(r) = \begin{cases} r^{|k|} & \lambda = 0 \\ J_{k}(r\sqrt{\lambda}) & \lambda > 0 \\ I_{k}(r\sqrt{-\lambda}) & \lambda < 0 \end{cases}
+		\end{align*}
+	\end{res}
+	
+	\begin{pf}
+		The Helmholtz equation reduces to 
+		\begin{align*}
+			-[\frac{1}{r} \pd_{r} ( r \pd_{r}) + \frac{1}{r^{2}} \pd_{\theta}^{2}] hw = \lambda hw \\
+		-	w(\frac{1}{r} h' + h'') - \frac{h}{r^{2}} w'' = \lambda hw \\
+			 \frac{1}{h}(rh' + r^{2}h'') + \lambda r^{2} = -\frac{w''}{w}
+		\end{align*}
+		when $w$ and $h$ are nonzero. As before, the sides then must be some constant. The equation for $w$ gives $w'' = -k^{2} w$, which we have studied before to see solutions $e^{ik \theta}$,$e^{-ik\theta}$ when $k$ is an integer. Thus, allowing $k$ to range over integers, we have solutions $w_{k}(\theta) = e^{ik\theta}$. 
+		
+		Next, the radial equation is 
+		\begin{align*}
+			r^{2}h'' + rh' + (\lambda r^{2}-k^{2})h = 0
+		\end{align*}
+		When $\lambda = 0$, the solutions are monomials $h_{k}(r) = r^{\alpha}$, and substituting this into the equation shows $\alpha = \pm k$ when $k$ is nonzero. If $k=0$, the solutions are $1$ and $\ln(r)$. 
+		
+		In the case $\lambda > 0$, making a change-of-variables $z = r \sqrt{\lambda}$ turns this into Bessel's equation, so we see solutions to the ODE by $J_k(r\sqrt{\lambda})$ and $Y_k(r\sqrt{\lambda})$. For $\lambda < 0$, $z = r\sqrt{-\lambda}$ turns the equation into the modified Bessel equation, and we again see solutions of the form $I_k,K_k$.  
+		
+		Only a subset of these solutions actually apply due to our polar assumptions. In particular, $\phi \in C^{2}$, but we know that $r = \sqrt{x^{2}+y^{2}}$ is not differentiable at the origin. Any solution we pick will be of the form 
+		\begin{align*}
+			e^{ik\theta} h(r)
+		\end{align*}
+		First, in the case $\lambda = 0$, $e^{i k \theta} r^{|k|}$ is just the polynomial $(x+iy)^{|k|}$ and is smooth, but $e^{i k \theta} r^{-|k|}$ is not, so we exclude these solutions. When $k=0$, we exclude $\ln(r)$. 
+		
+		When $\lambda \neq 0$, we have two types of asymptotics: acting like $r^{|k|}$ and like $r^{-|k|}$. For differentiability, we need
+		\begin{align*}
+			\lim_{x \to 0} \frac{h(|x|)}{x}
+		\end{align*}
+		to be defined. Hence, we throw out solutions where $h(r)$ acts like $r^{-|k|}$, i.e. $Y_k$ and $K_k$. We are left with the statement of the proposition.  
+	\end{pf}
+	
+	\vspace{0.25 cm}
+	
+	\textbf{Example:} A 2D disk very well models the head of a drum. We apply Dirichlet boundary conditions $\phi_{\lambda,k}|_{\pd B(0,1)} = 0$. This is the same as saying $h_{k}(1) = 0$ in the above solutions, which requires $\lambda >0$ (since otherwise we lack positive zeroes).
+	
+	 If we consider the wave equation, assuming speed $1$, we get possible product solutions from the above proposition 
+	\begin{align*}
+		u(t,x) = (a \sin(t\sqrt{\lambda}) + b\cos(t\sqrt{\lambda})) e^{ik\theta} J_{k}(r\sqrt{\lambda})
+	\end{align*}
+	
+	with condition $J_{k}(\sqrt{\lambda}) = 0$. The Bessel function $J_k$ has infinitely many zeroes, and so we must restrict to the case that $\sqrt{\lambda}$ is one of them (which, perhaps surprisingly, is many of them).
+	
+	
+	
+	\subsection{Spherical Symmetry}
+	
+	The spherical case in $\R^{3}$ is a direct generalization of the disc in $\R^{2}$. We first rewrite everything in spherical coordinates, and use a second application of separation of variables to reduce the equation to an ODE (associated Legendre equation), then use those solutions to construct Helmholtz solutions. Using more advanced techniques (variational methods, Chapter 11), more general domains may be considered. 
+	
+	We first recall that spherical coordinates are 
+	\begin{align*}
+		(x,y,z) = (r\sin(\phi)\cos(\theta), r\sin(\phi)\sin(\theta), r\cos(\phi))
+	\end{align*}
+	where $\theta \in [0,2\pi)$ denotes the angle in the $(x,y)$-planar direction and $\phi$ is the angle from the positive $z$-axis. Recall that changing from $(x,y,z) \to (r,\theta,\phi)$ introduces a factor of $r$ into integrals via the change-of-coordinates. 
+	
+	The Laplacian has the following spherical representation, which we split into radial and angular pieces
+	\begin{align*}
+		\Delta = \frac{1}{r^{2}} \pd_{r} (r^{2} \pd_{r}) + \frac{1}{r^{2}\sin(\phi)} \pd_{\phi}(\sin(\phi)\pd_{\phi}) + \frac{1}{r^{2}\sin^{2}(\phi)} \pd_{\theta}^{2} \\
+		= \frac{1}{r^{2}} \pd_{r} (r^{2} \pd_{r}) + \frac{1}{r^{2}} \Delta_{S^{2}}
+	\end{align*} 
+	We separate $\Delta_{S^{2}}$, called the spherical Laplacian, because it encapsulates the symmetries of the Laplacian. It is invariant under rotations of the sphere, and is actually the only second-order operator (on the sphere) with this property. The decomposition allows us to separate the radial and angular variables. First, we must treat this spherical Laplacian, which we also try to do by separating variables. Assume $u \in C^{2}(S^{2})$ solves 
+	\begin{align*}
+		-\Delta_{S^{2}}u = \lambda u
+	\end{align*}
+	and has $u = v(\phi) w(\theta)$. 
+	
+	Then,
+	\begin{align*}
+		\frac{\sin(\phi)}{v} \pd_{\phi} (\sin(\phi) \pd_{\phi} v) + \lambda\sin^{2}(\phi) = -\frac{1}{w} \pd_{\theta}^{2} w
+	\end{align*}
+	
+	By our spherical definition, $u$ must be $2\pi$-periodic in $\theta$. Therefore, the $\theta$-equation $-\pd_{\theta}^{2}w = kw$ has a full set of solutions $w(\theta) = e^{i m \theta}$ for $k = m^{2}$, $m \in \Z$ as we have derived before. 
+	
+	For $v$, we have 
+	\begin{align*}
+		\frac{\sin(\phi)}{v} \pd_{\theta} (\sin(\phi) \pd_{\phi} v_{m}) + \lambda\sin^{2}(\phi)  = k \\
+		\frac{1}{\sin(\phi)} \pd_{\theta} (\sin(\phi) \pd_{\phi} v_{m}) = (\lambda - \frac{k}{\sin^{2}(\phi)})v_{m}
+	\end{align*}
+	To simplify, we use the change-of-variables $z = \cos(\phi)$ and $v_{m}(\phi) = f(\cos(\phi))$. Notice then that $\frac{\pd}{\pd z} = \frac{\pd \phi}{\pd z} \frac{\pd}{\pd \phi} = -\frac{1}{\sin(\phi)} \pd_{\phi}$ so that we obtain
+	\begin{align*}
+		\frac{-1}{\sin(\phi)}  \pd_{\phi} ( \sin^{2}(\phi) \frac{-1}{\sin(\phi)}\pd_{\phi} v_{m}) + (\lambda - \frac{k}{\sin^{2}(\phi)})v_{m}=0 \\
+		\Leftrightarrow \\
+		\pd_{z}((1-z^{2})\pd_{z} f) + \left(\lambda - \frac{m^{2}}{1-z^{2}}\right)f = 0
+		\Leftrightarrow \\
+		(1-z^{2})f''(z) - 2zf'(z) + \left(\lambda - \frac{m^{2}}{1-z^{2}}\right)f=0
+	\end{align*}
+	
+	Again, we have reduced to an ODE called the \textit{associated Legendre equation}
+	\begin{align*}
+		(1-z^{2})f''(z) - 2zf'(z) + \left(l(l+1) - \frac{m^{2}}{1-z^{2}}\right)f=0
+	\end{align*}
+	
+	via separation of variables. Historically, a related ODE called just the Legendre equation was developed in connection to some important functions called the \textit{Legendre Polynomials}. Differentiating the Legendre equation $m$ times gives the equation we just stumbled upon. 
+	
+	This extra knowledge is useful because, while we can apply Frobenius' method to this ODE, we get a really nasty solution 
+	\begin{align*}
+		P_{l}^{m}(z) = (-1)^{m}2^{l}(1-x^2)^{m/2} \sum_{k=m}^{l} \frac{k!}{(k-m)!} x^{k-m} \binom{l}{k}\binom{\frac{l+k-1}{2}}{l}
+	\end{align*}
+	(the factor of $(x^{2}-1)^{m/2}$ helps transform the equation into something more workable, the rest is from the series solution)
+	whereas, using the knowledge of the Legendre equation, this simplifies enormously (via the Rodrigues formula) to 
+	\begin{align*}
+		P_{l}^{m}(x) = \frac{(-1)^{m}}{2^{l}l!}(1-x^2)^{m/2} \frac{d^{l+m}}{dx^{l+m}}(x^{2}-1)
+	\end{align*}
+	The normalization constants in both formulas arise for other reasons, and we don't care much about the constant multiples. Since these are second-order equations, there is also a related linearly-independent solution $Q^{m}_{l}(z)$ that is more complicated. 
+	
+	If we use these solutions in pair with the $\theta$ effect from before, we are looking at solutions 
+	\begin{align*}
+		Y^{m}_{l}(\phi,\theta) = c_{l,m} e^{im\theta} P_{l}^{m}(\cos(\phi))
+	\end{align*}
+	for constants $c_{l,m}$, which are called \textit{spherical harmonics}. These are actually smooth functions, since they wind up being just polynomials. 
+	
+	Thus, when $\lambda = l(l+1)$ for an integer $l$, we know the solutions! It turns out that, if $\lambda$ is not of this form, the solutions to the associated Legendre equation $P_{l}^{m}$ and $Q_{l}^{m}$ have singularities at $z=1,-1$ respectively. These correspond to the boundary values $\phi = 0,\pi$, and so we can only have $C^{2}$ solutions when $\lambda = l(l+1)$ for $l \in \Z$. We have proven the following. 
+	
+	\begin{res}
+		Suppose $u \in C^{2}(S^{2})$ is a solution of the equation 
+		\begin{align*}
+			-\Delta_{\S^{2}}u = \lambda u
+		\end{align*}
+		that factors as $u(\phi,\theta) = v(\phi)w(\theta)$. Then, up to multiplicative constant, $u$ is equal to a \textit{spherical harmonic} $Y^{m}_{l}$ for $l \in \Z_{\geq 0}$ and $m \in \{-l,...,l\}$. The corresponding eigenvalues depend only on $l$
+		\begin{align*}
+			\lambda_{l} = l(l+1)
+		\end{align*}
+		and each has multiplicity $2l+1$
+	\end{res}
+	
+	\textbf{Remark:} Then, full solutions of the 3D Laplacian will be of the form $h(r)Y^{m}_{l}$ for $h(r)$ satisfying 
+	\begin{align*}
+		h'' + \frac{2}{r} h' + \lambda h=0
+	\end{align*}
+	
+	Variation of parameters or the method of Frobenius may be used to solve. In the latter case, we wind up with a series $\sum a_{n}r^{n}$ for which 
+	\begin{align*}
+		a_{n} = \begin{cases}
+			\frac{(-\lambda)^{n}}{(n+1)!}a_{0} & n \text{ even}\\
+			\frac{2(-\lambda)^{n}}{(n+1)!}a_{1} & n \text{ odd}
+		\end{cases}
+	\end{align*}
+	
+	\vspace{0.25 cm}
+	\textbf{Example: Eigenvalues of the Helmholtz equation for the Hydrogen Atom} Schr{\"o}dinger's quantum model for the hydrogen atom poses that electron energy levels are precisely the eigenvalues 
+	\begin{align*}
+		(-\Delta  - \frac{1}{r}) \psi = \lambda \psi
+	\end{align*}
+	for $\psi: \R^{r} \to \R$. For physical reasons, we assume the eigenfunctions are bounded and decay to $0$ as $r \to \infty$. Using separation of variables, a full solution has the form 
+	\begin{align*}
+		\psi(r,\phi,\theta) = h(r) Y^{m}_{l}(\phi,\theta)
+	\end{align*}
+	where $h$ satisfies
+	\begin{align*}
+		\left[-\frac{1}{r^{2}} \pd_{r} (r^{2} \pd_{r}) + \frac{l(l+1)}{r^{2}} - \frac{1}{r} \right]h(r) = \lambda h(r)
+	\end{align*}
+	
+	This looks like a difficult ODE, so we try to learn about possible solutions by analyzing behaviour at $0$ and $\infty$. First, consider $\infty$. Let us make the additional assumption that the derivatives of $h$ are bounded. Then, we can ignore the terms with a $\frac{1}{r}$, because as $r$ gets very large, these will be negligible. This leaves behind
+	\begin{align*}
+		h''(r) = \lambda h
+	\end{align*}
+	so that we expect i.) that $\lambda < 0$ for decay to be possible and ii.) the asymptotic behavior $h(r) \sim c e^{-r\sqrt{-\lambda}}$. Then, we make an educated guess for the form of the function to be $h(r) = \tilde{q}(r)e^{-r\sqrt{-\lambda}}$. 
+	
+	Next, we notice that, near $0$, the exponential factor is basically constant. Since $0$ is also a regular singular point of the ODE, we expect to apply the method of Frobenius and guess $h(r) = e^{-r\sqrt{-\lambda}} r^{\alpha} \sum_{n=0}^{\infty} a_n r^{n}$. 
+		
+	Applying this guess, we have the indical equation (looking at the lowest power of $r$ to appear)
+	\begin{align*}
+		0=-a_0 \alpha(\alpha - 1)e^{-r\sqrt{-\lambda}}r^{\alpha - 2} - 2a_{0} \alpha r^{\alpha-2}e^{-r\sqrt{-\alpha}} + l(l+1)e^{-r\sqrt{-\lambda}}r^{\alpha-2}a_0  \\
+		\Leftrightarrow \\
+		-a_0(\alpha(\alpha +1)) + a_0 l(l+1)=0
+	\end{align*}
+	
+	which implies either $\alpha = l$ or $\alpha = -l-1$. Since we want $h$ to be bounded near $0$, we must have $\alpha \geq 0$, so we take $\alpha = l$. Before we take the general relationship, let's make a simpler ODE for $q$. For $h = qr^{l}e^{-r\sqrt{-\lambda}}$ to satisfy the above equation, $q$ must satisfy 
+	\begin{align*}
+		rq'' + 2(1+l-r\sqrt{-\lambda})q' + (1-2\sqrt{-\lambda}(l+1))q=0
+	\end{align*}
+	
+	and so using the series form
+	\begin{align*}
+		0 = \sum_{n=0}^{\infty} n(n-1)a_{n}r^{n-1} +2(1+l-r\sqrt{-\lambda}) na_{n}r^{n-1} + (1-2\sqrt{-\lambda}(l+1)) a_{n}r^{n}\\
+		0 = \sum_{n=0}^{\infty} r^{n}\left( [n(n+1)a_{n+1} +2(1+l)(n+1)a_{n+1}] + [2(-\sqrt{-\lambda})n +(1-2\sqrt{-\lambda}(l+1))]\right) 
+	\end{align*}
+	
+	yielding relation
+	\begin{align*}
+		a_{n+1} = \frac{2\sqrt{-\lambda}(n+l+1)-1}{(n+1)(n+2l+2)} a_{n}
+	\end{align*}
+	
+	For ``most'' $\lambda$, the numerator will never vanish and, for large enough $n$, the effect of $l$ will dissipate so we will have 
+	\begin{align*}
+		a_{n+1} \approx \frac{(2\sqrt{-\lambda})}{n+1}a_{n}
+	\end{align*}
+	
+	which is the relationship between the terms of the power series of $e^{2\sqrt{-\lambda} r}$. In other words, we will see exponential growth greater than the decay we imposed. Given our assumptions, the only time this doesn't happen is when $\lambda = -\frac{1}{4n^{2}}$, so the numerator comes up as $0$ at some point. This tells us the eigenvalues, and it actually turns out to be a complete set of eigenvalues. These are the emission lines of the hydrogen atom!
+	
+\end{document}

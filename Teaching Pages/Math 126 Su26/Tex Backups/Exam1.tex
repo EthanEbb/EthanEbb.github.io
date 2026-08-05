@@ -1,0 +1,204 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+
+
+%Math
+\usepackage{multirow, longtable, amsmath, amssymb, amsthm}
+\usepackage{indentfirst, graphicx, tabularx, fancyhdr, xcolor, todonotes}
+\usepackage[mathscr]{euscript}
+
+%Formatting
+\usepackage[margin = 1 in]{geometry}
+\usepackage{hyperref, cite}
+
+%Commands
+\newcommand{\Q}{{\mathbb{Q}}}
+\newcommand{\F}{{\mathbb{F}}}
+\newcommand{\Z}{{\mathbb{Z}}}
+\newcommand{\N}{{\mathbb{N}}}
+\newcommand{\R}{{\mathbb{R}}}
+\newcommand{\C}{{\mathbb{C}}}
+\newcommand{ \norm }[1]{{ || {#1}||}}
+\newcommand{\abs}[1]{{|{#1}|}}
+\newcommand{\cl}[1]{{\overline{#1}}}
+\newcommand{\pd}{\partial}
+\newcommand{\ip}[2]{ \langle {#1},{#2}\rangle }
+\newcommand{\ls}{\lesssim}
+\newcommand{\gs}{\gtrsim}
+
+%Result Environment
+\newcounter{result}[section]
+\newenvironment{myresult}[1][]{\refstepcounter{result}\par\medskip
+	\noindent \textbf{[\thesection.\theresult] #1} \rmfamily}{\medskip}
+
+%Proof Environment
+\newenvironment{myproof}{%
+	\par%
+	\medskip
+	\leftskip=2em\rightskip=2em%
+	\noindent\ignorespaces \textit{Proof:} \newline}{%
+	\,\, \newline \textit{Q.E.D.}\par\medskip}
+
+
+
+
+\begin{document}
+
+
+\title{Math 126 Midterm 1}
+\author{UCB Summer 2026}
+\date{July 9, 2026}
+\maketitle
+
+Remember that the exam is closed book. You will have 50 minutes to complete the Exam. You may use the front and back of each page. Please write your full name and SID below. Good luck!
+
+
+\textbf{Name:} 
+
+\vspace{0.5 cm}
+
+\textbf{SID:}
+
+\vspace{1 cm}
+
+\textbf{Formulas:}
+Characteristic ODEs: 
+\begin{align*}
+	x'(s) = D_p F \\
+	z'(s) = D_p F \cdot p \\
+	p'(s) = -D_{x} F - D_{z}(F) p
+\end{align*}
+
+Divergence: $$\int_{\Omega} \nabla \cdot F dx = \int_{\pd \Omega} F \cdot \eta dS$$
+
+Greens': $$\int_{\Omega} \nabla u \cdot \nabla v + v \Delta u dx = \int_{\pd \Omega} v \pd_{\eta}u dS$$
+
+D'Alembert: $$u(t,x) = \frac{1}{2} \left[g(x+ct) + g(x-ct) \right] + \frac{1}{2c} \int_{x-ct}^{x+ct} h(\tau) d\tau $$
+
+$$\mathcal{D}_{t,x} = \{ (s,y) \in \R_{+} \times \R \mid x-c(t-s) \leq y \leq x+c(t-s)\}$$
+
+Inhomogeneous Wave: $$u(t,x) = \frac{1}{2c} \int_{\mathcal{D}_{t,x}} f(s,y) dsdy$$
+
+Poisson: $$u(t,x) = \frac{\pd}{\pd t} \left( \frac{t}{2\pi} \int_{D} \frac{g(t-xy)}{\sqrt{1 - |y|^{2}}} dy\right) + \frac{t}{2\pi} \int_{D} \frac{h(t-xy)}{\sqrt{1-|y|^{2}}} dy$$
+
+Kirchoff: $$ u(t,x) = \frac{\pd}{\pd t} \left(\frac{1}{4 \pi t} \int_{\pd B(x,t)} g(y) dS(y) \right) + \frac{1}{4\pi t} \int_{\pd B(x,t)} h(y) dS(y)$$
+
+
+
+
+
+
+\newpage
+
+
+\textbf{Problem 1:} \\
+
+The following may be answered true or false. You do not need to explain your answer, but please write clearly and box your final answer. 
+
+
+
+\vspace{1 cm}
+A.) For all $u \in C^{\infty}(\R^{2})$, 
+\begin{align*}
+	\pd_{r} \int_{B(0,r)} u(x) dx = \int_{\pd B(0,r)} \Delta u(w) dS(w)
+\end{align*}
+
+
+\vspace{3 cm}
+B.) Let $\Omega \subset \R^{n}$ be a bounded domain with piecewise-$C^{1}$ boundary. A solution $u \in C^{2}([0,\infty) \times \cl{\Omega})$ to 
+\begin{align*}
+	\begin{cases} 
+		\pd_{t}^{2} u - c^{2} \Delta u = f & (0,\infty) \times \Omega \\
+		u(0,x) = g(x) & \Omega \\
+		\pd_{t} u (0,x) = h(x) & \Omega \\
+		u | _{\pd \Omega} = 0
+	\end{cases}
+\end{align*}
+is uniquely determined by $f,g,h \in C^{\infty}(\cl{\Omega})$. 
+
+\vspace{3 cm}
+C.) In two dimensions, a dropped pen would make a sharp, momentary sound followed by silence. 
+
+
+\newpage
+
+This page is for work
+\newpage
+
+
+
+\textbf{Problem 2:} \\
+
+Let $u(t,x) \in C^{2}([0,\infty) \times \R_{x})$ satisfy
+
+\begin{align*}
+	\begin{cases}
+		\pd_{t}u + x\pd_{x}u = 0 & (0,\infty) \times \R_{x} \\
+		u(0,x) = x^2
+	\end{cases}
+\end{align*}
+
+Find a formula for $u(t,x)$ when $t \geq 0$. 
+
+
+\newpage
+
+\vspace{0.5 cm}
+
+\newpage
+
+This page is for work
+\newpage
+
+
+
+\textbf{Problem 3:} \\
+
+Assume that $u \in C^{2}([0,\infty) \times \R_{x})$ solves 
+\begin{align*}
+	\pd_{t}^{2} u - \pd_{x}^2 u = 0
+\end{align*}
+
+and $v(t,x) \in C^{2}([0,\infty) \times \R_{x})$ solves 
+\begin{align*}
+	\pd_{t}^{2} v - \pd_{x}^{2} v = 2
+\end{align*}
+
+
+\textbf{Part A)} Let $ u(0,0) = 0$, $u(1,1) = 2$, and $u(1,-1) = 2$. What is $u(2,0)$?
+
+\vspace{5 cm}
+
+
+\textbf{Part B)} Let $(v,v_{t})|_{t=0} = (0,0)$. What is $v(2,0)$?
+
+
+\vspace{6 cm}
+
+\textbf{Part C)} Let $w(t,x)$ satisfy
+\begin{align*}
+	\begin{cases}
+		\pd_{t}^{2} u - \pd_{x}^2 u = 2 \\
+		(w,w_t)|_{t=0} = (u,u_t)|_{t=0}
+	\end{cases}
+\end{align*}
+
+What is $w(2,0)$?
+
+\newpage
+This page is for work
+\newpage
+
+\textbf{Problem 4:} \\
+
+Let $u(t,x) \in C^{2}([0,\infty) \times [0,l])$ satisfy 
+\begin{align*}
+	(\pd_{t}+2) u   - \pd_{x}^{2} u = 0 \\
+	u(t,0) = u(t,l) = 0
+\end{align*}
+
+If we apply the method of Separation of Variables, what possible solutions are there for $u$?
+
+
+
+\end{document}
